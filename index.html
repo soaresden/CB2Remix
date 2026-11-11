@@ -101,9 +101,19 @@ label.chk{display:flex;gap:6px;align-items:center}
 .bpanel{padding:12px}.bpanel h3{margin:6px 0 8px;font-size:12px;color:var(--ice);text-transform:uppercase;letter-spacing:.12em}
 .bpanel label{display:block;margin:6px 0}.rowb{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
 select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font:inherit}
-#bCanvas{image-rendering:pixelated;width:768px;max-width:100%;border:1px solid var(--line);cursor:crosshair;touch-action:none;display:block;margin:4px 0}
-#bCanvas.hov{outline:2px dashed var(--ice)}
-#bPrev{max-width:100%;background:#0e1d31;border-radius:10px}
+.faces{display:grid;gap:14px;padding:12px 10px}
+.face .fhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.face .fhead b{font-size:12px;color:var(--ice);letter-spacing:.12em}
+.face .fhead .mut{font-size:12px}
+.face .fhead label.btn{margin-left:auto}
+.fwrap{max-width:780px;border-radius:999px;overflow:hidden;border:2px solid var(--line2);background:#0e1d31}
+.fwrap canvas{display:block;width:100%;aspect-ratio:540/78;image-rendering:pixelated;touch-action:none;cursor:crosshair}
+.fwrap.hov{outline:2px dashed var(--ice);outline-offset:3px}
+.fwrap.placing{border-color:var(--acc)}
+.fwrap.placing canvas{cursor:move}
+#bPlace{border:1px solid var(--line2);border-radius:12px;padding:10px 12px;background:var(--panel2);max-width:780px}
+#bPlace p{margin:0 0 6px;font-size:13px}
+#bPlace input[type=range]{width:150px;vertical-align:middle}
 .modal{position:fixed;inset:0;background:rgba(4,10,20,.72);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
 .modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
 .modal h3{margin:0 0 10px;font:400 1.1rem var(--display)}
@@ -222,12 +232,28 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
           <button class="bt on" data-tool="brush" data-i18n="tBrush">✎ Pinceau</button><button class="bt" data-tool="fill" data-i18n="tFill">▧ Remplir</button><button class="bt" data-tool="pick" data-i18n="tPick">⦿ Pipette</button>
           <input type="color" id="bColor" value="#2e86de"><label class="mut"><span data-i18n="size"></span> <input type="range" id="bSize" min="1" max="10" value="2" style="width:70px"></label>
           <button id="bUndo" data-i18n="undo">Annuler</button><button id="bClear" data-i18n="bClear">Tout remplir</button>
-          <label class="btn pri"><span data-i18n="bImpAll"></span><input id="bImpAll" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></label>
           <select id="bEx"><option value="" data-i18n="examples"></option><option value="xmas" data-i18n="exXmas"></option><option value="flames" data-i18n="exFlames"></option><option value="peak" data-i18n="exPeak"></option></select>
           <button id="bExport" data-i18n="bExport">Exporter PNG</button>
         </div>
-        <div style="padding:10px;overflow:auto"><div class="mut" style="font-size:12px" data-i18n="bTopLbl"></div><canvas id="bCanvas" width="128" height="64"></canvas><div class="mut" style="font-size:12px" data-i18n="bHalfLbl"></div><p class="mut" style="font-size:12px;margin:6px 0 0" data-i18n="bDrop"></p></div>
-        <div style="padding:0 10px 10px"><div class="mut" style="font-size:12px;margin-bottom:4px" data-i18n="preview"></div><canvas id="bPrev" width="560" height="200"></canvas></div>
+        <div class="faces">
+          <div class="face" data-face="0">
+            <div class="fhead"><b data-i18n="top"></b><span class="mut" data-i18n="bNose"></span><label class="btn sm"><span data-i18n="bImp"></span><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></label></div>
+            <div class="fwrap"><canvas width="128" height="32"></canvas></div>
+          </div>
+          <div class="face" data-face="1">
+            <div class="fhead"><b data-i18n="bottom"></b><span class="mut" data-i18n="bNose"></span><label class="btn sm"><span data-i18n="bImp"></span><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></label></div>
+            <div class="fwrap"><canvas width="128" height="32"></canvas></div>
+          </div>
+          <div id="bPlace" hidden>
+            <p class="mut" data-i18n="bPlaceHelp"></p>
+            <div class="rowb">
+              <label class="mut"><span data-i18n="bZoom"></span> <input type="range" id="bZoom" min="-300" max="300" value="0"></label>
+              <label class="mut"><span data-i18n="bRot"></span> <input type="range" id="bRot" min="-180" max="180" value="0"></label>
+            </div>
+            <div class="rowb"><button id="bCover" data-i18n="bCover"></button><button id="bContain" data-i18n="bContain"></button><button id="bFlip" data-i18n="bFlip"></button><button id="bPlaceCancel" data-i18n="cancel"></button><button id="bPlaceOk" class="pri" data-i18n="bOk"></button></div>
+          </div>
+          <p class="mut" style="font-size:12px;margin:0" data-i18n="bDrop"></p>
+        </div>
       </div>
     </div>
   </section>

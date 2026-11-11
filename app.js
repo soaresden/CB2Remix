@@ -366,22 +366,26 @@
 
   // ---------- board designer
   const BD = (() => {
-    const W = Board.W, H = Board.H, cv = $('#bCanvas'), cx = cv.getContext('2d'), prev = $('#bPrev'), px = prev.getContext('2d');
+    // the card's board image is 128x64: rows 0-31 = top face, rows 32-63 = bottom face (nose on the left).
+    // Each face has its own canvas, stretched to the board's proportions (PX = width of a texel in display units).
+    const W = Board.W, H = Board.H, FH = 32, PX = (540 / 78) / (W / FH), FW = W * PX;
+    const faces = [...document.querySelectorAll('#boards .face')].map((el) => { const cv = el.querySelector('canvas'); return { el, wrap: el.querySelector('.fwrap'), cv, cx: cv.getContext('2d'), k: +el.dataset.face }; });
     let img = new Uint8ClampedArray(W * H * 4), card = null, cardName = 'carte.srm', tool = 'brush', hist = [], header = null, ready = false;
+    let P = null; // image being placed: {face, im, ux, uy, s0, z, a, flip}  (ux, uy, scale in display units)
     const fillAll = (c) => { for (let i = 0; i < W * H; i++) img.set([...c, 255], i * 4); };
     fillAll([245, 245, 245]);
-    function draw() {
-      cx.putImageData(new ImageData(img, W, H), 0, 0);
-      // preview: both faces as boards (rounded nose / tail)
-      const tc = document.createElement('canvas'); tc.width = W; tc.height = H; tc.getContext('2d').putImageData(new ImageData(img, W, H), 0, 0);
-      px.clearRect(0, 0, prev.width, prev.height); px.imageSmoothingEnabled = false;
-      for (const [k, y] of [[0, 14], [1, 108]]) {
-        px.save(); const x0 = 10, w = 540, h = 78, r = 38;
-        px.beginPath(); px.moveTo(x0 + r, y); px.lineTo(x0 + w - r, y); px.arc(x0 + w - r, y + h / 2, h / 2, -Math.PI / 2, Math.PI / 2); px.lineTo(x0 + r, y + h); px.arc(x0 + r, y + h / 2, h / 2, Math.PI / 2, Math.PI * 1.5); px.closePath(); px.clip();
-        px.drawImage(tc, 0, k * 32, W, 32, x0, y, w, h); px.restore();
-        px.strokeStyle = '#0008'; px.lineWidth = 2; px.stroke();
-        px.fillStyle = '#8ea0b8'; px.font = '12px system-ui'; px.fillText(k ? t('bottom') : t('top'), 14, y - 3);
+    function composite(f) { // the face as it will be written: its pixels, plus the image being placed
+      const c = document.createElement('canvas'); c.width = W; c.height = FH; const x = c.getContext('2d');
+      x.putImageData(new ImageData(img.slice(f.k * FH * W * 4, (f.k + 1) * FH * W * 4), W, FH), 0, 0);
+      if (P && P.face === f.k) {
+        const s = P.s0 * 2 ** P.z; x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high';
+        x.save(); x.scale(1 / PX, 1); x.translate(P.ux, P.uy); x.rotate(P.a); x.scale(P.flip ? -s : s, s);
+        x.drawImage(P.im, -P.im.width / 2, -P.im.height / 2); x.restore();
       }
+      return c;
+    }
+    function draw() {
+      for (const f of faces) { f.cx.clearRect(0, 0, W, FH); f.cx.drawImage(composite(f), 0, 0); f.wrap.classList.toggle('placing', !!P && P.face === f.k); }
     }
     function init() {
       if (ready) return; ready = true;
@@ -398,44 +402,70 @@
     $('#mcFile').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; const c = new Uint8Array(await f.arrayBuffer()); if (!Board.cardOK(c)) return S.dialog('Cool Boarders 2 Remix', t('notCard'), [[t('ok'), true, true]]); setCard(c, f.name); };
     $('#mcNew').onclick = () => setCard(Board.newCard(), 'carte.srm');
     document.querySelectorAll('#btools .bt').forEach((b) => (b.onclick = () => { document.querySelectorAll('#btools .bt').forEach((x) => x.classList.remove('on')); b.classList.add('on'); tool = b.dataset.tool; }));
-    const pos = (e) => { const r = cv.getBoundingClientRect(); return [Math.floor((e.clientX - r.left) / r.width * W), Math.floor((e.clientY - r.top) / r.height * H)]; };
     const col = () => hex2($('#bColor').value);
-    let down = false, last = null;
-    function dot(x, y) { const s = +$('#bSize').value, h = Math.floor((s - 1) / 2), c = col(); for (let yy = y - h; yy < y - h + s; yy++) for (let xx = x - h; xx < x - h + s; xx++) if (xx >= 0 && yy >= 0 && xx < W && yy < H) img.set([...c, 255], (yy * W + xx) * 4); }
-    function line(x, y) { if (last) { const n = Math.max(Math.abs(x - last[0]), Math.abs(y - last[1])); for (let k = 1; k <= n; k++) dot(Math.round(last[0] + (x - last[0]) * k / n), Math.round(last[1] + (y - last[1]) * k / n)); } else dot(x, y); last = [x, y]; }
-    function fill(x, y) { const c = col(), i0 = y * W + x, k = (i) => img[i * 4] * 65536 + img[i * 4 + 1] * 256 + img[i * 4 + 2], k0 = k(i0), seen = new Uint8Array(W * H), st = [i0], face = y < 32 ? 0 : 1;
-      while (st.length) { const i = st.pop(); if (seen[i]) continue; seen[i] = 1; if (k(i) !== k0) continue; img.set([...c, 255], i * 4); const X = i % W, Y = (i / W) | 0;
-        if (X > 0) st.push(i - 1); if (X < W - 1) st.push(i + 1); if (Y > 0 && ((Y - 1) >> 5) === face) st.push(i - W); if (Y < H - 1 && ((Y + 1) >> 5) === face) st.push(i + W); } }
-    cv.onpointerdown = (e) => { const [x, y] = pos(e); if (tool === 'pick') { const i = (y * W + x) * 4; $('#bColor').value = '#' + [img[i], img[i + 1], img[i + 2]].map((v) => v.toString(16).padStart(2, '0')).join(''); return; }
-      hist.push(img.slice()); if (hist.length > 40) hist.shift(); if (tool === 'fill') { fill(x, y); draw(); return; } down = true; last = null; cv.setPointerCapture(e.pointerId); line(x, y); draw(); };
-    cv.onpointermove = (e) => { if (down) { const [x, y] = pos(e); line(x, y); draw(); } };
-    cv.onpointerup = () => { down = false; last = null; };
-    $('#bUndo').onclick = () => { if (hist.length) { img = hist.pop(); draw(); } };
-    $('#bClear').onclick = () => { hist.push(img.slice()); fillAll(col()); draw(); };
-    // image import (JPG / PNG / WebP): whole board, top or bottom; button or drag-and-drop
-    function place(im, face, fit) { // face: 'all' | 0 | 1
-      const h = face === 'all' ? H : 32, c = document.createElement('canvas'); c.width = W; c.height = h; const x = c.getContext('2d');
-      x.fillStyle = '#fff'; x.fillRect(0, 0, W, h); x.imageSmoothingQuality = 'high';
-      const s = (fit === 'contain' ? Math.min : Math.max)(W / im.width, h / im.height);
-      x.drawImage(im, (W - im.width * s) / 2, (h - im.height * s) / 2, im.width * s, im.height * s);
-      hist.push(img.slice()); img.set(x.getImageData(0, 0, W, h).data, (face === 'all' ? 0 : face * 32) * W * 4); draw();
+    // ---- painting (brush / fill / picker), on either face
+    function dot(x, y, f) { const s = +$('#bSize').value, h = Math.floor((s - 1) / 2), c = col(); for (let yy = y - h; yy < y - h + s; yy++) for (let xx = x - h; xx < x - h + s; xx++) if (xx >= 0 && yy >= 0 && xx < W && yy < FH) img.set([...c, 255], ((yy + f.k * FH) * W + xx) * 4); }
+    let last = null;
+    function line(x, y, f) { if (last) { const n = Math.max(Math.abs(x - last[0]), Math.abs(y - last[1])); for (let k = 1; k <= n; k++) dot(Math.round(last[0] + (x - last[0]) * k / n), Math.round(last[1] + (y - last[1]) * k / n), f); } else dot(x, y, f); last = [x, y]; }
+    function fill(x, y, f) { const c = col(), o = f.k * FH * W, k = (i) => img[i * 4] * 65536 + img[i * 4 + 1] * 256 + img[i * 4 + 2], k0 = k(o + y * W + x), seen = new Uint8Array(W * FH), st = [y * W + x];
+      while (st.length) { const i = st.pop(); if (seen[i]) continue; seen[i] = 1; if (k(o + i) !== k0) continue; img.set([...c, 255], (o + i) * 4); const X = i % W, Y = (i / W) | 0;
+        if (X > 0) st.push(i - 1); if (X < W - 1) st.push(i + 1); if (Y > 0) st.push(i - W); if (Y < FH - 1) st.push(i + W); } }
+    // ---- placing an imported image: drag = move, wheel or two fingers = zoom / rotate
+    const ptrs = new Map(); let gest = null, painting = null;
+    const texel = (e, f) => { const r = f.cv.getBoundingClientRect(); return [Math.max(0, Math.min(W - 1, Math.floor((e.clientX - r.left) / r.width * W))), Math.max(0, Math.min(FH - 1, Math.floor((e.clientY - r.top) / r.height * FH)))]; };
+    const unit = (f) => { const r = f.cv.getBoundingClientRect(); return [FW / r.width, FH / r.height]; };
+    function syncSliders() { $('#bZoom').value = Math.round(P.z * 100); $('#bRot').value = Math.round(P.a * 180 / Math.PI); }
+    function startGesture() { const p = [...ptrs.values()]; gest = p.length === 2 ? { d: Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y), ang: Math.atan2(p[1].y - p[0].y, p[1].x - p[0].x), z: P.z, a: P.a } : null; }
+    for (const f of faces) {
+      f.cv.onpointerdown = (e) => {
+        if (P) { if (P.face !== f.k) return; f.cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY }); startGesture(); return; }
+        const [x, y] = texel(e, f);
+        if (tool === 'pick') { const i = ((y + f.k * FH) * W + x) * 4; $('#bColor').value = '#' + [img[i], img[i + 1], img[i + 2]].map((v) => v.toString(16).padStart(2, '0')).join(''); return; }
+        hist.push(img.slice()); if (hist.length > 40) hist.shift();
+        if (tool === 'fill') { fill(x, y, f); draw(); return; }
+        painting = f; last = null; f.cv.setPointerCapture(e.pointerId); line(x, y, f); draw();
+      };
+      f.cv.onpointermove = (e) => {
+        if (painting === f) { const [x, y] = texel(e, f); line(x, y, f); draw(); return; }
+        if (!P || P.face !== f.k || !ptrs.has(e.pointerId)) return;
+        const prev = ptrs.get(e.pointerId); ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (ptrs.size === 1) { const [ux, uy] = unit(f); P.ux += (e.clientX - prev.x) * ux; P.uy += (e.clientY - prev.y) * uy; }
+        else if (gest) { const p = [...ptrs.values()]; const d = Math.hypot(p[1].x - p[0].x, p[1].y - p[0].y), ang = Math.atan2(p[1].y - p[0].y, p[1].x - p[0].x);
+          P.z = Math.max(-3, Math.min(3, gest.z + Math.log2(d / gest.d))); P.a = gest.a + ang - gest.ang; syncSliders(); }
+        draw();
+      };
+      f.cv.onpointerup = f.cv.onpointercancel = (e) => { painting = null; last = null; ptrs.delete(e.pointerId); if (P) startGesture(); };
+      f.cv.onwheel = (e) => { if (!P || P.face !== f.k) return; e.preventDefault();
+        if (e.shiftKey) P.a += (e.deltaY > 0 ? 5 : -5) * Math.PI / 180; else P.z = Math.max(-3, Math.min(3, P.z + (e.deltaY > 0 ? -0.08 : 0.08)));
+        syncSliders(); draw(); };
+      const input = f.el.querySelector('input[type=file]');
+      input.onchange = (e) => { const file = e.target.files[0]; e.target.value = ''; importImage(file, f.k); };
+      f.wrap.ondragover = (e) => { e.preventDefault(); f.wrap.classList.add('hov'); };
+      f.wrap.ondragleave = () => f.wrap.classList.remove('hov');
+      f.wrap.ondrop = (e) => { e.preventDefault(); f.wrap.classList.remove('hov'); importImage(e.dataTransfer.files[0], f.k); };
     }
-    async function importImage(f, guess) {
-      if (!f || !/^image\//.test(f.type)) return;
-      const im = await loadImg(URL.createObjectURL(f));
-      const box = document.createElement('div'); box.innerHTML = '<label class="chk"><input type="radio" name="fit" value="cover" checked> <span></span></label><label class="chk"><input type="radio" name="fit" value="contain"> <span></span></label>';
-      box.querySelectorAll('span')[0].textContent = t('impFit'); box.querySelectorAll('span')[1].textContent = t('impContain');
-      const fit = () => box.querySelector('input:checked').value;
-      const opts = [[t('cancel'), null], [t('impBot'), () => [1, fit()], guess === 1], [t('impTop'), () => [0, fit()], guess === 0], [t('impAll'), () => ['all', fit()], guess === undefined]];
-      const r = await S.dialog(t('impWhere'), box, opts); if (r) place(im, r[0], r[1]);
+    function fit(cover) { const m = cover ? Math.max : Math.min; P.s0 = m(FW / P.im.width, FH / P.im.height); P.z = 0; P.a = 0; P.ux = FW / 2; P.uy = FH / 2; syncSliders(); draw(); }
+    async function importImage(file, k) {
+      if (!file || !/^image\//.test(file.type)) return;
+      const im = await loadImg(URL.createObjectURL(file));
+      P = { face: k, im, ux: FW / 2, uy: FH / 2, s0: 1, z: 0, a: 0, flip: false }; fit(true);
+      $('#bPlace').hidden = false; faces[k].el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-    $('#bImpAll').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; importImage(f); };
-    for (const el of [cv, prev]) {
-      el.ondragover = (e) => { e.preventDefault(); cv.classList.add('hov'); };
-      el.ondragleave = () => cv.classList.remove('hov');
-      el.ondrop = (e) => { e.preventDefault(); cv.classList.remove('hov'); const f = e.dataTransfer.files[0]; const r = el.getBoundingClientRect();
-        importImage(f, el === cv ? (e.clientY - r.top < r.height / 2 ? 0 : 1) : (e.clientY - r.top < r.height / 2 ? 0 : 1)); };
+    function endPlace(keep) {
+      if (!P) return;
+      if (keep) { hist.push(img.slice()); if (hist.length > 40) hist.shift(); img.set(composite(faces[P.face]).getContext('2d').getImageData(0, 0, W, FH).data, P.face * FH * W * 4); }
+      P = null; ptrs.clear(); gest = null; $('#bPlace').hidden = true; draw();
     }
+    $('#bZoom').oninput = (e) => { if (P) { P.z = e.target.value / 100; draw(); } };
+    $('#bRot').oninput = (e) => { if (P) { P.a = e.target.value * Math.PI / 180; draw(); } };
+    $('#bCover').onclick = () => P && fit(true);
+    $('#bContain').onclick = () => P && fit(false);
+    $('#bFlip').onclick = () => { if (P) { P.flip = !P.flip; draw(); } };
+    $('#bPlaceOk').onclick = () => endPlace(true);
+    $('#bPlaceCancel').onclick = () => endPlace(false);
+    document.addEventListener('keydown', (e) => { if (!P) return; if (e.key === 'Enter') endPlace(true); else if (e.key === 'Escape') endPlace(false); });
+    $('#bUndo').onclick = () => { if (P) return endPlace(false); if (hist.length) { img = hist.pop(); draw(); } };
+    $('#bClear').onclick = () => { endPlace(false); hist.push(img.slice()); fillAll(col()); draw(); };
     // ready-made examples, drawn on the spot (top = rows 0-31, bottom = rows 32-63, nose on the left)
     const EX = {
       xmas(x) {
@@ -461,9 +491,10 @@
         x.fillStyle = '#ff7a1a'; x.fillRect(0, 32, W, 32); x.fillStyle = '#0a1626'; x.font = 'bold 15px system-ui,sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('CB2 REMIX', 64, 48);
       },
     };
-    $('#bEx').onchange = (e) => { const k = e.target.value; e.target.value = ''; if (!EX[k]) return; const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); EX[k](x); hist.push(img.slice()); img = new Uint8ClampedArray(x.getImageData(0, 0, W, H).data); draw(); };
+    $('#bEx').onchange = (e) => { const k = e.target.value; e.target.value = ''; if (!EX[k]) return; endPlace(false); const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'); EX[k](x); hist.push(img.slice()); img = new Uint8ClampedArray(x.getImageData(0, 0, W, H).data); draw(); };
     $('#bExport').onclick = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').putImageData(new ImageData(img, W, H), 0, 0); c.toBlob((b) => dl(b, 'planche.png')); };
     $('#bSave').onclick = () => {
+      endPlace(true);
       try { const f = Board.encode(img, +$('#bStyle').value, +$('#bType').value, header); const c = Board.writeFile(card, Board.NAME, f); setCard(c, cardName);
         dl(new Blob([c]), cardName); $('#mcInfo').textContent = t('boardWritten', cardName); }
       catch (e) { S.dialog('Cool Boarders 2 Remix', e.message, [[t('ok'), true, true]]); }

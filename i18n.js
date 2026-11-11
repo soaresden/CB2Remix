@@ -39,7 +39,9 @@
       withRemix: 'Installer aussi le patch Remix (ce jeu est d’origine)',
       footer: 'Projet de fan, non affilié à Sony ni à UEP Systems. Aucun fichier du jeu n’est distribué : tu dois posséder ton propre exemplaire. Code sous licence MIT.',
       ok: 'OK', cancel: 'Annuler', galleryTitle: 'Galerie de skins', skinTitle: 'Enregistrer le skin', nameLbl: 'Nom du skin', authorLbl: 'Auteur', save: 'Enregistrer', resetTitle: 'Tout effacer',
-      replacesLbl: 'remplace', bImpAll: 'Importer une image (JPG/PNG)', bDrop: 'Tu peux aussi glisser une image JPG ou PNG sur la planche : en haut = dessus, en bas = dessous.',
+      replacesLbl: 'remplace', bImpAll: 'Importer une image (JPG/PNG)', bDrop: 'Tu peux aussi glisser une image JPG ou PNG directement sur le dessus ou sur le dessous.',
+      bNose: 'spatule à gauche', bImp: 'Importer une image', bPlaceHelp: 'Place l’image : glisse-la pour la déplacer, molette (ou deux doigts) pour zoomer, Maj + molette pour tourner. Puis Valider.',
+      bZoom: 'Zoom', bRot: 'Rotation', bCover: 'Remplir la face', bContain: 'Image entière', bFlip: 'Miroir', bOk: 'Valider',
       impWhere: 'Où placer cette image ?', impAll: 'Planche entière (dessus + dessous)', impTop: 'Seulement le dessus', impBot: 'Seulement le dessous', impFit: 'Remplir (recadrer)', impContain: 'Image entière (bandes)',
       examples: 'Exemples', exXmas: 'Planche de Noël', exFlames: 'Flammes', exPeak: 'Montagne',
       feat: [
@@ -88,7 +90,9 @@
       withRemix: 'Also install the Remix patch (this game is the original)',
       footer: 'Fan project, not affiliated with Sony or UEP Systems. No game files are distributed: you need your own copy. Code under the MIT licence.',
       ok: 'OK', cancel: 'Cancel', galleryTitle: 'Skin gallery', skinTitle: 'Save the skin', nameLbl: 'Skin name', authorLbl: 'Author', save: 'Save', resetTitle: 'Clear all',
-      replacesLbl: 'replaces', bImpAll: 'Import an image (JPG/PNG)', bDrop: 'You can also drop a JPG or PNG onto the board: upper half = top, lower half = bottom.',
+      replacesLbl: 'replaces', bImpAll: 'Import an image (JPG/PNG)', bDrop: 'You can also drop a JPG or PNG straight onto the top or the bottom.',
+      bNose: 'nose on the left', bImp: 'Import an image', bPlaceHelp: 'Place the image: drag it to move it, wheel (or two fingers) to zoom, Shift + wheel to rotate. Then Apply.',
+      bZoom: 'Zoom', bRot: 'Rotation', bCover: 'Fill the face', bContain: 'Whole image', bFlip: 'Mirror', bOk: 'Apply',
       impWhere: 'Where should this image go?', impAll: 'Whole board (top + bottom)', impTop: 'Top only', impBot: 'Bottom only', impFit: 'Fill (crop)', impContain: 'Whole image (bars)',
       examples: 'Examples', exXmas: 'Christmas board', exFlames: 'Flames', exPeak: 'Mountain',
       feat: [
