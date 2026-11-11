@@ -1,0 +1,34 @@
+[
+ {
+  "file": "matou-roux.cb2skin.json",
+  "name": "Matou roux",
+  "author": "Soaresden",
+  "rider": "yaggi",
+  "slot": "FRM1_11",
+  "replaces": "Yaggi — Veste 1 · Pantalon 1"
+ },
+ {
+  "file": "pere-noel.cb2skin.json",
+  "name": "Père Noël",
+  "author": "Soaresden",
+  "rider": "yaggi",
+  "slot": "FRM1_00",
+  "replaces": "Yaggi — Veste 2 · Pantalon 2"
+ },
+ {
+  "file": "pop-star.cb2skin.json",
+  "name": "Pop star",
+  "author": "Soaresden",
+  "rider": "irin",
+  "slot": "FRFM2_20",
+  "replaces": "Irin — Veste 1 · Pantalon 1"
+ },
+ {
+  "file": "cambrioleuse.cb2skin.json",
+  "name": "Cambrioleuse",
+  "author": "Soaresden",
+  "rider": "cindy",
+  "slot": "FRFM1_00",
+  "replaces": "Cindy — Veste 1 · Pantalon 1"
+ }
+]

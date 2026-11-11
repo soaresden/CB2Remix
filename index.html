@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a1626">
+<title>Cool Boarders 2 Remix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23ff7a1a' d='M1 13 6 4l3 5 2-3 4 7z'/%3E%3Cpath fill='%23fff' d='M6 4 4.6 6.5 6 6l1 1 .6-.9z'/%3E%3C/svg%3E">
+<style>
+/* Night on the mountain: deep sky, snow, CB2 orange. Single deliberate dark look. */
+:root{color-scheme:dark;
+  --sky:#0a1626;--sky2:#11284a;--bg:#0b1728;--panel:#132339;--panel2:#1a2e4a;--line:rgba(190,225,255,.14);--line2:rgba(190,225,255,.26);
+  --txt:#eef6ff;--mut:#9db3cc;--snow:#f4fbff;--ice:#8fd3ff;--acc:#ff7a1a;--acc2:#8fd3ff;--pine:#2f7a5a;--ok:#5fd38d;--bad:#ff6b6b;
+  --display:"Bungee",Impact,"Arial Black",sans-serif;--body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 var(--body)}
+body{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+a{color:var(--ice)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* hero */
+.hero{position:relative;overflow:hidden;background:radial-gradient(1000px 420px at 80% -10%,rgba(143,211,255,.20),transparent 60%),linear-gradient(180deg,#07101e,var(--sky2) 70%,#18355c);padding:22px 0 0}
+#snow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.topbar{position:relative;display:flex;align-items:center;gap:12px;z-index:2}
+.logo{font:400 18px var(--display);letter-spacing:.04em;color:var(--snow)} .logo b{color:var(--acc);font-weight:400}
+.topbar .sp{flex:1}
+.lang{display:flex;border:1px solid var(--line2);border-radius:999px;overflow:hidden;background:rgba(10,22,38,.6)}
+.lang button{border:0;border-radius:0;padding:6px 12px;background:none;color:var(--mut);font:700 13px var(--body);cursor:pointer}
+.lang button.on{background:rgba(143,211,255,.16);color:var(--snow)}
+.hero-in{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:36px;align-items:center;padding:34px 0 150px}
+.kicker{margin:0 0 8px;color:var(--ice);font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:.78rem}
+h1{margin:0 0 14px;font:400 clamp(2.1rem,5.6vw,3.6rem)/1.02 var(--display);letter-spacing:.01em;text-wrap:balance}
+h1 span{color:var(--acc)}
+.lead{margin:0 0 18px;color:#c9daec;max-width:56ch;font-size:1.05rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.chips li{padding:6px 12px;border-radius:999px;background:rgba(244,251,255,.08);border:1px solid var(--line);font-size:.88rem;font-weight:600}
+.tv{position:relative;border-radius:18px;padding:12px;background:linear-gradient(160deg,#27466e,#152a46);box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18)}
+.tv img{display:block;width:100%;border-radius:10px;image-rendering:pixelated;aspect-ratio:5/4;object-fit:cover;background:#000}
+.tv figcaption{font-size:.8rem;color:var(--mut);margin-top:8px;text-align:center}
+.mountains{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:170px;z-index:1}
+/* steps */
+.step{position:relative;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:18px;padding:20px 22px;margin:22px 0}
+.step h2{display:flex;align-items:center;gap:12px;margin:0 0 8px;font:400 1.25rem var(--display);letter-spacing:.02em}
+.num{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--snow);color:var(--sky);font:800 .95rem var(--body);flex:none}
+#drop{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px dashed var(--line2);border-radius:14px;padding:22px;cursor:pointer;text-align:center;background:rgba(244,251,255,.03)}
+#drop.hov,#drop:hover{border-color:var(--ice);background:rgba(143,211,255,.08)}
+#log{font:12px/1.4 ui-monospace,Consolas,monospace;color:var(--mut);white-space:pre-wrap;max-height:120px;overflow:auto;margin-top:8px}
+#discline{display:none;align-items:center;gap:10px;flex-wrap:wrap}
+#discline .pill{padding:5px 12px;border-radius:999px;font-weight:700;font-size:.88rem;border:1px solid var(--line2)}
+#discline .pill.ok{border-color:rgba(95,211,141,.6);color:var(--ok)} #discline .pill.warn{border-color:rgba(255,122,26,.6);color:var(--acc)}
+/* tabs */
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:8px 0 14px}
+.tab{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:rgba(19,35,57,.85);color:var(--txt);cursor:pointer;font:inherit}
+.tab svg{width:36px;height:36px;flex:none}
+.tab b{display:block;font:400 1.05rem var(--display);letter-spacing:.02em}
+.tab span{display:block;color:var(--mut);font-size:.88rem}
+.tab.on{border-color:var(--acc);background:linear-gradient(180deg,rgba(255,122,26,.14),rgba(19,35,57,.9));box-shadow:0 0 0 1px var(--acc) inset}
+.tab:hover{border-color:var(--ice)}
+.needdisc{display:none;padding:18px;border-radius:14px;border:1px dashed var(--line2);color:var(--mut);text-align:center}
+/* patch panel */
+#patch .feat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#patch .grp{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(10,22,38,.4)}
+#patch .grp h3{margin:0 0 6px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice)}
+#patch ul{margin:0;padding-left:18px} #patch li{margin:3px 0;color:#d6e4f2;font-size:.93rem}
+.go{width:100%;margin-top:16px;border:0;border-radius:14px;padding:16px;font:400 1.1rem var(--display);letter-spacing:.04em;color:#1a0d02;cursor:pointer;background:linear-gradient(100deg,#ff9a3d,var(--acc));box-shadow:0 12px 30px rgba(255,122,26,.3)}
+.go:disabled{opacity:.4;cursor:not-allowed}
+#patchStatus{margin-top:10px;color:var(--mut);text-align:center;min-height:1.5em;white-space:pre-wrap}
+footer{color:var(--mut);font-size:.88rem;margin:40px 0 30px;text-align:center}
+/* workspace (shared with the skins / boards tools) */
+button,.btn{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);border-radius:9px;padding:7px 12px;font:600 13px var(--body);cursor:pointer}
+button:hover,.btn:hover{border-color:var(--ice)}
+button.pri,label.btn.pri{background:var(--acc);border-color:var(--acc);color:#1a0d02}
+button:disabled{opacity:.45;cursor:default}
+.mut{color:var(--mut)}
+.panel-ws{display:none}
+#work.show{display:grid}#patch.show{display:block}
+#work{grid-template-columns:230px minmax(280px,1fr) minmax(300px,420px);gap:14px;height:min(860px,calc(100vh - 40px))}
+#boards.show{display:block}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:auto;min-height:0}
+#riders h3{margin:12px 12px 4px;font-size:12px;color:var(--ice);text-transform:uppercase;letter-spacing:.12em}
+.slot{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-left:3px solid transparent;font-size:14px}
+.slot:hover{background:var(--panel2)} .slot.on{background:var(--panel2);border-left-color:var(--acc)}
+.slot .dot{width:8px;height:8px;border-radius:50%;flex:none} .slot.mod .dot{background:var(--acc)}
+#view{position:relative;display:flex;flex-direction:column}
+#view canvas{flex:1;width:100%;min-height:0;display:block;cursor:grab}
+#view .seg{display:inline-flex;border:1px solid var(--line2);border-radius:9px;overflow:hidden}#view .seg button{border:0;border-radius:0}#view .seg button.on{background:var(--acc);color:#1a0d02}
+#view .bar .sp{flex:1}#view .bar{display:flex;gap:8px;padding:8px;border-top:1px solid var(--line);flex-wrap:wrap;align-items:center}
+#title{position:absolute;left:12px;top:10px;font-weight:700;text-shadow:0 1px 3px #000}
+#edit{display:flex;flex-direction:column}
+#tools,#btools{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-bottom:1px solid var(--line);align-items:center}
+#tools .t.on,#btools .bt.on{border-color:var(--acc);color:var(--acc)}
+input[type=color]{width:36px;height:32px;border:1px solid var(--line2);border-radius:8px;background:none;padding:0}
+#texwrap{flex:1;overflow:auto;padding:10px;display:flex;justify-content:center;align-items:flex-start;min-height:0}
+#tex{image-rendering:pixelated;border:1px solid var(--line);background:repeating-conic-gradient(#1c2838 0 25%,#243246 0 50%) 0 0/16px 16px;cursor:crosshair;touch-action:none;max-width:100%}
+#swatches{display:flex;flex-wrap:wrap;gap:3px;padding:0 10px 8px}
+#swatches i{width:18px;height:18px;border-radius:4px;border:1px solid #0006;cursor:pointer}
+.row{display:flex;gap:6px;padding:8px 10px;border-top:1px solid var(--line);flex-wrap:wrap}
+label.chk{display:flex;gap:6px;align-items:center}
+#bwork{display:grid;grid-template-columns:300px 1fr;gap:14px}
+.bpanel{padding:12px}.bpanel h3{margin:6px 0 8px;font-size:12px;color:var(--ice);text-transform:uppercase;letter-spacing:.12em}
+.bpanel label{display:block;margin:6px 0}.rowb{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font:inherit}
+#bCanvas{image-rendering:pixelated;width:768px;max-width:100%;border:1px solid var(--line);cursor:crosshair;touch-action:none;display:block;margin:4px 0}
+#bCanvas.hov{outline:2px dashed var(--ice)}
+#bPrev{max-width:100%;background:#0e1d31;border-radius:10px}
+.modal{position:fixed;inset:0;background:rgba(4,10,20,.72);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 10px;font:400 1.1rem var(--display)}
+.modal input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;color:var(--txt);padding:8px 10px;font:inherit;margin:4px 0 10px}
+.gal{display:grid;gap:8px}
+.gal button{text-align:left;padding:10px 12px}
+.gal button b{display:block}
+.gal button span{color:var(--mut);font-weight:400}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+@media (max-width:960px){#work{grid-template-columns:1fr;height:auto}#view canvas{height:380px}#bwork{grid-template-columns:1fr}}
+@media (max-width:760px){.hero-in{grid-template-columns:1fr;padding-bottom:130px}.tabs{grid-template-columns:1fr}#patch .feat{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){#snow{display:none}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <canvas id="snow" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="topbar"><div class="logo">CB2 <b>Remix</b></div><div class="sp"></div><div class="lang"><button data-lang="fr">FR</button><button data-lang="en">EN</button></div></div>
+    <div class="hero-in">
+      <div>
+        <p class="kicker">Cool Boarders 2 · PlayStation · PAL SCES-00992</p>
+        <h1>Cool Boarders 2 <span>Remix</span></h1>
+        <p class="lead" data-i18n="heroLead"></p>
+        <ul class="chips"><li data-i18n="chip1"></li><li data-i18n="chip2"></li><li data-i18n="chip3"></li></ul>
+      </div>
+      <figure class="tv" style="margin:0"><img src="screens/race.png" alt="" width="320" height="240"><figcaption data-i18n="heroCap"></figcaption></figure>
+    </div>
+  </div>
+  <svg class="mountains" viewBox="0 0 1440 170" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#2a4f7d" d="M0 120 140 46 250 104 380 22 520 110 650 54 760 98 900 16 1050 104 1180 52 1300 96 1440 40V170H0Z"/>
+    <path fill="#f4fbff" d="M380 22 352 46 372 42 392 54 410 40ZM900 16 868 44 892 38 912 52 930 36ZM140 46 120 62 140 58 156 66Z" opacity=".9"/>
+    <path fill="#0f223b" d="M0 150 180 92 300 132 460 70 610 140 760 84 900 140 1080 78 1230 136 1440 90V170H0Z"/>
+    <path fill="#0b1728" d="M0 170V158C220 140 420 168 720 150S1180 140 1440 160V170Z"/>
+  </svg>
+</div>
+<main class="wrap">
+  <section class="step" id="open">
+    <h2><span class="num">1</span><span data-i18n="openTitle"></span></h2>
+    <p class="mut" data-i18n-html="openText"></p>
+    <label id="drop"><b data-i18n-html="drop"></b><span class="mut" data-i18n="dropSmall"></span><input id="file" type="file" accept=".chd,.bin,.img,.iso" hidden></label>
+    <div id="discline"><span class="pill" id="discname"></span><span class="pill" id="discstate"></span><label class="btn"><span data-i18n="otherDisc"></span><input id="file2" type="file" accept=".chd,.bin,.img,.iso" hidden></label></div>
+    <div id="log"></div>
+  </section>
+  <section class="step">
+    <h2><span class="num">2</span><span data-i18n="chooseTitle"></span></h2>
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="patch" role="tab"><svg viewBox="0 0 36 36"><path d="M8 32V5" stroke="#eef6ff" stroke-width="2.5" stroke-linecap="round"/><path d="M9 6h18l-4 6 4 6H9z" fill="#ff7a1a"/></svg><div><b data-i18n="tabPatch"></b><span data-i18n="tabPatchSub"></span></div></button>
+      <button class="tab" data-tab="skins" role="tab"><svg viewBox="0 0 36 36"><path d="M12 5 6 9l-3 9 5 2 2-5v16h16V15l2 5 5-2-3-9-6-4c-1 3-3 4-6 4s-5-1-6-4z" fill="#8fd3ff"/></svg><div><b data-i18n="tabSkins"></b><span data-i18n="tabSkinsSub"></span></div></button>
+      <button class="tab" data-tab="boards" role="tab"><svg viewBox="0 0 36 36"><rect x="4" y="13" width="28" height="10" rx="5" fill="#ff7a1a"/><path d="M10 15v6M26 15v6" stroke="#0b1728" stroke-width="2"/></svg><div><b data-i18n="tabBoards"></b><span data-i18n="tabBoardsSub"></span></div></button>
+    </div>
+    <p class="needdisc" id="needdisc" data-i18n="needDisc"></p>
+    <section id="patch" class="panel-ws">
+      <div class="feat" id="featList"></div>
+      <button class="go" id="patchGo" disabled data-i18n="patchGo"></button>
+      <div id="patchStatus"></div>
+    </section>
+  <section id="work" class="panel-ws">
+    <div class="col" id="riders"></div>
+    <div class="col" id="view">
+      <div id="title"></div>
+      <canvas id="gl"></canvas>
+      <div class="bar">
+        <span class="seg"><button id="vRace" class="on" data-i18n="vRace">En course</button><button id="vMenu" data-i18n="vMenu">Menu du jeu</button></span>
+        <button id="rotL">⟲</button><button id="rotR">⟳</button><button id="rotF" data-i18n="front">Face</button><button id="rotB" data-i18n="back">Dos</button>
+        <label class="chk"><input type="checkbox" id="paint3d" checked> <span data-i18n="paint3d"></span></label>
+        <label class="chk"><input type="checkbox" id="spin"> <span data-i18n="spin"></span></label>
+        <span class="mut" style="font-size:12px" data-i18n="viewHelp"></span>
+        <span class="sp"></span>
+        <button id="btnBuild" class="pri" disabled data-i18n="build"></button>
+      </div>
+    </div>
+    <div class="col" id="edit">
+      <div id="tools">
+        <button class="t on" data-tool="brush" data-i18n="tBrush">✎ Pinceau</button>
+        <button class="t" data-tool="tint" data-i18n="tTint" data-i18n-title="tTintTip">◐ Teinte</button>
+        <button class="t" data-tool="fill" data-i18n="tFill" data-i18n-title="tFillTip">▧ Remplir</button>
+        <button class="t" data-tool="pick" data-i18n="tPick">⦿ Pipette</button>
+        <button class="t" data-tool="erase" data-i18n="tErase" data-i18n-title="tEraseTip">⌫ Gomme</button>
+        <input type="color" id="color" value="#e07a2e">
+        <label class="mut"><span data-i18n="size"></span> <input type="range" id="size" min="1" max="12" value="2" style="width:70px"></label>
+        <label class="mut"><span data-i18n="tol"></span> <input type="range" id="tol" min="0" max="200" value="60" style="width:60px"></label>
+        <label class="chk mut" data-i18n-title="shadeTip"><input type="checkbox" id="filltint" checked> <span data-i18n="shade"></span></label>
+        <label class="chk mut"><input type="checkbox" id="uvs"> UV</label>
+      </div>
+      <div id="swatches"></div>
+      <div id="texwrap"><canvas id="tex" width="128" height="256"></canvas></div>
+      <div class="row">
+        <button id="undo" data-i18n="undo">Annuler</button>
+        <button id="reset" data-i18n="reset">Tout effacer</button>
+        <button id="tpl" data-i18n="tpl">Exporter le gabarit PNG</button>
+        <label class="btn"><span data-i18n="imp"></span><input id="imp" type="file" accept="image/png,image/*" hidden></label>
+      </div>
+      <div class="row">
+        <button id="saveSkin" data-i18n="saveSkin">Enregistrer le skin…</button>
+        <label class="btn"><span data-i18n="loadSkin"></span><input id="loadSkin" type="file" accept=".json,.cb2skin" hidden></label>
+        <button id="gallery" data-i18n="gallery">Galerie</button>
+      </div>
+    </div>
+  </section>
+  <section id="boards" class="panel-ws">
+    <div id="bwork">
+      <div class="col bpanel">
+        <h3 data-i18n="mcTitle">Carte mémoire</h3>
+        <p class="mut" style="margin:0 0 8px" data-i18n-html="mcText"></p>
+        <div class="rowb"><label class="btn"><span data-i18n="mcOpen"></span><input id="mcFile" type="file" accept=".srm,.mcd,.mcr" hidden></label><button id="mcNew" data-i18n="mcNew">Carte vierge</button></div>
+        <p id="mcInfo" class="mut"></p>
+        <h3 data-i18n="board">Planche</h3>
+        <label class="mut">Style <select id="bStyle"><option value="0">Free Style</option><option value="1">All-Around</option><option value="2">Alpine</option></select></label>
+        <label class="mut">Type <select id="bType"><option value="0">Type-1</option><option value="1">Type-2</option><option value="2">Type-3</option></select></label>
+        <p class="mut" style="font-size:12px" data-i18n="boardHelp"></p>
+        <div class="rowb"><button id="bSave" class="pri" disabled data-i18n="bSave">Écrire dans la carte et télécharger</button></div>
+      </div>
+      <div class="col">
+        <div id="btools">
+          <button class="bt on" data-tool="brush" data-i18n="tBrush">✎ Pinceau</button><button class="bt" data-tool="fill" data-i18n="tFill">▧ Remplir</button><button class="bt" data-tool="pick" data-i18n="tPick">⦿ Pipette</button>
+          <input type="color" id="bColor" value="#2e86de"><label class="mut"><span data-i18n="size"></span> <input type="range" id="bSize" min="1" max="10" value="2" style="width:70px"></label>
+          <button id="bUndo" data-i18n="undo">Annuler</button><button id="bClear" data-i18n="bClear">Tout remplir</button>
+          <label class="btn pri"><span data-i18n="bImpAll"></span><input id="bImpAll" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></label>
+          <select id="bEx"><option value="" data-i18n="examples"></option><option value="xmas" data-i18n="exXmas"></option><option value="flames" data-i18n="exFlames"></option><option value="peak" data-i18n="exPeak"></option></select>
+          <button id="bExport" data-i18n="bExport">Exporter PNG</button>
+        </div>
+        <div style="padding:10px;overflow:auto"><div class="mut" style="font-size:12px" data-i18n="bTopLbl"></div><canvas id="bCanvas" width="128" height="64"></canvas><div class="mut" style="font-size:12px" data-i18n="bHalfLbl"></div><p class="mut" style="font-size:12px;margin:6px 0 0" data-i18n="bDrop"></p></div>
+        <div style="padding:0 10px 10px"><div class="mut" style="font-size:12px;margin-bottom:4px" data-i18n="preview"></div><canvas id="bPrev" width="560" height="200"></canvas></div>
+      </div>
+    </div>
+  </section>
+  </section>
+  <footer data-i18n-html="footer"></footer>
+</main>
+<div id="build" class="modal"><div class="box">
+  <h3 style="margin-top:0" data-i18n="buildTitle"></h3>
+  <p id="buildInfo" class="mut"></p>
+  <label class="chk" id="withRemixRow" hidden><input type="checkbox" id="withRemix" checked> <span data-i18n="withRemix"></span></label>
+  <div id="buildLog" style="font:12px ui-monospace,monospace;color:var(--mut);white-space:pre-wrap"></div>
+  <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end"><button id="buildClose" data-i18n="close">Fermer</button><button id="buildGo" class="pri" data-i18n="create">Créer</button></div>
+</div></div>
+<div class="modal" id="dlg"><div class="box"><h3 id="dlgTitle"></h3><div id="dlgBody"></div><div class="acts" id="dlgActs"></div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="i18n.js"></script>
+<script src="patches.js"></script>
+<script src="lzma.js"></script>
+<script src="chdpatch.js"></script>
+<script src="disc.js"></script>
+<script src="cb2.js"></script>
+<script src="board.js"></script>
+<script src="menu.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
