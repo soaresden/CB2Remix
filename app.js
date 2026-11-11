@@ -291,6 +291,16 @@
     g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
     const mat = new THREE.MeshBasicMaterial({ map: glTex, vertexColors: true, side: THREE.DoubleSide, alphaTest: 0.5, transparent: false });
     mesh = new THREE.Mesh(g, mat); scene.add(mesh);
+    // Fit the model to the stage like the menu view does (height 1966, feet on the snow, centred): the riders'
+    // race models are not all at the same size and height (Snowman sank below the ground disc).
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9;
+    for (const a of [pos, gpos]) for (let i = 0; i < a.length; i += 3) {
+      x0 = Math.min(x0, a[i]); x1 = Math.max(x1, a[i]); y0 = Math.min(y0, a[i + 1]); y1 = Math.max(y1, a[i + 1]); z0 = Math.min(z0, a[i + 2]); z1 = Math.max(z1, a[i + 2]);
+    }
+    if (y1 > y0) {
+      const sc = 1966 / (y1 - y0);
+      for (const o of [mesh, extra]) if (o) { o.scale.setScalar(sc); o.position.set(-(x0 + x1) / 2 * sc, -983 - y0 * sc, -(z0 + z1) / 2 * sc); }
+    }
   }
 
   function setMenuModel(r) {
