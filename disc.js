@@ -39,6 +39,14 @@
     return { edc, ecc, fix };
   })();
   class CHD {
+    // reads go through a 4 MB window: consecutive hunks are stored one after the other, and each read of the
+    // player's file is slow on phones (thousands of small reads per music track otherwise)
+    async readc(a, b) {
+      const W = this.win;
+      if (W && a >= W.a && b <= W.a + W.d.length) return W.d.subarray(a - W.a, b - W.a);
+      const e = Math.min(this.size, Math.max(b, a + (1 << 22)));
+      const d = await this.read(a, e); this.win = { a, d }; return d.subarray(0, b - a);
+    }
     static async open(read, size) {
       const c = new CHD(); c.read = read; c.size = size;
       const h = await read(0, 124);
@@ -72,9 +80,9 @@
       if (this.cache.has(i)) return this.cache.get(i);
       let t = this.M.type[i], r = i, k = 0;
       while (t === 5 && k++ < 64) { r = this.M.off[r]; t = this.M.type[r]; }
-      const src = await this.read(this.M.off[r], this.M.off[r] + this.M.len[r]);
+      const src = await this.readc(this.M.off[r], this.M.off[r] + this.M.len[r]);
       let out;
-      if (t === 4) out = src;
+      if (t === 4) out = src.slice();
       else {
         const codec = this.codecs[t], n = this.fph, hb = this.hdr.hunkbytes;
         const eccb = (n + 7) >> 3, clb = hb < 65536 ? 2 : 3, hdrb = eccb + clb;

@@ -6,6 +6,7 @@
     read(n) { // n <= 32
       let v = 0;
       while (n > 0) {
+        if (this.p >> 3 >= this.b.length) throw new Error('FLAC : fin de données inattendue');
         const byte = this.b[this.p >> 3], off = this.p & 7, take = Math.min(8 - off, n);
         v = v * (1 << take) + ((byte >> (8 - off - take)) & ((1 << take) - 1));
         this.p += take; n -= take;
@@ -72,6 +73,7 @@
       let n = BS[bsc]; if (bsc === 1) n = 192; if (bsc === 6) n = br.read(8) + 1; else if (bsc === 7) n = br.read(16) + 1;
       if (src_ === 12) br.read(8); else if (src_ === 13 || src_ === 14) br.read(16);
       br.read(8); // header CRC-8
+      if (!n || ch > 10) throw new Error('FLAC : en-tête de trame invalide');
       const bps = SS[ssc] || 16, nch = ch < 8 ? ch + 1 : 2;
       const chans = [];
       for (let c = 0; c < nch; c++) chans.push(subframe(br, n, bps + ((ch === 8 && c === 1) || (ch === 9 && c === 0) || (ch === 10 && c === 1) ? 1 : 0)));
