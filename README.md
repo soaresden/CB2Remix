@@ -8,12 +8,12 @@
 
 | | |
 |---|---|
-| **Patchs** | Installe le hack Remix v19 sur le jeu d'origine. |
+| **Patchs** | Installe le hack Remix v20 sur le jeu d'origine. |
 | **Prêt-à-porter** | Repeins les tenues des 7 riders, avec aperçu 3D en course et dans le menu du jeu. |
 | **Atelier** | Dessine ou importe (JPG / PNG) ta planche et écris-la dans ta carte mémoire. |
 | **Musiques** | Écoute la bande-son du jeu et télécharge-la en MP3 ou en WAV. |
 
-## 1. Patchs (Remix v19, à la carte)
+## 1. Patchs (Remix v20, à la carte)
 
 Ouvre le jeu **d'origine** (PAL SCES-00992, `.chd` ou `.bin`), coche les mods que tu veux, puis **Construire et télécharger**.
 
