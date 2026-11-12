@@ -50,7 +50,7 @@ Merci de proposer des créations originales (pas de personnages, logos ou marque
 ## 3. Atelier (planches)
 
 1. Ouvre ta carte mémoire (Batocera : `/userdata/saves/psx/`, le `.srm` du jeu ou le `_1.mcd`) ou pars d'une carte vierge.
-2. Dessine, choisis un exemple (Noël, Flammes, Montagne) ou **importe une image JPG / PNG** (bouton ou glisser-déposer) : planche entière, dessus seul ou dessous seul.
+2. Le dessus et le dessous ont chacun leur zone. Dessine, choisis un exemple (Noël, Flammes, Montagne) ou **importe une image JPG / PNG** sur la face voulue (bouton ou glisser-déposer), puis place-la : glisser pour la déplacer, molette ou deux doigts pour zoomer et tourner, et **Valider**.
 3. Style (Free Style / All-Around / Alpine) et type (1 à 3), puis **Écrire dans la carte et télécharger**.
 4. Jeu fermé, remplace ta carte par le fichier téléchargé. Dans le jeu : **Board Edit** → *Load*.
 
