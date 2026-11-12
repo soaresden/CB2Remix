@@ -246,6 +246,68 @@
       }
       return mods;
     };
+    // modular Remix (cb2-decomp remix/modular.py): pkg = {exe_crc, exe_size, ops: {feature: [op]}}, feats = ids
+    // -> {lba: {sub, data}}. Ops: ['w', file, off, old, new] word, ['b', file, off, hex], ['append', file, hex],
+    // ['bs', file, off, [[0, len, src] | [1, hex]]] bytes copied from the original file or new, ['rec', path, lba, size] directory record, ['sec', lba, subhex, [[0, len, addr] | [1, hex]]] whole sector
+    d.applyMods = async (pkg, feats, log = () => {}) => {
+      const hex = (h) => { const u = new Uint8Array(h.length >> 1); for (let i = 0; i < u.length; i++) u[i] = parseInt(h.substr(i * 2, 2), 16); return u; };
+      const exe = await d.readFile('/SCES_009.92').catch(() => null);
+      if (!exe || exe.length !== pkg.exe_size || d.crc32(exe) !== pkg.exe_crc) { const e = new Error('source'); e.code = 'source'; throw e; }
+      const on = new Set(feats.filter((f) => pkg.ops[f]));
+      if (on.has('max') || on.has('air')) on.add('input');
+      if (on.has('input') && !on.has('air')) on.add('input_noair');
+      const order = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'input', 'input_noair'].filter((f) => on.has(f));
+      const files = {}, recs = {}, secs = {};
+      const origs = {}, orig = async (p) => origs[p] || (origs[p] = await d.readFile(p));
+      const buf = async (p) => { if (!files[p]) files[p] = (await orig(p)).slice(); return files[p]; };
+      for (const f of order) for (const op of pkg.ops[f]) {
+        if (op[0] === 'w') { const b = await buf(op[1]), dv = new DataView(b.buffer, b.byteOffset, b.length);
+          if (f !== 'input_noair' && dv.getUint32(op[2], true) !== op[3] >>> 0) throw new Error('mot inattendu ' + op[1] + ' +' + op[2].toString(16));
+          dv.setUint32(op[2], op[4] >>> 0, true); }
+        else if (op[0] === 'b') (await buf(op[1])).set(hex(op[3]), op[2]);
+        else if (op[0] === 'bs') { const b = await buf(op[1]), src = await orig(op[1]); let o = op[2];
+          for (const x of op[3]) { const u = x[0] === 0 ? src.subarray(x[2], x[2] + x[1]) : hex(x[1]); b.set(u, o); o += u.length; } }
+        else if (op[0] === 'append') { const a = await buf(op[1]), x = hex(op[2]), n = new Uint8Array(a.length + x.length); n.set(a); n.set(x, a.length); files[op[1]] = n; }
+        else if (op[0] === 'rec') recs[op[1]] = [op[2], op[3]];
+        else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
+      }
+      log('…');
+      const mods = {}, blank = (n) => new Uint8Array(n);
+      const ms = files['/MAIN_SEL.BIN'];
+      if (ms && ms.length > d.files['/MAIN_SEL.BIN'].size) { // grown MAIN_SEL moves to the end of the info movie (cut)
+        const nms = Math.ceil(ms.length / 2048), sm = d.files['/MOVIE/SBCMOVE.STR'], sn = Math.floor(sm.size / 2048), ml = sm.lba + sn - nms;
+        recs['/MOVIE/SBCMOVE.STR'] = [sm.lba, (sn - nms) * 2048]; recs['/MAIN_SEL.BIN'] = [ml, ms.length];
+        for (let k = 0; k < nms; k++) { const data = blank(2048); data.set(ms.subarray(k * 2048, Math.min(ms.length, (k + 1) * 2048)));
+          mods[ml + k] = { sub: Uint8Array.from([0, 0, k === nms - 1 ? 0x89 : 0x08, 0, 0, 0, k === nms - 1 ? 0x89 : 0x08, 0]), data }; }
+        delete files['/MAIN_SEL.BIN'];
+      }
+      for (const [p, b] of Object.entries(files)) {
+        const e = d.files[p];
+        for (let k = 0; k < Math.ceil(b.length / 2048); k++) {
+          const orig = await d.user(e.lba + k), nw = orig.slice(); nw.set(b.subarray(k * 2048, Math.min(b.length, (k + 1) * 2048)));
+          if (nw.some((x, i) => x !== orig[i])) mods[e.lba + k] = nw;
+        }
+      }
+      const src = async (addr, len) => { const out = new Uint8Array(len); let k = 0; while (k < len) { const l = Math.floor((addr + k) / 2048), off = (addr + k) % 2048, m = Math.min(len - k, 2048 - off); out.set((await d.user(l)).subarray(off, off + m), k); k += m; } return out; };
+      for (const [l, [sub, ops]] of Object.entries(secs)) {
+        const data = new Uint8Array(2048); let p = 0;
+        for (const op of ops) { const x = op[0] === 0 ? await src(op[2], op[1]) : hex(op[1]); data.set(x, p); p += x.length; }
+        mods[l] = { sub, data };
+      }
+      for (const [p, [l, s]] of Object.entries(recs)) {
+        const r = d.files[p].rec, m = mods[r.lba], data = (m ? (m instanceof Uint8Array ? m : m.data) : await d.user(r.lba)).slice(), dv = new DataView(data.buffer);
+        dv.setUint32(r.off + 2, l, true); dv.setUint32(r.off + 6, l, false); dv.setUint32(r.off + 10, s, true); dv.setUint32(r.off + 14, s, false);
+        mods[r.lba] = m && !(m instanceof Uint8Array) ? { sub: m.sub, data } : data;
+      }
+      return mods;
+    };
+    // configuration code written in the volume descriptor (application-use area, unused by the game)
+    d.markConfig = async (mods, text) => {
+      const m = mods[16], data = (m ? (m instanceof Uint8Array ? m : m.data) : await d.user(16)).slice();
+      const s = 'CB2REMIX ' + text; data.fill(0, 900, 1000); for (let i = 0; i < s.length && i < 100; i++) data[900 + i] = s.charCodeAt(i);
+      mods[16] = data; return mods;
+    };
+    d.readConfig = async () => { const u = await d.user(16), s = String.fromCharCode(...u.subarray(900, 1000)).replace(/\0.*$/s, ''); return s.startsWith('CB2REMIX ') ? s.slice(9) : null; };
     // new image with the given user-data sectors replaced: {lba: Uint8Array(2048)} -> {parts, size}
     // parts = [{a,b} byte ranges of the source | Uint8Array]
     d.build = async (mods, log = () => {}) => {

@@ -33,6 +33,7 @@
       mReading: 'Lecture', mEncoding: 'Encodage', mNow: (n) => 'En écoute : ' + n, mSaved: (n) => 'Téléchargé : ' + n, mAllProgress: (i, n) => 'Piste ' + i + ' / ' + n + '…', mAlbum: 'Bande originale',
       mFound: (n) => n + ' pistes audio sur ton disque.', mNone: 'Aucune piste audio trouvée sur ce disque (une image .bin seule ne contient parfois que la piste de données : ouvre plutôt le CHD).',
       mLameKO: 'Impossible de charger l’encodeur MP3 (connexion ?) : choisis WAV ou réessaie.', mNote: 'Les pistes sont lues sur ton propre disque et converties dans ton navigateur. L’encodeur MP3 (lamejs, LGPL) est chargé depuis jsDelivr la première fois. Les noms BGM… sont ceux des fichiers du disque.',
+      tabProg: 'Progression', tabProgSub: 'Ta checklist 100 %, lue sur ta carte mémoire',
       tabPatch: 'Patchs', tabPatchSub: 'Le hack Remix : riders cachés, tricks, MAX…',
       heroLead: 'Le hack Remix, des tenues retouchées et ta propre planche pour Cool Boarders 2. Tout se fait dans ton navigateur à partir de ton jeu : aucun fichier du jeu n’est hébergé ici.',
       chip1: '❄ Patch Remix v16', chip2: 'Skins en 3D', chip3: 'Planches perso', dropSmall: '.chd, .bin ou .img — le fichier reste sur ton ordinateur', heroCap: 'Course de compétition, Remix v16',
@@ -45,7 +46,7 @@
       patchSource: 'Ce fichier ne correspond pas au jeu d’origine (PAL SCES-00992). Le patch ne peut s’appliquer que sur le jeu d’origine non modifié.',
       patchNeed: 'Le patch s’installe sur le jeu d’origine (PAL SCES-00992), en .chd ou .bin.',
       patchDone: (n) => `Terminé : ${n}. Remplace ton ancien fichier par celui-ci (garde l’original de côté).`,
-      withRemix: 'Installer aussi le patch Remix (ce jeu est d’origine)',
+      withRemix: 'Installer aussi les mods choisis dans l’onglet Patchs (ce jeu est d’origine)',
       footer: 'Projet de fan, non affilié à Sony ni à UEP Systems. Aucun fichier du jeu n’est distribué : tu dois posséder ton propre exemplaire. Code sous licence MIT.',
       ok: 'OK', cancel: 'Annuler', galleryTitle: 'Galerie de skins', skinTitle: 'Enregistrer le skin', nameLbl: 'Nom du skin', authorLbl: 'Auteur', save: 'Enregistrer', resetTitle: 'Tout effacer',
       replacesLbl: 'remplace', bImpAll: 'Importer une image (JPG/PNG)', bDrop: 'Tu peux aussi glisser une image JPG ou PNG directement sur le dessus ou sur le dessous.',
@@ -53,6 +54,25 @@
       bZoom: 'Zoom', bRot: 'Rotation', bCover: 'Remplir la face', bContain: 'Image entière', bFlip: 'Miroir', bOk: 'Valider',
       impWhere: 'Où placer cette image ?', impAll: 'Planche entière (dessus + dessous)', impTop: 'Seulement le dessus', impBot: 'Seulement le dessous', impFit: 'Remplir (recadrer)', impContain: 'Image entière (bandes)',
       examples: 'Exemples', exXmas: 'Planche de Noël', exFlames: 'Flammes', exPeak: 'Montagne',
+      cfgCode: 'Code de configuration', cfgCopy: 'Copier', cfgLink: 'Copier le lien', cfgCopied: 'Copié !', cfgPaste: 'Coller un code…', cfgLoad: 'Charger',
+      cfgBad: 'Code invalide.', cfgLoaded: (c) => 'Code ' + c + ' chargé.', cfgHelp: 'Ce code résume tes choix : partage-le, ou recolle-le plus tard pour reconstruire exactement le même jeu à partir de ton disque.',
+      preAll: 'Remix complet', preEarn: '100 % à gagner', preNone: 'Aucun mod', preEarnTip: 'Toutes les améliorations, mais rien n’est débloqué d’avance : riders cachés, pistes, planches SPECIAL, miroir et hard se gagnent comme dans le jeu d’origine.',
+      grpMods: 'Les mods', grpMusic: 'Musiques', grpSkins: 'Tenues (Prêt-à-porter)', musEU: 'Version européenne (d’origine)', musUS: 'Version américaine (il faut ton CD US en .chd)',
+      skinsNone: 'Aucune tenue dans la galerie.', skinsNote: 'Les tenues cochées remplacent celles du jeu (elles apparaissent aussi dans l’onglet Prêt-à-porter).',
+      modsOff: 'Aucun mod coché : le jeu reste d’origine (seules la musique et les tenues changent).', needsInput: 'utilise la lecture manette partagée',
+      patchGoMods: 'Construire et télécharger', stRemixCfg: (c) => 'Remix installé (' + c + ')', patchAlreadyCfg: (c) => 'Ce jeu est déjà patché avec le code ' + c + '. Pour changer de mods, repars de ton jeu d’origine (recolle ce code pour retrouver tes réglages).',
+      skinApplying: (n) => 'Tenue : ' + n + '…', summary: (n, m) => n + ' mod' + (n > 1 ? 's' : '') + ' sur ' + m,
+      mods: {
+        unlock: ['Tout débloqué', 'Pistes, riders, planches SPECIAL, miroir, hard et récompenses débloqués dès une nouvelle partie ; tous les riders sélectionnables même avec une ancienne sauvegarde. Décoche pour tout gagner toi-même.'],
+        special: ['Planches SPECIAL partout', 'Les planches SPECIAL sont toujours proposées, en compétition aussi.'],
+        hardmirror: ['Hard + Mirror', 'L1 + R1 + X sur Competition : hard et miroir en même temps (L1 + X = hard, R1 + X = miroir).'],
+        riders: ['Boss, Gray et Snowman en championnat', '7 riders en compétition, leurs noms dans les résultats, la voix de Boss et les correctifs de ciel et de son. Le Boss adversaire devient Jicchi. (La fin du film d’intro est raccourcie de 0,8 s.)'],
+        outfits: ['Tenues cachées de Cindy et Irin', 'En vestes 4 à 6 sur l’écran WEAR, avec aperçu dans le menu, dans tous les modes. (La fin de la vidéo d’info est raccourcie.)'],
+        max: ['Stats MAX', '○ sur l’écran BOARDER : toutes les stats au maximum, « MAX » sous le portrait. Barres TECHNIQUE / POWER corrigées.'],
+        air: ['Figures en l’air', 'La croix seule fait tourner (gauche/droite = spin, haut/bas = flip), Carré = rotations ×4, enchaînements « X to Y » en gardant R1.'],
+        ramming: ['Chocs en Boarder Cross', 'Fonce dans un adversaire : le plus rapide des deux reste debout.'],
+        bam: ['Big Air Master', 'Touches toujours affichées et figures suivantes (NEXT) à droite.'],
+      },
       feat: [
         ['Riders & championnat', ['Boss, Gray et Snowman jouables en championnat, tout débloqué dès le départ (Mirror et Hard compris).', 'Hard + Mirror ensemble : L1 + R1 + X sur Competition.', 'Gray, Snowman et Boss ont leur propre nom dans les résultats ; Boss a sa propre voix.', 'Tenue cachée de Cindy / Irin dans la liste des vestes, avec aperçu dans le menu.']],
         ['Figures', ['En l’air, la croix seule fait tourner (gauche/droite = spin, haut/bas = flip).', 'Grabs avec les commandes d’origine, enchaînements « … to … » en gardant R1.', 'Carré maintenu en l’air : rotations 4× plus rapides.', 'Big Air Master : touches et figure suivante toujours affichées.']],
@@ -93,6 +113,7 @@
       mReading: 'Reading', mEncoding: 'Encoding', mNow: (n) => 'Playing: ' + n, mSaved: (n) => 'Downloaded: ' + n, mAllProgress: (i, n) => 'Track ' + i + ' / ' + n + '…', mAlbum: 'Original soundtrack',
       mFound: (n) => n + ' audio tracks on your disc.', mNone: 'No audio track found on this disc (a lone .bin file sometimes only holds the data track: open the CHD instead).',
       mLameKO: 'Could not load the MP3 encoder (connection?): pick WAV or try again.', mNote: 'Tracks are read from your own disc and converted in your browser. The MP3 encoder (lamejs, LGPL) is loaded from jsDelivr the first time. The BGM… names are the disc’s own file names.',
+      tabProg: 'Progress', tabProgSub: 'Your 100% checklist, read from your memory card',
       tabPatch: 'Patches', tabPatchSub: 'The Remix hack: hidden riders, tricks, MAX…',
       heroLead: 'The Remix hack, repainted outfits and your own board for Cool Boarders 2. Everything runs in your browser from your own game: no game files are hosted here.',
       chip1: '❄ Remix patch v16', chip2: '3D skins', chip3: 'Custom boards', dropSmall: '.chd, .bin or .img — the file stays on your computer', heroCap: 'Competition race, Remix v16',
@@ -105,7 +126,7 @@
       patchSource: 'This file does not match the original game (PAL SCES-00992). The patch only applies to the unmodified original game.',
       patchNeed: 'The patch installs on the original game (PAL SCES-00992), as .chd or .bin.',
       patchDone: (n) => `Done: ${n}. Replace your old file with this one (keep the original somewhere safe).`,
-      withRemix: 'Also install the Remix patch (this game is the original)',
+      withRemix: 'Also install the mods picked in the Patches tab (this game is the original)',
       footer: 'Fan project, not affiliated with Sony or UEP Systems. No game files are distributed: you need your own copy. Code under the MIT licence.',
       ok: 'OK', cancel: 'Cancel', galleryTitle: 'Skin gallery', skinTitle: 'Save the skin', nameLbl: 'Skin name', authorLbl: 'Author', save: 'Save', resetTitle: 'Clear all',
       replacesLbl: 'replaces', bImpAll: 'Import an image (JPG/PNG)', bDrop: 'You can also drop a JPG or PNG straight onto the top or the bottom.',
@@ -113,6 +134,25 @@
       bZoom: 'Zoom', bRot: 'Rotation', bCover: 'Fill the face', bContain: 'Whole image', bFlip: 'Mirror', bOk: 'Apply',
       impWhere: 'Where should this image go?', impAll: 'Whole board (top + bottom)', impTop: 'Top only', impBot: 'Bottom only', impFit: 'Fill (crop)', impContain: 'Whole image (bars)',
       examples: 'Examples', exXmas: 'Christmas board', exFlames: 'Flames', exPeak: 'Mountain',
+      cfgCode: 'Configuration code', cfgCopy: 'Copy', cfgLink: 'Copy link', cfgCopied: 'Copied!', cfgPaste: 'Paste a code…', cfgLoad: 'Load',
+      cfgBad: 'Invalid code.', cfgLoaded: (c) => 'Code ' + c + ' loaded.', cfgHelp: 'This code sums up your choices: share it, or paste it back later to rebuild exactly the same game from your disc.',
+      preAll: 'Full Remix', preEarn: '100% to earn', preNone: 'No mods', preEarnTip: 'Every improvement, but nothing unlocked up front: hidden riders, tracks, SPECIAL boards, mirror and hard are earned as in the original game.',
+      grpMods: 'Mods', grpMusic: 'Music', grpSkins: 'Outfits (Ready-to-wear)', musEU: 'European version (original)', musUS: 'US version (needs your US CD as .chd)',
+      skinsNone: 'No outfit in the gallery.', skinsNote: 'Ticked outfits replace the game’s ones (they also show up in the Ready-to-wear tab).',
+      modsOff: 'No mod ticked: the game stays original (only music and outfits change).', needsInput: 'uses the shared pad reading',
+      patchGoMods: 'Build and download', stRemixCfg: (c) => 'Remix installed (' + c + ')', patchAlreadyCfg: (c) => 'This game is already patched with code ' + c + '. To change mods, start again from your original game (paste this code back to get your settings).',
+      skinApplying: (n) => 'Outfit: ' + n + '…', summary: (n, m) => n + ' mod' + (n > 1 ? 's' : '') + ' out of ' + m,
+      mods: {
+        unlock: ['Everything unlocked', 'Tracks, riders, SPECIAL boards, mirror, hard and awards unlocked on a new game; every rider selectable even with an old save. Untick to earn it all yourself.'],
+        special: ['SPECIAL boards everywhere', 'SPECIAL boards always offered, in competition too.'],
+        hardmirror: ['Hard + Mirror', 'L1 + R1 + X on Competition: hard and mirror together (L1 + X = hard, R1 + X = mirror).'],
+        riders: ['Boss, Gray and Snowman in the championship', '7 riders in competition, their names in the results, Boss’s own voice and the sky and sound fixes. The CPU Boss becomes Jicchi. (The end of the intro movie is cut by 0.8 s.)'],
+        outfits: ['Cindy and Irin hidden outfits', 'As jackets 4 to 6 on the WEAR screen, previewed in the menu, in every mode. (The end of the info movie is cut.)'],
+        max: ['MAX stats', '○ on the BOARDER screen: every stat maxed, “MAX” under the portrait. TECHNIQUE / POWER bars fixed.'],
+        air: ['Air control', 'The d-pad alone rotates (left/right = spin, up/down = flip), Square = rotations x4, “X to Y” combos while holding R1.'],
+        ramming: ['Boarder Cross ramming', 'Ram an opponent: the faster of the two stays up.'],
+        bam: ['Big Air Master', 'Keys always shown and the next tricks (NEXT) on the right.'],
+      },
       feat: [
         ['Riders & championship', ['Boss, Gray and Snowman playable in the championship, everything unlocked from the start (Mirror and Hard too).', 'Hard + Mirror together: L1 + R1 + X on Competition.', 'Gray, Snowman and Boss have their own names in the results; Boss has his own voice.', 'Cindy / Irin hidden outfit in the jacket list, with a menu preview.']],
         ['Tricks', ['In the air, the D-pad alone rotates (left/right = spin, up/down = flip).', 'Grabs with the original buttons, “… to …” combos by holding R1.', 'Hold Square in the air: rotations 4× faster.', 'Big Air Master: buttons and next trick always shown.']],
@@ -131,6 +171,7 @@
     document.querySelectorAll('[data-i18n]').forEach((e) => (e.textContent = t(e.dataset.i18n)));
     document.querySelectorAll('[data-i18n-html]').forEach((e) => (e.innerHTML = t(e.dataset.i18nHtml)));
     document.querySelectorAll('[data-i18n-title]').forEach((e) => (e.title = t(e.dataset.i18nTitle)));
+    document.querySelectorAll('[data-i18n-ph]').forEach((e) => (e.placeholder = t(e.dataset.i18nPh)));
     document.querySelectorAll('[data-lang]').forEach((b) => b.classList.toggle('on', b.dataset.lang === lang));
     listeners.forEach((f) => f());
   }

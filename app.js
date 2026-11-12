@@ -38,8 +38,10 @@
       S.disc = d; S.file = f; if (window.CB2Music) CB2Music.setDisc(d, f.name); S.slots = {}; S.models = {}; S.cur = null; S.hist = []; S.patchedName = null;
       log(t('discOK', d.kind.toUpperCase(), Object.keys(d.files).length));
       // Remix extras (competition textures of Gray / Snowman)
-      S.state = 'other';
+      S.state = 'other'; S.cfgOnDisc = null;
       try {
+        S.cfgOnDisc = await d.readConfig();
+        if (S.cfgOnDisc) { S.state = 'remix'; S.loc = remixLoc(await d.readFile('/SCES_009.92')); throw 0; }
         const exeName = await d.bootExe(), exe = await d.readFile(exeName);
         if (exeName === '/SCUS_943.58') { // USA version
           const P = await remixPatch(true), o = 0x800 + 0x8004f538 - 0x80010000;
@@ -47,7 +49,7 @@
         } else { S.loc = remixLoc(exe);
           if (S.loc) S.state = 'remix';
           else { const P = await remixPatch(); if (exe.length === u32(P, 12) && d.crc32(exe) === u32(P, 8)) S.state = 'original'; } }
-      } catch (e) { S.loc = null; }
+      } catch (e) { if (e !== 0) S.loc = null; }
       try { S.chr = await d.readFile('/TITLE/CHR.DAT'); S.menu = MenuSkin.scan(S.chr); } catch (e) { S.chr = null; }
       S.menuMaps = {};
       $('#discname').textContent = f.name; discState();
@@ -336,35 +338,14 @@
   $('#buildGo').onclick = async () => {
     $('#buildGo').disabled = true; const L = (t) => ($('#buildLog').textContent += t + '\n');
     try {
-      const d = S.disc; let sec = {}, loc = S.loc, chr0 = S.chr;
-      const user = async (l) => (sec[l] ? (sec[l] instanceof Uint8Array ? sec[l] : sec[l].data) : d.user(l));
-      const putFile = async (lba, bytes) => { for (let k = 0; k < Math.ceil(bytes.length / 2048); k++) { const u = (await user(lba + k)).slice(); u.set(bytes.subarray(k * 2048, Math.min(bytes.length, (k + 1) * 2048)));
-        sec[lba + k] = sec[lba + k] && !(sec[lba + k] instanceof Uint8Array) ? { sub: sec[lba + k].sub, data: u } : u; } };
-      const readF = async (p) => { const e = d.files[p], out = new Uint8Array(Math.ceil(e.size / 2048) * 2048); for (let k = 0; k < out.length / 2048; k++) out.set(await user(e.lba + k), k * 2048); return out.subarray(0, e.size); };
-      const withRemix = S.state === 'original' && $('#withRemix').checked;
-      if (withRemix) { L(t('patchApplying')); sec = await d.applyDelta(await remixPatch()); loc = remixLoc(await readF('/SCES_009.92')); if (S.chr) chr0 = await readF('/TITLE/CHR.DAT'); L('✓ Remix v' + window.REMIX.version); }
-      for (const x of Object.values(S.slots).filter((y) => y.dirty)) {
-        const nf = CB2.fromRGBA(x.f, x.m.pm, composite(x), (() => { const ch = new Uint8Array(TW * TH); for (let i = 0; i < TW * TH; i++) ch[i] = x.over[i * 4 + 3] ? 1 : 0; return ch; })());
-        const bytes = CB2.writeFBD(nf); await putFile(d.files[x.s.file].lba, bytes); L('✓ ' + x.r.name + ' — ' + slotLabel(x.s));
-        if (x.s.enemy && loc) { const e = loc[x.s.enemy]; const raw = new Uint8Array(Math.ceil(e.size / 2048) * 2048); for (let k = 0; k < raw.length / 2048; k++) raw.set(await user(e.lba + k), k * 2048);
-          await putFile(e.lba, CB2.patchEnemy(raw.subarray(0, e.size), bytes)); L(t('compTex')); }
-      }
-      if (S.chr) {
-        const chr = chr0.slice(); let touched = false; const dirty = Object.values(S.slots).filter((y) => y.dirty && menuSlot(y));
-        for (let r = 0; r < 4; r++) {
-          const mine = dirty.filter((y) => menuSlot(y).r === r); if (!mine.length) continue;
-          const js = [...new Set(mine.map((y) => menuSlot(y).j))], ps = [...new Set(mine.map((y) => menuSlot(y).p))];
-          for (const j of js) { const tx = menuTextures(r, j, 0, mine.filter((y) => menuSlot(y).j === j)); MenuSkin.writeTIM(chr, S.menu[r].up[j], tx.up, Board.quant); }
-          for (const p of ps) { const tx = menuTextures(r, 0, p, mine.filter((y) => menuSlot(y).p === p)); MenuSkin.writeTIM(chr, S.menu[r].lo[p], tx.lo, Board.quant); }
-          touched = true;
-        }
-        if (touched) { await putFile(d.files['/TITLE/CHR.DAT'].lba, chr); L(t('menuTex')); }
-      }
+      const d = S.disc, withRemix = S.state === 'original' && $('#withRemix').checked, code = Seed.encode(S.cfg);
+      const sec = await configuredSectors(d, { mods: withRemix ? S.cfg.mods : null, slots: Object.values(S.slots).filter((y) => y.dirty) }, L);
+      if (withRemix) { await d.markConfig(sec, code); L('✓ ' + code); }
       L(t('assembling'));
       const r = await d.build(sec, L);
       const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : S.file.slice(p.a, p.b))));
       const base = S.file.name.replace(/\.(chd|bin|img|iso)$/i, '');
-      const name = d.kind === 'bin' ? S.file.name : base + (withRemix ? ' (Remix)' : '') + t('skinsSuffix') + '.chd';
+      const name = d.kind === 'bin' ? S.file.name : base + (withRemix ? ' (Remix ' + code.slice(4) + ')' : '') + t('skinsSuffix') + '.chd';
       dl(blob, name); L(t('downloading', name, (blob.size / 1048576).toFixed(0)));
     } catch (e) { L(t('error', e.message)); console.error(e); }
   };
@@ -512,7 +493,6 @@
   // ---------- soundtrack of the USA version (the player's own CD): European BGM n -> USA track (menus identical,
   // the rest one track later from BGM 13: see docs/pal_vs_usa.md of cb2-decomp)
   const US_MUSIC = {}; for (let k = 2; k <= 20; k++) US_MUSIC[k] = k <= 12 ? k : k + 1;
-  $('#usMus').onchange = () => { $('#usPick').hidden = !$('#usMus').checked; patchState(); };
   $('#usFile').onchange = async (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     $('#usInfo').textContent = t('usReading');
@@ -528,33 +508,105 @@
   function discState() {
     const p = $('#discstate'); if (!S.disc) return;
     p.className = 'pill ' + (S.state === 'other' ? 'warn' : 'ok');
-    p.textContent = { original: t('stOriginal'), remix: t('stRemix'), 'original-us': t('stOriginalUS'), 'remix-us': t('stRemixUS') }[S.state] || t('stOther');
+    p.textContent = S.cfgOnDisc ? t('stRemixCfg', S.cfgOnDisc) : { original: t('stOriginal'), remix: t('stRemix'), 'original-us': t('stOriginalUS'), 'remix-us': t('stRemixUS') }[S.state] || t('stOther');
     $('.usmus').hidden = /us$/.test(S.state);
+    const us = /us$/.test(S.state); $('#modList').hidden = us; $('.cfg').hidden = us; $('#usNote').hidden = !us; $('#usNote').textContent = t('patchNeedUS');
+    $('#skinList').parentElement && ($('#skinList').hidden = us);
   }
   function patchState() {
-    const usOK = $('#usMus').checked && S.us;
     const isUS = S.state === 'original-us', wantUS = $('#usMus').checked && !isUS;
-    $('#patchGo').disabled = !S.disc || S.patching || !(S.state === 'original' || isUS || (S.state === 'remix' && usOK)) || (wantUS && !S.us);
+    $('#usPick').hidden = !wantUS;
+    $('#patchGo').disabled = !S.disc || S.patching || !(S.state === 'original' || isUS) || (wantUS && !S.us);
     if (S.patching || S.patchedName) return;
-    $('#patchStatus').textContent = !S.disc ? '' : S.state === 'remix' || S.state === 'remix-us' ? t('patchAlready') : S.state === 'other' ? t('patchSource') : isUS ? t('patchNeedUS') : t('patchNeed');
+    $('#patchStatus').textContent = !S.disc ? '' : S.cfgOnDisc ? t('patchAlreadyCfg', S.cfgOnDisc) : S.state === 'remix' || S.state === 'remix-us' ? t('patchAlready') : S.state === 'other' ? t('patchSource') : isUS ? '' : t('patchNeed');
   }
-  function renderFeat() {
-    const box = $('#featList'); box.innerHTML = '';
-    for (const [h, items] of t('feat')) { const g = document.createElement('div'); g.className = 'grp'; const hh = document.createElement('h3'); hh.textContent = h; g.appendChild(hh);
-      const ul = document.createElement('ul'); for (const it of items) { const li = document.createElement('li'); li.textContent = it; ul.appendChild(li); } g.appendChild(ul); box.appendChild(g); }
+  // ---------- mods, configuration code, ready-to-wear outfits
+  const MODS = Seed.IDS, PRESETS = { all: MODS, earn: MODS.filter((m) => m !== 'unlock' && m !== 'special'), none: [] };
+  S.cfg = { mods: [...MODS], usMusic: false, skins: [] }; S.skinIdx = [];
+  async function modsPkg() {
+    if (!_P.mods) { const b = Uint8Array.from(atob(window.REMIX_MODS.pkg), (c) => c.charCodeAt(0));
+      _P.mods = JSON.parse(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text()); }
+    return _P.mods;
+  }
+  function renderMods() {
+    const box = $('#modList'); box.innerHTML = '';
+    for (const id of MODS) {
+      const [name, desc] = t('mods')[id], l = document.createElement('label'); l.className = 'mod' + (S.cfg.mods.includes(id) ? ' on' : '');
+      l.innerHTML = '<input type="checkbox" class="sw"><div><b></b><p></p></div><img alt="" loading="lazy" hidden>';
+      const cb = l.firstChild; cb.checked = S.cfg.mods.includes(id); cb.onchange = () => { S.cfg.mods = MODS.filter((m) => m === id ? cb.checked : S.cfg.mods.includes(m)); cfgChanged(); };
+      l.querySelector('b').textContent = name; l.querySelector('p').textContent = desc;
+      const im = l.querySelector('img'); im.onload = () => (im.hidden = false); im.src = 'screens/mod_' + id + '.png'; im.alt = name;
+      im.onclick = (e) => { e.preventDefault(); im.classList.toggle('big'); };
+      box.appendChild(l);
+    }
+    const sk = $('#skinList'); sk.innerHTML = '';
+    if (!S.skinIdx.length) { sk.innerHTML = '<span class="mut"></span>'; sk.firstChild.textContent = t('skinsNone'); }
+    S.skinIdx.forEach((k, i) => { const l = document.createElement('label'); l.className = S.cfg.skins.includes(i) ? 'on' : '';
+      l.innerHTML = '<input type="checkbox" class="sw"><span><b></b><br><small></small></span>'; const cb = l.firstChild; cb.checked = S.cfg.skins.includes(i);
+      cb.onchange = () => { S.cfg.skins = S.skinIdx.map((_, n) => n).filter((n) => n === i ? cb.checked : S.cfg.skins.includes(n)); cfgChanged(); };
+      l.querySelector('b').textContent = k.name + (k.author ? t('by', k.author) : ''); l.querySelector('small').textContent = t('replacesLbl') + ' : ' + k.replaces; sk.appendChild(l); });
+    $('#usMus').checked = S.cfg.usMusic; $('#musEU').checked = !S.cfg.usMusic;
+    $('#cfgOut').textContent = Seed.encode(S.cfg); $('#cfgSum').textContent = t('summary', S.cfg.mods.length, MODS.length);
+    document.querySelectorAll('.presets button').forEach((b) => b.classList.toggle('on', PRESETS[b.dataset.preset].join() === S.cfg.mods.join()));
+  }
+  function cfgChanged() { renderMods(); try { history.replaceState(null, '', '#' + Seed.encode(S.cfg)); localStorage.setItem('cb2cfg', Seed.encode(S.cfg)); } catch (e) {} patchState(); }
+  function loadCode(code, quiet) { const c = Seed.decode(code); if (!c) { if (!quiet) $('#cfgMsg').textContent = t('cfgBad'); return false; }
+    c.skins = c.skins.filter((i) => i < Math.max(S.skinIdx.length, 16)); S.cfg = c; cfgChanged(); if (!quiet) $('#cfgMsg').textContent = t('cfgLoaded', Seed.encode(c)); return true; }
+  document.querySelectorAll('.presets button').forEach((b) => (b.onclick = () => { S.cfg.mods = [...PRESETS[b.dataset.preset]]; cfgChanged(); }));
+  $('#cfgLoad').onclick = () => loadCode($('#cfgIn').value);
+  $('#cfgIn').onkeydown = (e) => { if (e.key === 'Enter') loadCode($('#cfgIn').value); };
+  const copy = async (x) => { try { await navigator.clipboard.writeText(x); $('#cfgMsg').textContent = t('cfgCopied'); } catch (e) { $('#cfgMsg').textContent = x; } };
+  $('#cfgCopy').onclick = () => copy(Seed.encode(S.cfg));
+  $('#cfgLink').onclick = () => copy(location.href.split('#')[0] + '#' + Seed.encode(S.cfg));
+  $('#musEU').onchange = $('#usMus').onchange = () => { S.cfg.usMusic = $('#usMus').checked; cfgChanged(); };
+  (async () => {
+    try { S.skinIdx = await (await fetch('skins/index.json')).json(); } catch (e) { S.skinIdx = []; }
+    let start = location.hash.slice(1); try { start = start || localStorage.getItem('cb2cfg') || ''; } catch (e) {}
+    if (!start || !loadCode(start, true)) renderMods();
+  })();
+  // the game as configured: mods + outfits (+ the Workshop's own edits) -> sector map, ready for d.build / composeSoundtrack
+  async function configuredSectors(d, { mods, skins, slots = [] }, L) {
+    let sec = {}, loc = S.loc, chr0 = S.chr;
+    const user = async (l) => (sec[l] ? (sec[l] instanceof Uint8Array ? sec[l] : sec[l].data) : d.user(l));
+    const putFile = async (lba, bytes) => { for (let k = 0; k < Math.ceil(bytes.length / 2048); k++) { const u = (await user(lba + k)).slice(); u.set(bytes.subarray(k * 2048, Math.min(bytes.length, (k + 1) * 2048)));
+      sec[lba + k] = sec[lba + k] && !(sec[lba + k] instanceof Uint8Array) ? { sub: sec[lba + k].sub, data: u } : u; } };
+    const readF = async (p) => { const e = d.files[p], out = new Uint8Array(Math.ceil(e.size / 2048) * 2048); for (let k = 0; k < out.length / 2048; k++) out.set(await user(e.lba + k), k * 2048); return out.subarray(0, e.size); };
+    if (mods) { L(t('patchApplying')); sec = await d.applyMods(await modsPkg(), mods, L); loc = remixLoc(await readF('/SCES_009.92')); if (S.chr) chr0 = await readF('/TITLE/CHR.DAT'); }
+    for (const i of skins || []) { const k = S.skinIdx[i]; if (!k) continue; L(t('skinApplying', k.name)); await applySkin(await (await fetch('skins/' + k.file)).json()); slots.push(S.cur); }
+    slots = [...new Set(slots)];
+    for (const x of slots) {
+      const nf = CB2.fromRGBA(x.f, x.m.pm, composite(x), (() => { const ch = new Uint8Array(TW * TH); for (let i = 0; i < TW * TH; i++) ch[i] = x.over[i * 4 + 3] ? 1 : 0; return ch; })());
+      const bytes = CB2.writeFBD(nf); await putFile(d.files[x.s.file].lba, bytes); L('✓ ' + x.r.name + ' — ' + slotLabel(x.s));
+      if (x.s.enemy && loc) { const e = loc[x.s.enemy]; const raw = new Uint8Array(Math.ceil(e.size / 2048) * 2048); for (let k = 0; k < raw.length / 2048; k++) raw.set(await user(e.lba + k), k * 2048);
+        await putFile(e.lba, CB2.patchEnemy(raw.subarray(0, e.size), bytes)); L(t('compTex')); }
+    }
+    if (S.chr) {
+      const chr = chr0.slice(); let touched = false; const dirty = slots.filter((y) => menuSlot(y));
+      for (let r = 0; r < 4; r++) {
+        const mine = dirty.filter((y) => menuSlot(y).r === r); if (!mine.length) continue;
+        const js = [...new Set(mine.map((y) => menuSlot(y).j))], ps = [...new Set(mine.map((y) => menuSlot(y).p))];
+        for (const j of js) { const tx = menuTextures(r, j, 0, mine.filter((y) => menuSlot(y).j === j)); MenuSkin.writeTIM(chr, S.menu[r].up[j], tx.up, Board.quant); }
+        for (const p of ps) { const tx = menuTextures(r, 0, p, mine.filter((y) => menuSlot(y).p === p)); MenuSkin.writeTIM(chr, S.menu[r].lo[p], tx.lo, Board.quant); }
+        touched = true;
+      }
+      if (touched) { await putFile(d.files['/TITLE/CHR.DAT'].lba, chr); L(t('menuTex')); }
+    }
+    return sec;
   }
   $('#patchGo').onclick = async () => {
     const st = (x) => ($('#patchStatus').textContent = x); S.patching = true; S.patchedName = null; patchState();
     try {
       st(t('patchApplying')); const d = S.disc;
-      const isUS = S.state === 'original-us', withUS = !isUS && $('#usMus').checked && S.us;
-      const mods = S.state === 'original' || isUS ? await d.applyDelta(await remixPatch(isUS), (x) => st(t('patchApplying') + ' ' + x)) : {};
+      const isUS = S.state === 'original-us', withUS = !isUS && S.cfg.usMusic && S.us, code = Seed.encode(S.cfg);
+      let mods;
+      if (isUS) mods = await d.applyDelta(await remixPatch(true), (x) => st(t('patchApplying') + ' ' + x));
+      else { mods = await configuredSectors(d, { mods: S.cfg.mods, skins: S.cfg.skins }, st); await d.markConfig(mods, code); }
       st(t('assembling'));
       const r = withUS ? await d.composeSoundtrack(S.us, mods, US_MUSIC, (x) => st(t('assembling') + ' ' + x)) : await d.build(mods, (x) => st(t('assembling') + ' ' + x));
       const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : (p.f ? S.usFile : S.file).slice(p.a, p.b))));
-      const base = S.file.name.replace(/\.chd$/i, '').replace(/ \(Remix\)$/, '');
-      const name = d.kind === 'bin' ? S.file.name : base + (isUS ? ' (Remix US).chd' : withUS ? ' (Remix, musiques US).chd' : ' (Remix).chd');
-      dl(blob, name); S.patchedName = name; st(t('patchDone', name));
+      const base = S.file.name.replace(/\.chd$/i, '').replace(/ \(Remix[^)]*\)$/, '');
+      const name = d.kind === 'bin' ? S.file.name : base + (isUS ? ' (Remix US).chd' : ' (Remix ' + code.slice(4) + ').chd');
+      dl(blob, name); S.patchedName = name; st(t('patchDone', name) + (isUS ? '' : '\n' + t('cfgCode') + ' : ' + code));
     } catch (e) { st(e.code === 'source' ? t('patchSource') : t('error', e.message)); console.error(e); }
     S.patching = false; $('#patchGo').disabled = false;
   };
@@ -579,7 +631,7 @@
   // ---------- language
   document.querySelectorAll('[data-lang]').forEach((b) => (b.onclick = () => I18N.set(b.dataset.lang)));
   I18N.onChange(() => {
-    renderFeat(); discState(); patchState();
+    renderMods(); discState(); patchState();
     if (!S.disc) return;
     document.querySelectorAll('.slot').forEach((d) => { const r = RIDERS.find((x) => x.slots.some((y) => y.id === d.dataset.id)); const sl = r.slots.find((y) => y.id === d.dataset.id); d.lastChild.textContent = slotLabel(sl); });
     if (S.cur) $('#title').textContent = S.cur.r.name + ' — ' + slotLabel(S.cur.s);
@@ -591,8 +643,8 @@
   S.tab = 'patch';
   function showTab() {
     document.querySelectorAll('.tabs .tab').forEach((x) => { x.classList.toggle('on', x.dataset.tab === S.tab); x.setAttribute('aria-selected', x.dataset.tab === S.tab); });
-    for (const id of ['patch', 'work', 'boards', 'music']) $('#' + id).classList.toggle('show', !!S.disc && (id === 'work' ? 'skins' : id) === S.tab);
-    $('#needdisc').style.display = S.disc ? 'none' : 'block';
+    for (const id of ['patch', 'work', 'boards', 'music', 'prog']) $('#' + id).classList.toggle('show', (!!S.disc || id === 'prog') && (id === 'work' ? 'skins' : id) === S.tab);
+    $('#needdisc').style.display = S.disc || S.tab === 'prog' ? 'none' : 'block';
     if (S.tab === 'skins' && S.cur) setTimeout(() => window.dispatchEvent(new Event('resize')), 0);
     patchState();
   }

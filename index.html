@@ -50,7 +50,7 @@ h1 span{color:var(--acc)}
 #discline .pill{padding:5px 12px;border-radius:999px;font-weight:700;font-size:.88rem;border:1px solid var(--line2)}
 #discline .pill.ok{border-color:rgba(95,211,141,.6);color:var(--ok)} #discline .pill.warn{border-color:rgba(255,122,26,.6);color:var(--acc)}
 /* tabs */
-.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 14px}
+.tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:8px 0 14px}
 #music.show{display:block}
 .usmus{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}
 .mhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
@@ -60,7 +60,7 @@ h1 span{color:var(--acc)}
 .mrow.on{border-color:var(--acc)}
 .mrow .mn,.mrow .md,.mrow .mp{color:var(--mut);font-variant-numeric:tabular-nums;font-size:.9rem}
 .mrow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media (max-width:1100px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1100px){.tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (max-width:640px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.mrow{grid-template-columns:2em minmax(0,1fr) auto;row-gap:6px}.mrow .md,.mrow .mp{grid-column:2}.mrow .mplay{grid-column:3;grid-row:1}.mrow .msave{grid-column:3;grid-row:2}}
 .tab{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:rgba(19,35,57,.85);color:var(--txt);cursor:pointer;font:inherit}
 .tab svg{width:36px;height:36px;flex:none}
@@ -71,6 +71,39 @@ h1 span{color:var(--acc)}
 .needdisc{display:none;padding:18px;border-radius:14px;border:1px dashed var(--line2);color:var(--mut);text-align:center}
 /* patch panel */
 #patch .feat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.cfg{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(10,22,38,.4)}
+.cfgrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cfglbl{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice);font-weight:700}
+#cfgOut{font:700 1.15rem ui-monospace,Consolas,monospace;letter-spacing:.06em;color:var(--snow);padding:4px 10px;border-radius:8px;background:rgba(244,251,255,.07);border:1px solid var(--line2)}
+#cfgIn{font:600 .95rem ui-monospace,Consolas,monospace;width:13em;max-width:100%;padding:6px 10px;border-radius:8px;border:1px solid var(--line2);background:rgba(10,22,38,.6);color:var(--txt);text-transform:uppercase}
+.cfghelp{margin:8px 0;font-size:.88rem} #cfgMsg{color:var(--acc)}
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ph{margin:18px 0 8px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice)}
+.mods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mod{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(10,22,38,.4);cursor:pointer}
+.mod.on{border-color:var(--acc);background:linear-gradient(180deg,rgba(255,122,26,.10),rgba(10,22,38,.45))}
+.mod b{display:block;font-size:.98rem} .mod p{margin:4px 0 0;color:var(--mut);font-size:.86rem;line-height:1.4}
+.mod img{width:112px;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--line2);image-rendering:pixelated;background:#000}
+.mod img.big{position:fixed;inset:0;margin:auto;width:min(92vw,640px);height:auto;z-index:50;box-shadow:0 0 0 100vmax rgba(0,0,0,.75)}
+.sw{appearance:none;width:42px;height:24px;border-radius:999px;background:rgba(244,251,255,.16);position:relative;cursor:pointer;margin:2px 0 0;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--snow);transition:left .15s}
+.sw:checked{background:var(--acc)} .sw:checked::after{left:21px}
+.sw:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+.skinpick{display:flex;flex-wrap:wrap;gap:8px}
+.skinpick label{display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(10,22,38,.4);cursor:pointer}
+.skinpick label.on{border-color:var(--acc)}
+.phead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;align-items:center;margin:14px 0}
+.pbig{font:400 2.4rem var(--display);color:var(--acc);grid-row:span 2}.phead p{margin:0}
+.pbar{height:12px;border-radius:999px;background:rgba(244,251,255,.1);overflow:hidden}.pbar i{display:block;height:100%;background:linear-gradient(90deg,#ff9a3d,var(--acc))}
+.pgrp{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(10,22,38,.4);margin:10px 0}
+.pgrp h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice)}
+.pitem{display:flex;gap:10px;align-items:flex-start;padding:6px 0}.pitem p{margin:2px 0 0;color:var(--mut);font-size:.86rem}
+.pchk{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--line2);margin-top:2px}
+.pitem.ok .pchk{background:var(--ok);border-color:var(--ok)}.pitem.ok .pchk::after{content:"✓";display:block;color:#0b1728;font-weight:900;text-align:center;line-height:16px}
+.ptab{width:100%;border-collapse:collapse;font-size:.9rem}.ptab th,.ptab td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:center}
+.ptab td:first-child,.ptab th:first-child{text-align:left}.ptab td.ok{color:var(--ok)}
+.btn.pri{background:var(--acc);color:#1a0d02;border-color:var(--acc)} .skinpick small{color:var(--mut)}
+@media (max-width:700px){.mods{grid-template-columns:minmax(0,1fr)}.mod{grid-template-columns:auto minmax(0,1fr)}.mod img{grid-column:2;width:100%;max-width:240px}}
 #patch .grp{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:rgba(10,22,38,.4)}
 #patch .grp h3{margin:0 0 6px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ice)}
 #patch ul{margin:0;padding-left:18px} #patch li{margin:3px 0;color:#d6e4f2;font-size:.93rem}
@@ -85,7 +118,7 @@ button.pri,label.btn.pri{background:var(--acc);border-color:var(--acc);color:#1a
 button:disabled{opacity:.45;cursor:default}
 .mut{color:var(--mut)}
 .panel-ws{display:none}
-#work.show{display:grid}#patch.show{display:block}
+#work.show{display:grid}#patch.show{display:block}#prog.show{display:block}
 #work{grid-template-columns:230px minmax(280px,1fr) minmax(300px,420px);gap:14px;height:min(860px,calc(100vh - 40px))}
 #boards.show{display:block}
 .col{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:auto;min-height:0}
@@ -176,6 +209,7 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
       <button class="tab" data-tab="skins" role="tab"><svg viewBox="0 0 36 36"><path d="M12 5 6 9l-3 9 5 2 2-5v16h16V15l2 5 5-2-3-9-6-4c-1 3-3 4-6 4s-5-1-6-4z" fill="#8fd3ff"/></svg><div><b data-i18n="tabSkins"></b><span data-i18n="tabSkinsSub"></span></div></button>
       <button class="tab" data-tab="boards" role="tab"><svg viewBox="0 0 36 36"><rect x="4" y="13" width="28" height="10" rx="5" fill="#ff7a1a"/><path d="M10 15v6M26 15v6" stroke="#0b1728" stroke-width="2"/></svg><div><b data-i18n="tabBoards"></b><span data-i18n="tabBoardsSub"></span></div></button>
       <button class="tab" data-tab="music" role="tab"><svg viewBox="0 0 36 36"><path d="M14 26V8l16-3v18" fill="none" stroke="#8fd3ff" stroke-width="2.5" stroke-linejoin="round"/><circle cx="10" cy="26" r="4.5" fill="#ff7a1a"/><circle cx="26" cy="23" r="4.5" fill="#ff7a1a"/></svg><div><b data-i18n="tabMusic"></b><span data-i18n="tabMusicSub"></span></div></button>
+      <button class="tab" data-tab="prog" role="tab"><svg viewBox="0 0 36 36"><path d="M10 6h16v6a8 8 0 0 1-16 0z" fill="#ffd25e"/><path d="M10 8H5c0 5 2 7 6 7M26 8h5c0 5-2 7-6 7" fill="none" stroke="#ffd25e" stroke-width="2"/><path d="M15 20h6v5h-6zM11 30h14" stroke="#8fd3ff" stroke-width="3" stroke-linecap="round"/></svg><div><b data-i18n="tabProg"></b><span data-i18n="tabProgSub"></span></div></button>
     </div>
     <p class="needdisc" id="needdisc" data-i18n="needDisc"></p>
     <section id="music" class="panel-ws">
@@ -184,10 +218,29 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
       <div id="mList"></div>
       <p class="mut" style="font-size:12px" data-i18n="mNote"></p>
     </section>
+    <section id="prog" class="panel-ws">
+      <h3 class="ph" id="progTitle"></h3>
+      <p id="progLead"></p>
+      <label class="btn pri"><span id="progPickTxt"></span><input type="file" id="progFile" accept=".srm,.mcr,.mcd,.mc,.mem,.gme,.vmp,.mcs,.psx,.ps1,.psv,.bin,.sav" hidden></label>
+      <p class="mut" id="progWhere"></p>
+      <div id="progOut"></div>
+    </section>
     <section id="patch" class="panel-ws">
-      <div class="feat" id="featList"></div>
-      <div class="usmus"><label class="chk"><input type="checkbox" id="usMus"> <span data-i18n="usMus"></span></label><label class="btn" id="usPick" hidden><span data-i18n="usPick"></span><input type="file" id="usFile" accept=".chd" hidden></label><span id="usInfo" class="mut"></span></div>
-      <button class="go" id="patchGo" disabled data-i18n="patchGo"></button>
+      <div class="cfg">
+        <div class="cfgrow"><span class="cfglbl" data-i18n="cfgCode"></span><output id="cfgOut"></output><button id="cfgCopy" data-i18n="cfgCopy"></button><button id="cfgLink" data-i18n="cfgLink"></button>
+          <span class="sp"></span><input id="cfgIn" type="text" spellcheck="false" autocomplete="off" data-i18n-ph="cfgPaste"><button id="cfgLoad" data-i18n="cfgLoad"></button></div>
+        <p class="mut cfghelp"><span data-i18n="cfgHelp"></span> <span id="cfgMsg"></span></p>
+        <div class="presets"><button data-preset="all" data-i18n="preAll"></button><button data-preset="earn" data-i18n="preEarn" data-i18n-title="preEarnTip"></button><button data-preset="none" data-i18n="preNone"></button><span id="cfgSum" class="mut"></span></div>
+      </div>
+      <h3 class="ph" data-i18n="grpMods"></h3>
+      <div class="mods" id="modList"></div>
+      <p class="mut" id="usNote" hidden></p>
+      <h3 class="ph" data-i18n="grpMusic"></h3>
+      <div class="usmus"><label class="chk"><input type="radio" name="mus" id="musEU" checked> <span data-i18n="musEU"></span></label><label class="chk"><input type="radio" name="mus" id="usMus"> <span data-i18n="musUS"></span></label><label class="btn" id="usPick" hidden><span data-i18n="usPick"></span><input type="file" id="usFile" accept=".chd" hidden></label><span id="usInfo" class="mut"></span></div>
+      <h3 class="ph" data-i18n="grpSkins"></h3>
+      <div class="skinpick" id="skinList"></div>
+      <p class="mut" data-i18n="skinsNote"></p>
+      <button class="go" id="patchGo" disabled data-i18n="patchGoMods"></button>
       <div id="patchStatus"></div>
     </section>
   <section id="work" class="panel-ws">
@@ -290,6 +343,7 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="i18n.js"></script>
 <script src="patches.js"></script>
+<script src="seed.js"></script>
 <script src="lzma.js"></script>
 <script src="chdpatch.js"></script>
 <script src="flac.js"></script>
@@ -299,5 +353,6 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
 <script src="menu.js"></script>
 <script src="app.js"></script>
 <script src="music.js"></script>
+<script src="progress.js"></script>
 </body>
 </html>

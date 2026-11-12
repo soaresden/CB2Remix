@@ -13,19 +13,16 @@
 | **Atelier** | Dessine ou importe (JPG / PNG) ta planche et écris-la dans ta carte mémoire. |
 | **Musiques** | Écoute la bande-son du jeu et télécharge-la en MP3 ou en WAV. |
 
-## 1. Patchs (Remix v16)
+## 1. Patchs (Remix v16, à la carte)
 
-Ouvre le jeu **d'origine** (PAL SCES-00992, `.chd` ou `.bin`) puis **Installer le Remix et télécharger**. Le site reconnaît un jeu d'origine, un jeu déjà Remix ou une autre version (dans ce cas le patch est refusé).
+Ouvre le jeu **d'origine** (PAL SCES-00992, `.chd` ou `.bin`), coche les mods que tu veux, puis **Construire et télécharger**.
 
-Le patch est un petit fichier de différences (`patches.js`, environ 22 Ko) : il ne contient que les octets écrits par le Remix et des références vers ton propre disque, jamais de données du jeu.
+- **Interrupteurs** : 9 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master), avec un aperçu.
+- **Préréglages** : *Remix complet*, *100 % à gagner* (toutes les améliorations, mais riders cachés, pistes, planches, Mirror et Hard se gagnent comme dans le jeu d'origine), *Aucun mod*.
+- **Musiques** (européennes ou américaines, avec ton CD US en .chd) et **tenues du Prêt-à-porter** à inclure.
+- **Code de configuration** `CB2-XXXX-XXXX` : il résume tous ces choix. Copie-le ou partage le lien (le code est dans l'adresse), recolle-le plus tard : le même code redonne exactement le même jeu. Il est aussi écrit dans le jeu construit, que le site reconnaît ensuite.
 
-Ce qu'apporte le Remix :
-- Boss, Gray et Snowman jouables en championnat, tout débloqué (Mirror et Hard compris) ; Hard + Mirror avec L1 + R1 + X.
-- Noms et voix propres pour Boss, Gray et Snowman ; tenue cachée de Cindy / Irin dans la liste des vestes.
-- Figures : la croix seule fait tourner en l'air, grabs d'origine, enchaînements « … to … », Carré = rotations 4× plus rapides, Big Air Master avec touches et figure suivante.
-- Stats MAX avec ○ sur l'écran BOARDER.
-- Boarder Cross : fonce dans un adversaire et il tombe.
-- Planches SPECIAL toujours disponibles, correctifs ciel et voix.
+Le patch ne contient que les octets écrits par le Remix et des références vers ton propre disque, jamais de données du jeu. Le même code marche avec le patcheur Batocera et `make_remix.py --config` du dépôt de décompilation.
 
 ## 2. Prêt-à-porter (skins)
 
@@ -66,6 +63,10 @@ Les musiques sont les pistes audio du disque (`/CDDA/BGM*.DA`). L'onglet les lit
 convertit en MP3 (128 à 320 kb/s, avec titre et numéro de piste) ou en WAV sans perte, une par une ou toutes dans un zip.
 L'encodeur MP3 ([lamejs](https://github.com/zhuker/lamejs), LGPL) est chargé depuis jsDelivr la première fois. Avec une image
 `.bin` seule, les pistes ne sont trouvées que si le fichier contient tout le disque.
+
+## 5. Progression (100 %)
+
+Ouvre ta carte mémoire (`.srm` de Batocera/pcsx_rearmed, `.mcr`, `.mcd`, `.mc`, `.gme`, `.vmp`, `.mcs`, `.psv`) : la page lit ta sauvegarde de Cool Boarders 2 et affiche ta checklist (riders cachés, Mirror, Hard, planches SPECIAL, 30 trophées du Free Style) avec le pourcentage et la condition de chaque déblocage, lue dans le code du jeu. Pas besoin du disque pour cet onglet.
 
 ## Limites connues
 
