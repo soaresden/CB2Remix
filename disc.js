@@ -4,6 +4,7 @@
   const isNode = typeof module !== 'undefined';
   const CP = isNode ? require('./chdpatch.js') : root.CHDPatch;
   const LZ = isNode ? require('./lzma.js') : root.LZMA;
+  const FL = isNode ? require('./flac.js') : root.FLAC;
   const be = (d, o, n) => { let v = 0; for (let i = 0; i < n; i++) v = v * 256 + d[o + i]; return v; };
   async function inflateRaw(u8) {
     if (isNode) return new Uint8Array(require('zlib').inflateRawSync(u8));
@@ -48,6 +49,23 @@
       const map = await read(c.hdr.mapoffset, c.hdr.mapoffset + 16 + be(mh, 0, 4));
       c.M = CP.decodeMap(c.hdr, map);
       c.fph = c.hdr.hunkbytes / FRAME; c.cache = new Map();
+      // track list (metadata CHT2 / CHTR): CHD frame and disc LBA of each track's index 01
+      c.tracks = []; let mo = be(h, 48, 8);
+      while (mo) {
+        const mh2 = await read(mo, mo + 16), tag = String.fromCharCode(...mh2.subarray(0, 4)), len = be(mh2, 5, 3);
+        if (tag === 'CHT2' || tag === 'CHTR') {
+          const s = String.fromCharCode(...(await read(mo + 16, mo + 16 + len))).replace(/\0.*$/, ''), g = (k) => (s.match(new RegExp(k + ':(\\S+)')) || [])[1];
+          c.tracks.push({ n: +g('TRACK'), type: g('TYPE'), frames: +g('FRAMES'), pregap: +(g('PREGAP') || 0), pgtype: g('PGTYPE') || '', postgap: +(g('POSTGAP') || 0) });
+        }
+        mo = be(mh2, 8, 8);
+      }
+      c.tracks.sort((a, b) => a.n - b.n);
+      let f = 0, l = 0;
+      for (const t of c.tracks) {
+        const v = t.pgtype[0] === 'V', pg = t.pregap; if (t.n === 1) l = -pg;
+        t.lba = l + pg; t.chd = f + (v ? pg : 0); t.len = t.frames - (v ? pg : 0);
+        l = t.lba + t.len + t.postgap; f += t.frames + ((4 - (t.frames % 4)) % 4);
+      }
       return c;
     }
     async hunk(i) {
@@ -64,6 +82,15 @@
         let base;
         if (codec === 'cdlz') base = LZ.decodeRaw(src.subarray(hdrb, hdrb + cbase), n * SEC);
         else if (codec === 'cdzl') base = await inflateRaw(src.subarray(hdrb, hdrb + cbase));
+        else if (codec === 'cdfl') { // CD audio in FLAC (no ECC flags, no length header); samples stored big-endian like the other codecs
+          const r = FL.decodeFrames(src, n * SEC / 4); base = new Uint8Array(n * SEC);
+          for (let i = 0; i < r.pcm.length; i++) { base[i * 2] = (r.pcm[i] >> 8) & 255; base[i * 2 + 1] = r.pcm[i] & 255; }
+          out = new Uint8Array(hb);
+          for (let f = 0; f < n; f++) out.set(base.subarray(f * SEC, (f + 1) * SEC), f * FRAME);
+          out.eccFlags = new Uint8Array(eccb); out.subSrc = src.subarray(r.consumed).slice(); out.codec = codec;
+          if (this.cache.size > 64) this.cache.clear();
+          this.cache.set(i, out); return out;
+        }
         else throw new Error('codec CHD non géré : ' + codec);
         out = new Uint8Array(hb);
         for (let f = 0; f < n; f++) out.set(base.subarray(f * SEC, (f + 1) * SEC), f * FRAME);
@@ -128,6 +155,23 @@
       return out.subarray(0, f.size);
     };
     d.name = name;
+    // ---- CD audio (the game's music): tracks named after the /CDDA/*.DA entries of the disc when they match
+    d.audioTracks = () => {
+      const named = Object.entries(d.files).filter(([p]) => /^\/CDDA\/.+\.DA$/i.test(p)).map(([p, e]) => ({ name: p.split('/').pop().replace(/\.DA$/i, ''), lba: e.lba, len: Math.round(e.size / 2048) }));
+      const nameOf = (lba) => { const m = named.find((x) => Math.abs(x.lba - lba) <= 225); return m ? m.name : null; };
+      if (d.kind === 'chd' && d.tracks.length) return d.tracks.filter((t) => t.type === 'AUDIO').map((t) => ({ n: t.n, name: nameOf(t.lba), frames: t.len, chd: t.chd, lba: t.lba }));
+      return named.sort((a, b) => a.lba - b.lba).map((x, i) => ({ n: i + 2, name: x.name, frames: x.len, lba: x.lba }));
+    };
+    // 16-bit stereo samples (L R L R ...) of a track; onProgress(fraction)
+    d.readAudio = async (t, onProgress = () => {}) => {
+      const pcm = new Int16Array(t.frames * SEC / 2), le = d.kind !== 'chd';
+      for (let k = 0; k < t.frames; k++) {
+        const s = await d.sector(t.chd !== undefined ? t.chd + k : t.lba + k), o = k * SEC / 2;
+        for (let i = 0; i < SEC / 2; i++) pcm[o + i] = le ? (s[i * 2] | (s[i * 2 + 1] << 8)) << 16 >> 16 : ((s[i * 2] << 8) | s[i * 2 + 1]) << 16 >> 16;
+        if (k % 512 === 0) { onProgress(k / t.frames); await new Promise((r) => setTimeout(r, 0)); }
+      }
+      return pcm;
+    };
     // Remix delta patch (see delta/mkdelta.py) -> {lba: {sub, data}}
     d.crc32 = (u8) => { let c = ~0; for (let i = 0; i < u8.length; i++) { c ^= u8[i]; for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1)); } return ~c >>> 0; };
     d.applyDelta = async (P, log = () => {}) => {

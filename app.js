@@ -34,7 +34,7 @@
       const read = async (a, b) => new Uint8Array(await f.slice(a, b).arrayBuffer());
       const d = await Disc.open(read, f.size, f.name);
       if (!d.files['/DATA/CHR/FR/1P/FRM1.PMD']) throw new Error(t('notCB2'));
-      S.disc = d; S.file = f; S.slots = {}; S.models = {}; S.cur = null; S.hist = []; S.patchedName = null;
+      S.disc = d; S.file = f; if (window.CB2Music) CB2Music.setDisc(d, f.name); S.slots = {}; S.models = {}; S.cur = null; S.hist = []; S.patchedName = null;
       log(t('discOK', d.kind.toUpperCase(), Object.keys(d.files).length));
       // Remix extras (competition textures of Gray / Snowman)
       S.state = 'other';
@@ -563,7 +563,7 @@
   S.tab = 'patch';
   function showTab() {
     document.querySelectorAll('.tabs .tab').forEach((x) => { x.classList.toggle('on', x.dataset.tab === S.tab); x.setAttribute('aria-selected', x.dataset.tab === S.tab); });
-    for (const id of ['patch', 'work', 'boards']) $('#' + id).classList.toggle('show', !!S.disc && (id === 'work' ? 'skins' : id) === S.tab);
+    for (const id of ['patch', 'work', 'boards', 'music']) $('#' + id).classList.toggle('show', !!S.disc && (id === 'work' ? 'skins' : id) === S.tab);
     $('#needdisc').style.display = S.disc ? 'none' : 'block';
     if (S.tab === 'skins' && S.cur) setTimeout(() => window.dispatchEvent(new Event('resize')), 0);
     patchState();

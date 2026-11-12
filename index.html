@@ -50,7 +50,17 @@ h1 span{color:var(--acc)}
 #discline .pill{padding:5px 12px;border-radius:999px;font-weight:700;font-size:.88rem;border:1px solid var(--line2)}
 #discline .pill.ok{border-color:rgba(95,211,141,.6);color:var(--ok)} #discline .pill.warn{border-color:rgba(255,122,26,.6);color:var(--acc)}
 /* tabs */
-.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:8px 0 14px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 14px}
+#music.show{display:block}
+.mhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+#mAudio{width:100%;max-width:640px;margin:0 0 10px}
+#mList{display:grid;gap:6px}
+.mrow{display:grid;grid-template-columns:2.2em minmax(0,1fr) 3.4em 7.5em auto auto;gap:10px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(10,22,38,.4)}
+.mrow.on{border-color:var(--acc)}
+.mrow .mn,.mrow .md,.mrow .mp{color:var(--mut);font-variant-numeric:tabular-nums;font-size:.9rem}
+.mrow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:1100px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.mrow{grid-template-columns:2em minmax(0,1fr) auto;row-gap:6px}.mrow .md,.mrow .mp{grid-column:2}.mrow .mplay{grid-column:3;grid-row:1}.mrow .msave{grid-column:3;grid-row:2}}
 .tab{display:flex;gap:12px;align-items:flex-start;text-align:left;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:rgba(19,35,57,.85);color:var(--txt);cursor:pointer;font:inherit}
 .tab svg{width:36px;height:36px;flex:none}
 .tab b{display:block;font:400 1.05rem var(--display);letter-spacing:.02em}
@@ -164,8 +174,15 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
       <button class="tab on" data-tab="patch" role="tab"><svg viewBox="0 0 36 36"><path d="M8 32V5" stroke="#eef6ff" stroke-width="2.5" stroke-linecap="round"/><path d="M9 6h18l-4 6 4 6H9z" fill="#ff7a1a"/></svg><div><b data-i18n="tabPatch"></b><span data-i18n="tabPatchSub"></span></div></button>
       <button class="tab" data-tab="skins" role="tab"><svg viewBox="0 0 36 36"><path d="M12 5 6 9l-3 9 5 2 2-5v16h16V15l2 5 5-2-3-9-6-4c-1 3-3 4-6 4s-5-1-6-4z" fill="#8fd3ff"/></svg><div><b data-i18n="tabSkins"></b><span data-i18n="tabSkinsSub"></span></div></button>
       <button class="tab" data-tab="boards" role="tab"><svg viewBox="0 0 36 36"><rect x="4" y="13" width="28" height="10" rx="5" fill="#ff7a1a"/><path d="M10 15v6M26 15v6" stroke="#0b1728" stroke-width="2"/></svg><div><b data-i18n="tabBoards"></b><span data-i18n="tabBoardsSub"></span></div></button>
+      <button class="tab" data-tab="music" role="tab"><svg viewBox="0 0 36 36"><path d="M14 26V8l16-3v18" fill="none" stroke="#8fd3ff" stroke-width="2.5" stroke-linejoin="round"/><circle cx="10" cy="26" r="4.5" fill="#ff7a1a"/><circle cx="26" cy="23" r="4.5" fill="#ff7a1a"/></svg><div><b data-i18n="tabMusic"></b><span data-i18n="tabMusicSub"></span></div></button>
     </div>
     <p class="needdisc" id="needdisc" data-i18n="needDisc"></p>
+    <section id="music" class="panel-ws">
+      <div class="mhead"><label class="mut"><span data-i18n="mFormat"></span> <select id="mFmt"><option value="mp3-320">MP3 320 kb/s</option><option value="mp3-192">MP3 192 kb/s</option><option value="mp3-128">MP3 128 kb/s</option><option value="wav" data-i18n="mWav"></option></select></label><button id="mAll" class="pri" data-i18n="mAll"></button><span id="mStatus" class="mut" aria-live="polite"></span></div>
+      <audio id="mAudio" controls hidden></audio>
+      <div id="mList"></div>
+      <p class="mut" style="font-size:12px" data-i18n="mNote"></p>
+    </section>
     <section id="patch" class="panel-ws">
       <div class="feat" id="featList"></div>
       <button class="go" id="patchGo" disabled data-i18n="patchGo"></button>
@@ -273,10 +290,12 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
 <script src="patches.js"></script>
 <script src="lzma.js"></script>
 <script src="chdpatch.js"></script>
+<script src="flac.js"></script>
 <script src="disc.js"></script>
 <script src="cb2.js"></script>
 <script src="board.js"></script>
 <script src="menu.js"></script>
 <script src="app.js"></script>
+<script src="music.js"></script>
 </body>
 </html>

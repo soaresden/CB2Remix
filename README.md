@@ -11,6 +11,7 @@
 | **Patchs** | Installe le hack Remix v16 sur le jeu d'origine. |
 | **Prêt-à-porter** | Repeins les tenues des 7 riders, avec aperçu 3D en course et dans le menu du jeu. |
 | **Atelier** | Dessine ou importe (JPG / PNG) ta planche et écris-la dans ta carte mémoire. |
+| **Musiques** | Écoute la bande-son du jeu et télécharge-la en MP3 ou en WAV. |
 
 ## 1. Patchs (Remix v16)
 
@@ -55,6 +56,13 @@ Merci de proposer des créations originales (pas de personnages, logos ou marque
 
 32 couleurs maximum, comme dans l'éditeur du jeu.
 
+## 4. Musiques
+
+Les musiques sont les pistes audio du disque (`/CDDA/BGM*.DA`). L'onglet les lit sur ton CHD, les joue dans la page et les
+convertit en MP3 (128 à 320 kb/s, avec titre et numéro de piste) ou en WAV sans perte, une par une ou toutes dans un zip.
+L'encodeur MP3 ([lamejs](https://github.com/zhuker/lamejs), LGPL) est chargé depuis jsDelivr la première fois. Avec une image
+`.bin` seule, les pistes ne sont trouvées que si le fichier contient tout le disque.
+
 ## Limites connues
 
 - Boss utilise en compétition une texture à part, pas encore modifiée.
@@ -62,9 +70,10 @@ Merci de proposer des créations originales (pas de personnages, logos ou marque
 
 ## Technique
 
-- `disc.js` : CHD v5 (LZMA / Deflate) et BIN, ISO 9660, EDC/ECC ; seuls les blocs modifiés sont réécrits ; application du patch `CB2D`.
+- `disc.js` : CHD v5 (LZMA / Deflate / FLAC, pistes audio) et BIN, ISO 9660, EDC/ECC ; seuls les blocs modifiés sont réécrits ; application du patch `CB2D`.
 - `cb2.js` : modèles PMD, textures FBD 4 bits. `menu.js` : modèles TMD et TIM du menu (`TITLE/CHR.DAT`), transfert de texture course → menu.
 - `board.js` : format `ORGBOARD` et cartes mémoire brutes de 128 Ko.
+- `flac.js` : décodeur FLAC des blocs audio des CHD. `music.js` : onglet Musiques (WAV, MP3 via lamejs, zip).
 - Rendu 3D : three.js r128.
 
 Projet de fan, non affilié à Sony ni à UEP Systems. Code sous licence MIT.
