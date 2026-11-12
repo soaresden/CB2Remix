@@ -13,6 +13,7 @@
       boss: ['Boss', '1re place en Compétition Mirror.'], gray: ['Gray', 'Half-pipe : 37,6 points ou plus — ou finir toutes les figures du Big Air Master.'],
       snow: ['Snowman', '1re place en Compétition Hard — ou les 30 trophées du Free Style.'],
       mirror: ['Mode Mirror', 'Finir la Compétition sur le podium (top 3).'], hard: ['Mode Hard', 'Finir la Compétition Mirror sur le podium.'],
+      hm: ['Hard + Mirror (Remix)', 'Mode ajouté par le Remix : L1 + R1 + ✕ sur Competition. Disponible dès que le Hard est débloqué (pas compté dans le 100 % du jeu d’origine).'],
       sp: (i) => ['Planche SPECIAL ' + (i + 1), 'Records du Free Style (trophées des pistes).'],
       courses: (n) => 'Pistes ouvertes au Free Style : ' + n + ' / 10',
       trophyHelp: 'Un trophée = battre le record officiel de la piste (affiché en bas à gauche) en Free Style.',
@@ -27,6 +28,7 @@
       boss: ['Boss', '1st place in Mirror Competition.'], gray: ['Gray', 'Half-pipe: 37.6 points or more — or finish every Big Air Master trick.'],
       snow: ['Snowman', '1st place in Hard Competition — or all 30 Free Style trophies.'],
       mirror: ['Mirror mode', 'Finish Competition on the podium (top 3).'], hard: ['Hard mode', 'Finish Mirror Competition on the podium.'],
+      hm: ['Hard + Mirror (Remix)', 'Mode added by the Remix: L1 + R1 + ✕ on Competition. Available once Hard is unlocked (not counted in the original game’s 100%).'],
       sp: (i) => ['SPECIAL board ' + (i + 1), 'Free Style records (course trophies).'],
       courses: (n) => 'Courses open in Free Style: ' + n + ' / 10',
       trophyHelp: 'A trophy = beat the course’s official record (shown bottom left) in Free Style.',
@@ -60,12 +62,12 @@
     if (!st) return;
     const items = [];
     const sec = (title) => { const s = document.createElement('div'); s.className = 'pgrp'; const h = document.createElement('h3'); h.textContent = title; s.appendChild(h); box.appendChild(s); return s; };
-    const row = (parent, [name, how], ok) => { items.push(ok); const r = document.createElement('div'); r.className = 'pitem' + (ok ? ' ok' : '');
-      r.innerHTML = '<span class="pchk" aria-hidden="true"></span><div><b></b><p></p></div>'; r.querySelector('b').textContent = name; r.querySelector('p').textContent = how;
+    const row = (parent, [name, how], ok, extra) => { if (!extra) items.push(ok); const r = document.createElement('div'); r.className = 'pitem' + (ok ? ' ok' : '');
+      r.innerHTML = '<span class="pchk" aria-hidden="true"></span><div><b></b><p></p></div>'; if (extra) r.classList.add('extra'); r.querySelector('b').textContent = name; r.querySelector('p').textContent = how;
       r.setAttribute('aria-label', name + (ok ? ' ✓' : '')); parent.appendChild(r); };
     const head = document.createElement('div'); head.className = 'phead'; box.appendChild(head);
     let s = sec(tr('riders')); row(s, tr('boss'), st.riders & 0x10); row(s, tr('gray'), st.riders & 0x20); row(s, tr('snow'), st.riders & 0x40);
-    s = sec(tr('modes')); row(s, tr('mirror'), st.mirror); row(s, tr('hard'), st.hard);
+    s = sec(tr('modes')); row(s, tr('mirror'), st.mirror); row(s, tr('hard'), st.hard); row(s, tr('hm'), st.hard, true);
     const c = document.createElement('p'); c.className = 'mut'; c.textContent = tr('courses', Math.min(10, st.courses)); s.appendChild(c);
     s = sec(tr('boards')); for (let i = 0; i < 3; i++) row(s, tr('sp', i), (st.special >> i) & 1);
     s = sec(tr('trophies'));

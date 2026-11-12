@@ -268,6 +268,14 @@
         else if (op[0] === 'bs') { const b = await buf(op[1]), src = await orig(op[1]); let o = op[2];
           for (const x of op[3]) { const u = x[0] === 0 ? src.subarray(x[2], x[2] + x[1]) : hex(x[1]); b.set(u, o); o += u.length; } }
         else if (op[0] === 'append') { const a = await buf(op[1]), x = hex(op[2]), n = new Uint8Array(a.length + x.length); n.set(a); n.set(x, a.length); files[op[1]] = n; }
+        else if (op[0] === 'px4') { // 4-bit image: rectangles of the original copied (transparent index skipped)
+          const b = await buf(op[1]), [, , hdr, W, [cx, cy, cw, ch, fill], tr, blits] = op;
+          const get = (x, y) => { const v = b[hdr + y * W * 2 + (x >> 1)]; return x & 1 ? v >> 4 : v & 15; };
+          const put = (x, y, c) => { const i = hdr + y * W * 2 + (x >> 1); b[i] = x & 1 ? (b[i] & 15) | (c << 4) : (b[i] & 0xf0) | c; };
+          const src = blits.map(([sx, sy, w, h]) => { const a = []; for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) a.push(get(sx + x, sy + y)); return a; });
+          for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) put(cx + x, cy + y, fill);
+          blits.forEach(([, , w, h, dx, dy], k) => { for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const c = src[k][y * w + x]; if (c !== tr) put(dx + x, dy + y, c); } });
+        }
         else if (op[0] === 'rec') recs[op[1]] = [op[2], op[3]];
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
       }
