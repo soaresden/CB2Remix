@@ -256,7 +256,7 @@
       const on = new Set(feats.filter((f) => pkg.ops[f]));
       if (on.has('max') || on.has('air')) on.add('input');
       if (on.has('input') && !on.has('air')) on.add('input_noair');
-      const order = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'input', 'input_noair'].filter((f) => on.has(f));
+      const order = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'input', 'input_noair'].filter((f) => on.has(f));
       const files = {}, recs = {}, secs = {};
       const origs = {}, orig = async (p) => origs[p] || (origs[p] = await d.readFile(p));
       const buf = async (p) => { if (!files[p]) files[p] = (await orig(p)).slice(); return files[p]; };
@@ -291,6 +291,7 @@
       }
       for (const [p, b] of Object.entries(files)) {
         const e = d.files[p];
+        if (b.length !== e.size) { if (Math.ceil(b.length / 2048) !== Math.ceil(e.size / 2048)) throw new Error('taille ' + p); if (!recs[p]) recs[p] = [e.lba, b.length]; }
         for (let k = 0; k < Math.ceil(b.length / 2048); k++) {
           const orig = await d.user(e.lba + k), nw = orig.slice(); nw.set(b.subarray(k * 2048, Math.min(b.length, (k + 1) * 2048)));
           if (nw.some((x, i) => x !== orig[i])) mods[e.lba + k] = nw;

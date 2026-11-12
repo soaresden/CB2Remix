@@ -8,16 +8,16 @@
 
 | | |
 |---|---|
-| **Patchs** | Installe le hack Remix v17 sur le jeu d'origine. |
+| **Patchs** | Installe le hack Remix v18 sur le jeu d'origine. |
 | **Prêt-à-porter** | Repeins les tenues des 7 riders, avec aperçu 3D en course et dans le menu du jeu. |
 | **Atelier** | Dessine ou importe (JPG / PNG) ta planche et écris-la dans ta carte mémoire. |
 | **Musiques** | Écoute la bande-son du jeu et télécharge-la en MP3 ou en WAV. |
 
-## 1. Patchs (Remix v17, à la carte)
+## 1. Patchs (Remix v18, à la carte)
 
 Ouvre le jeu **d'origine** (PAL SCES-00992, `.chd` ou `.bin`), coche les mods que tu veux, puis **Construire et télécharger**.
 
-- **Interrupteurs** : 9 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master), avec un aperçu.
+- **Interrupteurs** : 10 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master, progression dans le jeu), avec un aperçu.
 - **Préréglages** : *Remix complet*, *100 % à gagner* (toutes les améliorations, mais riders cachés, pistes, planches, Mirror et Hard se gagnent comme dans le jeu d'origine), *Aucun mod*.
 - **Musiques** (européennes ou américaines, avec ton CD US en .chd) et **tenues du Prêt-à-porter** à inclure.
 - **Code de configuration** `CB2-XXXX-XXXX` : il résume tous ces choix. Copie-le ou partage le lien (le code est dans l'adresse), recolle-le plus tard : le même code redonne exactement le même jeu. Il est aussi écrit dans le jeu construit, que le site reconnaît ensuite.
@@ -66,7 +66,9 @@ L'encodeur MP3 ([lamejs](https://github.com/zhuker/lamejs), LGPL) est chargé de
 
 ## 5. Progression (100 %)
 
-Ouvre ta carte mémoire (`.srm` de Batocera/pcsx_rearmed, `.mcr`, `.mcd`, `.mc`, `.gme`, `.vmp`, `.mcs`, `.psv`) : la page lit ta sauvegarde de Cool Boarders 2 et affiche ta checklist (riders cachés, Mirror, Hard, planches SPECIAL, 30 trophées du Free Style) avec le pourcentage et la condition de chaque déblocage, lue dans le code du jeu. Pas besoin du disque pour cet onglet.
+Dans le jeu (mod « Progression dans le jeu ») : maintiens **SELECT** sur l'écran des modes.
+
+Sur le site : Ouvre ta carte mémoire (`.srm` de Batocera/pcsx_rearmed, `.mcr`, `.mcd`, `.mc`, `.gme`, `.vmp`, `.mcs`, `.psv`) : la page lit ta sauvegarde de Cool Boarders 2 et affiche ta checklist (riders cachés, Mirror, Hard, planches SPECIAL, 30 trophées du Free Style) avec le pourcentage et la condition de chaque déblocage, lue dans le code du jeu. Pas besoin du disque pour cet onglet.
 
 ## Limites connues
 
