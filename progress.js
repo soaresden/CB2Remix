@@ -15,7 +15,8 @@
       mirror: ['Mode Mirror', 'Finir la Compétition sur le podium (top 3).'], hard: ['Mode Hard', 'Finir la Compétition Mirror sur le podium.'],
       hm: ['Hard + Mirror (Remix)', 'Mode ajouté par le Remix : L1 + R1 + ✕ sur Competition. Disponible dès que le Hard est débloqué (pas compté dans le 100 % du jeu d’origine).'],
       sp: (i) => ['Planche SPECIAL ' + (i + 1), 'Records du Free Style (trophées des pistes).'],
-      courses: (n) => 'Pistes ouvertes au Free Style : ' + n + ' / 10',
+      courses: (n) => ['Pistes du Free Style (' + n + ' / 10)', '3 au départ ; toutes après un podium en Compétition.'],
+      mcourses: (n) => ['Pistes en Mirror (' + n + ' / 10)', '3 après le podium en Compétition ; toutes après un podium en Compétition Mirror.'],
       trophyHelp: 'Un trophée = battre le record officiel de la piste (affiché en bas à gauche) en Free Style.',
       outfits: 'Les tenues cachées de Cindy et Irin ne se gagnent pas : dans le jeu d’origine c’est un code (avec le mod « Tenues cachées », elles sont toujours là).',
       remixNote: 'Avec le mod « Tout débloqué », une nouvelle sauvegarde a déjà riders, modes et planches : seuls les trophées restent à gagner.',
@@ -30,7 +31,8 @@
       mirror: ['Mirror mode', 'Finish Competition on the podium (top 3).'], hard: ['Hard mode', 'Finish Mirror Competition on the podium.'],
       hm: ['Hard + Mirror (Remix)', 'Mode added by the Remix: L1 + R1 + ✕ on Competition. Available once Hard is unlocked (not counted in the original game’s 100%).'],
       sp: (i) => ['SPECIAL board ' + (i + 1), 'Free Style records (course trophies).'],
-      courses: (n) => 'Courses open in Free Style: ' + n + ' / 10',
+      courses: (n) => ['Free Style courses (' + n + ' / 10)', '3 at the start; all after a Competition podium.'],
+      mcourses: (n) => ['Mirror courses (' + n + ' / 10)', '3 after the Competition podium; all after a Mirror Competition podium.'],
       trophyHelp: 'A trophy = beat the course’s official record (shown bottom left) in Free Style.',
       outfits: 'Cindy and Irin’s hidden outfits are not earned: in the original game they come from a code (with the “hidden outfits” mod they are always there).',
       remixNote: 'With the “Everything unlocked” mod, a new save already has riders, modes and boards: only the trophies are left to earn.',
@@ -55,7 +57,7 @@
     const dv = new DataView(block.buffer, block.byteOffset, block.length);
     if (block[0] !== 0x53 || block[1] !== 0x43 || dv.getUint32(0x21c, true) !== 0x998) return null;
     const v = (a) => dv.getUint16(0x21c + 4 + a - 0x80057434, true);
-    return { riders: v(0x80057440), courses: v(0x8005743e), special: v(0x80057442), mirror: v(0x80057444), hard: v(0x80057446), time: v(0x80057448), trick: v(0x8005744a), total: v(0x8005744c) };
+    return { riders: v(0x80057440), fcourses: v(0x8005743c), courses: v(0x8005743e), special: v(0x80057442), mirror: v(0x80057444), hard: v(0x80057446), time: v(0x80057448), trick: v(0x8005744a), total: v(0x8005744c) };
   }
   function render(st, label) {
     const box = $('#progOut'); box.innerHTML = '';
@@ -68,7 +70,7 @@
     const head = document.createElement('div'); head.className = 'phead'; box.appendChild(head);
     let s = sec(tr('riders')); row(s, tr('boss'), st.riders & 0x10); row(s, tr('gray'), st.riders & 0x20); row(s, tr('snow'), st.riders & 0x40);
     s = sec(tr('modes')); row(s, tr('mirror'), st.mirror); row(s, tr('hard'), st.hard); row(s, tr('hm'), st.hard, true);
-    const c = document.createElement('p'); c.className = 'mut'; c.textContent = tr('courses', Math.min(10, st.courses)); s.appendChild(c);
+    row(s, tr('courses', Math.min(10, st.fcourses)), st.fcourses >= 10); row(s, tr('mcourses', Math.min(10, st.courses)), st.courses >= 10);
     s = sec(tr('boards')); for (let i = 0; i < 3; i++) row(s, tr('sp', i), (st.special >> i) & 1);
     s = sec(tr('trophies'));
     const tb = document.createElement('table'); tb.className = 'ptab';
