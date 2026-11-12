@@ -1,0 +1,16 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Or et noir",
+ "name_en": "Black & gold",
+ "author": "CB2 Remix",
+ "rider": "cindy",
+ "slot": "FRFM1_02",
+ "replaces": "Cindy — Veste 1 · Pantalon 3",
+ "recipe": {
+  "op": "duo",
+  "a": "#0e0e10",
+  "b": "#f4c552",
+  "keepSkin": true
+ }
+}

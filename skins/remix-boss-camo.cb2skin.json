@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Camouflage",
+ "name_en": "Camo",
+ "author": "CB2 Remix",
+ "rider": "boss",
+ "slot": "BOSS0",
+ "replaces": "Boss — Couleur 1",
+ "recipe": {
+  "op": "tri",
+  "a": "#1c2610",
+  "b": "#566f2c",
+  "c": "#c9bf86",
+  "keepSkin": true
+ }
+}

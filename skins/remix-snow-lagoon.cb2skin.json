@@ -1,0 +1,18 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Lagon",
+ "name_en": "Lagoon",
+ "author": "CB2 Remix",
+ "rider": "snow",
+ "slot": "SNOW1",
+ "replaces": "Snowman — Couleur 2",
+ "recipe": {
+  "op": "tri",
+  "a": "#03262b",
+  "b": "#0f9a9a",
+  "c": "#d8fff4",
+  "keepSkin": true,
+  "keepWhite": true
+ }
+}

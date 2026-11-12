@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Néon",
+ "name_en": "Neon",
+ "author": "CB2 Remix",
+ "rider": "yaggi",
+ "slot": "FRM1_01",
+ "replaces": "Yaggi — Veste 2 · Pantalon 1",
+ "recipe": {
+  "op": "hue",
+  "deg": 170,
+  "sat": 1.7,
+  "light": 0.04,
+  "keepSkin": true
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Camouflage",
+ "name_en": "Camo",
+ "author": "CB2 Remix",
+ "rider": "yaggi",
+ "slot": "FRM1_12",
+ "replaces": "Yaggi — Veste 1 · Pantalon 3",
+ "recipe": {
+  "op": "tri",
+  "a": "#1c2610",
+  "b": "#566f2c",
+  "c": "#c9bf86",
+  "keepSkin": true
+ }
+}

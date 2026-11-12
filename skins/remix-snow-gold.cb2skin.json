@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Or et noir",
+ "name_en": "Black & gold",
+ "author": "CB2 Remix",
+ "rider": "snow",
+ "slot": "SNOW0",
+ "replaces": "Snowman — Couleur 1",
+ "recipe": {
+  "op": "duo",
+  "a": "#0e0e10",
+  "b": "#f4c552",
+  "keepSkin": true,
+  "keepWhite": true
+ }
+}

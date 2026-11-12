@@ -30,5 +30,355 @@
   "rider": "cindy",
   "slot": "FRFM1_00",
   "replaces": "Cindy — Veste 1 · Pantalon 1"
+ },
+ {
+  "file": "remix-yaggi-arctic.cb2skin.json",
+  "name": "Arctique",
+  "name_en": "Arctic",
+  "author": "CB2 Remix",
+  "rider": "yaggi",
+  "slot": "FRM1_11",
+  "replaces": "Yaggi — Veste 1 · Pantalon 1",
+  "replaces_en": "Yaggi — Jacket 1 · Pants 1"
+ },
+ {
+  "file": "remix-yaggi-volcano.cb2skin.json",
+  "name": "Volcan",
+  "name_en": "Volcano",
+  "author": "CB2 Remix",
+  "rider": "yaggi",
+  "slot": "FRM1_10",
+  "replaces": "Yaggi — Veste 1 · Pantalon 2",
+  "replaces_en": "Yaggi — Jacket 1 · Pants 2"
+ },
+ {
+  "file": "remix-yaggi-camo.cb2skin.json",
+  "name": "Camouflage",
+  "name_en": "Camo",
+  "author": "CB2 Remix",
+  "rider": "yaggi",
+  "slot": "FRM1_12",
+  "replaces": "Yaggi — Veste 1 · Pantalon 3",
+  "replaces_en": "Yaggi — Jacket 1 · Pants 3"
+ },
+ {
+  "file": "remix-yaggi-neon.cb2skin.json",
+  "name": "Néon",
+  "name_en": "Neon",
+  "author": "CB2 Remix",
+  "rider": "yaggi",
+  "slot": "FRM1_01",
+  "replaces": "Yaggi — Veste 2 · Pantalon 1",
+  "replaces_en": "Yaggi — Jacket 2 · Pants 1"
+ },
+ {
+  "file": "remix-yaggi-gold.cb2skin.json",
+  "name": "Or et noir",
+  "name_en": "Black & gold",
+  "author": "CB2 Remix",
+  "rider": "yaggi",
+  "slot": "FRM1_00",
+  "replaces": "Yaggi — Veste 2 · Pantalon 2",
+  "replaces_en": "Yaggi — Jacket 2 · Pants 2"
+ },
+ {
+  "file": "remix-jin-mono.cb2skin.json",
+  "name": "Noir et blanc",
+  "name_en": "Black & white",
+  "author": "CB2 Remix",
+  "rider": "jin",
+  "slot": "FRM2_00",
+  "replaces": "Jin — Veste 1 · Pantalon 1",
+  "replaces_en": "Jin — Jacket 1 · Pants 1"
+ },
+ {
+  "file": "remix-jin-lagoon.cb2skin.json",
+  "name": "Lagon",
+  "name_en": "Lagoon",
+  "author": "CB2 Remix",
+  "rider": "jin",
+  "slot": "FRM2_01",
+  "replaces": "Jin — Veste 1 · Pantalon 2",
+  "replaces_en": "Jin — Jacket 1 · Pants 2"
+ },
+ {
+  "file": "remix-jin-volcano.cb2skin.json",
+  "name": "Volcan",
+  "name_en": "Volcano",
+  "author": "CB2 Remix",
+  "rider": "jin",
+  "slot": "FRM2_02",
+  "replaces": "Jin — Veste 1 · Pantalon 3",
+  "replaces_en": "Jin — Jacket 1 · Pants 3"
+ },
+ {
+  "file": "remix-jin-retro.cb2skin.json",
+  "name": "Rétro 90",
+  "name_en": "Retro 90s",
+  "author": "CB2 Remix",
+  "rider": "jin",
+  "slot": "FRM2_10",
+  "replaces": "Jin — Veste 2 · Pantalon 1",
+  "replaces_en": "Jin — Jacket 2 · Pants 1"
+ },
+ {
+  "file": "remix-jin-sunset.cb2skin.json",
+  "name": "Coucher de soleil",
+  "name_en": "Sunset",
+  "author": "CB2 Remix",
+  "rider": "jin",
+  "slot": "FRM2_11",
+  "replaces": "Jin — Veste 2 · Pantalon 2",
+  "replaces_en": "Jin — Jacket 2 · Pants 2"
+ },
+ {
+  "file": "remix-cindy-candy.cb2skin.json",
+  "name": "Bonbon",
+  "name_en": "Candy",
+  "author": "CB2 Remix",
+  "rider": "cindy",
+  "slot": "FRFM1_00",
+  "replaces": "Cindy — Veste 1 · Pantalon 1",
+  "replaces_en": "Cindy — Jacket 1 · Pants 1"
+ },
+ {
+  "file": "remix-cindy-arctic.cb2skin.json",
+  "name": "Arctique",
+  "name_en": "Arctic",
+  "author": "CB2 Remix",
+  "rider": "cindy",
+  "slot": "FRFM1_01",
+  "replaces": "Cindy — Veste 1 · Pantalon 2",
+  "replaces_en": "Cindy — Jacket 1 · Pants 2"
+ },
+ {
+  "file": "remix-cindy-gold.cb2skin.json",
+  "name": "Or et noir",
+  "name_en": "Black & gold",
+  "author": "CB2 Remix",
+  "rider": "cindy",
+  "slot": "FRFM1_02",
+  "replaces": "Cindy — Veste 1 · Pantalon 3",
+  "replaces_en": "Cindy — Jacket 1 · Pants 3"
+ },
+ {
+  "file": "remix-cindy-lagoon.cb2skin.json",
+  "name": "Lagon",
+  "name_en": "Lagoon",
+  "author": "CB2 Remix",
+  "rider": "cindy",
+  "slot": "FRFM1_10",
+  "replaces": "Cindy — Veste 2 · Pantalon 1",
+  "replaces_en": "Cindy — Jacket 2 · Pants 1"
+ },
+ {
+  "file": "remix-cindy-neon.cb2skin.json",
+  "name": "Néon",
+  "name_en": "Neon",
+  "author": "CB2 Remix",
+  "rider": "cindy",
+  "slot": "FRFM1_11",
+  "replaces": "Cindy — Veste 2 · Pantalon 2",
+  "replaces_en": "Cindy — Jacket 2 · Pants 2"
+ },
+ {
+  "file": "remix-irin-sunset.cb2skin.json",
+  "name": "Coucher de soleil",
+  "name_en": "Sunset",
+  "author": "CB2 Remix",
+  "rider": "irin",
+  "slot": "FRFM2_20",
+  "replaces": "Irin — Veste 1 · Pantalon 1",
+  "replaces_en": "Irin — Jacket 1 · Pants 1"
+ },
+ {
+  "file": "remix-irin-mono.cb2skin.json",
+  "name": "Noir et blanc",
+  "name_en": "Black & white",
+  "author": "CB2 Remix",
+  "rider": "irin",
+  "slot": "FRFM2_21",
+  "replaces": "Irin — Veste 1 · Pantalon 2",
+  "replaces_en": "Irin — Jacket 1 · Pants 2"
+ },
+ {
+  "file": "remix-irin-candy.cb2skin.json",
+  "name": "Bonbon",
+  "name_en": "Candy",
+  "author": "CB2 Remix",
+  "rider": "irin",
+  "slot": "FRFM2_22",
+  "replaces": "Irin — Veste 1 · Pantalon 3",
+  "replaces_en": "Irin — Jacket 1 · Pants 3"
+ },
+ {
+  "file": "remix-irin-camo.cb2skin.json",
+  "name": "Camouflage",
+  "name_en": "Camo",
+  "author": "CB2 Remix",
+  "rider": "irin",
+  "slot": "FRFM2_10",
+  "replaces": "Irin — Veste 2 · Pantalon 1",
+  "replaces_en": "Irin — Jacket 2 · Pants 1"
+ },
+ {
+  "file": "remix-irin-retro.cb2skin.json",
+  "name": "Rétro 90",
+  "name_en": "Retro 90s",
+  "author": "CB2 Remix",
+  "rider": "irin",
+  "slot": "FRFM2_11",
+  "replaces": "Irin — Veste 2 · Pantalon 2",
+  "replaces_en": "Irin — Jacket 2 · Pants 2"
+ },
+ {
+  "file": "remix-boss-gold.cb2skin.json",
+  "name": "Or et noir",
+  "name_en": "Black & gold",
+  "author": "CB2 Remix",
+  "rider": "boss",
+  "slot": "BOSS0",
+  "replaces": "Boss — Couleur 1",
+  "replaces_en": "Boss — Colour 1"
+ },
+ {
+  "file": "remix-boss-arctic.cb2skin.json",
+  "name": "Arctique",
+  "name_en": "Arctic",
+  "author": "CB2 Remix",
+  "rider": "boss",
+  "slot": "BOSS1",
+  "replaces": "Boss — Couleur 2",
+  "replaces_en": "Boss — Colour 2"
+ },
+ {
+  "file": "remix-boss-volcano.cb2skin.json",
+  "name": "Volcan",
+  "name_en": "Volcano",
+  "author": "CB2 Remix",
+  "rider": "boss",
+  "slot": "BOSS0",
+  "replaces": "Boss — Couleur 1",
+  "replaces_en": "Boss — Colour 1"
+ },
+ {
+  "file": "remix-boss-mono.cb2skin.json",
+  "name": "Noir et blanc",
+  "name_en": "Black & white",
+  "author": "CB2 Remix",
+  "rider": "boss",
+  "slot": "BOSS1",
+  "replaces": "Boss — Couleur 2",
+  "replaces_en": "Boss — Colour 2"
+ },
+ {
+  "file": "remix-boss-camo.cb2skin.json",
+  "name": "Camouflage",
+  "name_en": "Camo",
+  "author": "CB2 Remix",
+  "rider": "boss",
+  "slot": "BOSS0",
+  "replaces": "Boss — Couleur 1",
+  "replaces_en": "Boss — Colour 1"
+ },
+ {
+  "file": "remix-gray-neon.cb2skin.json",
+  "name": "Néon",
+  "name_en": "Neon",
+  "author": "CB2 Remix",
+  "rider": "gray",
+  "slot": "GRAY0",
+  "replaces": "Gray — Couleur 1",
+  "replaces_en": "Gray — Colour 1"
+ },
+ {
+  "file": "remix-gray-gold.cb2skin.json",
+  "name": "Or et noir",
+  "name_en": "Black & gold",
+  "author": "CB2 Remix",
+  "rider": "gray",
+  "slot": "GRAY1",
+  "replaces": "Gray — Couleur 2",
+  "replaces_en": "Gray — Colour 2"
+ },
+ {
+  "file": "remix-gray-lagoon.cb2skin.json",
+  "name": "Lagon",
+  "name_en": "Lagoon",
+  "author": "CB2 Remix",
+  "rider": "gray",
+  "slot": "GRAY0",
+  "replaces": "Gray — Couleur 1",
+  "replaces_en": "Gray — Colour 1"
+ },
+ {
+  "file": "remix-gray-candy.cb2skin.json",
+  "name": "Bonbon",
+  "name_en": "Candy",
+  "author": "CB2 Remix",
+  "rider": "gray",
+  "slot": "GRAY1",
+  "replaces": "Gray — Couleur 2",
+  "replaces_en": "Gray — Colour 2"
+ },
+ {
+  "file": "remix-gray-mono.cb2skin.json",
+  "name": "Noir et blanc",
+  "name_en": "Black & white",
+  "author": "CB2 Remix",
+  "rider": "gray",
+  "slot": "GRAY0",
+  "replaces": "Gray — Couleur 1",
+  "replaces_en": "Gray — Colour 1"
+ },
+ {
+  "file": "remix-snow-volcano.cb2skin.json",
+  "name": "Volcan",
+  "name_en": "Volcano",
+  "author": "CB2 Remix",
+  "rider": "snow",
+  "slot": "SNOW0",
+  "replaces": "Snowman — Couleur 1",
+  "replaces_en": "Snowman — Colour 1"
+ },
+ {
+  "file": "remix-snow-lagoon.cb2skin.json",
+  "name": "Lagon",
+  "name_en": "Lagoon",
+  "author": "CB2 Remix",
+  "rider": "snow",
+  "slot": "SNOW1",
+  "replaces": "Snowman — Couleur 2",
+  "replaces_en": "Snowman — Colour 2"
+ },
+ {
+  "file": "remix-snow-gold.cb2skin.json",
+  "name": "Or et noir",
+  "name_en": "Black & gold",
+  "author": "CB2 Remix",
+  "rider": "snow",
+  "slot": "SNOW0",
+  "replaces": "Snowman — Couleur 1",
+  "replaces_en": "Snowman — Colour 1"
+ },
+ {
+  "file": "remix-snow-neon.cb2skin.json",
+  "name": "Néon",
+  "name_en": "Neon",
+  "author": "CB2 Remix",
+  "rider": "snow",
+  "slot": "SNOW1",
+  "replaces": "Snowman — Couleur 2",
+  "replaces_en": "Snowman — Colour 2"
+ },
+ {
+  "file": "remix-snow-candy.cb2skin.json",
+  "name": "Bonbon",
+  "name_en": "Candy",
+  "author": "CB2 Remix",
+  "rider": "snow",
+  "slot": "SNOW0",
+  "replaces": "Snowman — Couleur 1",
+  "replaces_en": "Snowman — Colour 1"
  }
 ]

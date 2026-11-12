@@ -44,6 +44,10 @@ Galerie d'exemples : *Père Noël* (Yaggi), *Matou roux* (Yaggi), *Pop star* (Ir
 
 Merci de proposer des créations originales (pas de personnages, logos ou marques existants).
 
+### Propositions de tenues (recettes)
+
+La galerie contient 5 propositions par rider (Yaggi, Jin, Cindy, Irin, Boss, Gray et Snowman) : Arctique, Volcan, Camouflage, Néon, Or et noir, Bonbon, Noir et blanc, Lagon, Rétro 90, Coucher de soleil. Ce sont des **recettes** de couleurs (fichiers `skins/remix-*.cb2skin.json`, format version 2) appliquées dans ton navigateur à la texture de ton propre disque : la peau est conservée, le blanc du Snowman aussi, et aucun pixel du jeu n'est stocké dans le dépôt. Elles se cochent aussi dans l'onglet Patchs et entrent dans le code de configuration (jusqu'à 64 tenues).
+
 ## 3. Atelier (planches)
 
 1. Ouvre ta carte mémoire (Batocera : `/userdata/saves/psx/`, le `.srm` du jeu ou le `_1.mcd`) ou pars d'une carte vierge.

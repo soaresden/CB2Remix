@@ -1,0 +1,18 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Néon",
+ "name_en": "Neon",
+ "author": "CB2 Remix",
+ "rider": "snow",
+ "slot": "SNOW1",
+ "replaces": "Snowman — Couleur 2",
+ "recipe": {
+  "op": "hue",
+  "deg": 170,
+  "sat": 1.7,
+  "light": 0.04,
+  "keepSkin": true,
+  "keepWhite": true
+ }
+}

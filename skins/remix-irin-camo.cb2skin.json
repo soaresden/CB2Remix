@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Camouflage",
+ "name_en": "Camo",
+ "author": "CB2 Remix",
+ "rider": "irin",
+ "slot": "FRFM2_10",
+ "replaces": "Irin — Veste 2 · Pantalon 1",
+ "recipe": {
+  "op": "tri",
+  "a": "#1c2610",
+  "b": "#566f2c",
+  "c": "#c9bf86",
+  "keepSkin": true
+ }
+}

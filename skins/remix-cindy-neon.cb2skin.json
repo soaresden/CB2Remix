@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Néon",
+ "name_en": "Neon",
+ "author": "CB2 Remix",
+ "rider": "cindy",
+ "slot": "FRFM1_11",
+ "replaces": "Cindy — Veste 2 · Pantalon 2",
+ "recipe": {
+  "op": "hue",
+  "deg": 170,
+  "sat": 1.7,
+  "light": 0.04,
+  "keepSkin": true
+ }
+}

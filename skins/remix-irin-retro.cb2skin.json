@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Rétro 90",
+ "name_en": "Retro 90s",
+ "author": "CB2 Remix",
+ "rider": "irin",
+ "slot": "FRFM2_11",
+ "replaces": "Irin — Veste 2 · Pantalon 2",
+ "recipe": {
+  "op": "hue",
+  "deg": 95,
+  "sat": 1.45,
+  "light": 0.02,
+  "keepSkin": true
+ }
+}

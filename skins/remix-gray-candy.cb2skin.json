@@ -1,0 +1,16 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Bonbon",
+ "name_en": "Candy",
+ "author": "CB2 Remix",
+ "rider": "gray",
+ "slot": "GRAY1",
+ "replaces": "Gray — Couleur 2",
+ "recipe": {
+  "op": "duo",
+  "a": "#3d1557",
+  "b": "#ffc2ea",
+  "keepSkin": true
+ }
+}

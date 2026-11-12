@@ -228,8 +228,34 @@
     const r = RIDERS.find((x) => x.id === j.rider), s = r && r.slots.find((x) => x.id === j.slot);
     if (!s) throw new Error(t('unknownSlot', j.slot));
     await selectSlot(r, s);
+    if (j.recipe) { pushHist(); recolor(S.cur.orig, S.cur.over, j.recipe); changed(); return; }
     const img = await loadImg(j.png); const c = document.createElement('canvas'); c.width = TW; c.height = TH; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
     pushHist(); S.cur.over.set(x.getImageData(0, 0, TW, TH).data); changed();
+  }
+  // ---- recipe outfits (version 2): a colour transformation applied to the player's own texture (no game pixels stored).
+  // recipe = { op: 'hue' (deg, sat, light) | 'duo' (a, b: dark / light colours) | 'mono' (contrast) | 'tri' (a, b, c),
+  //            keepSkin (default true): skin-like colours are left alone }
+  function recolor(orig, over, R) {
+    const hx = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+    const hsl = (r, g, b) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0, s = 0;
+      if (mx !== mn) { const d = mx - mn; s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; } return [h, s, l]; };
+    const rgb = (h, s, l) => { const f = (n) => { const k = (n + h / 30) % 12, a = s * Math.min(l, 1 - l); return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); }; return [f(0), f(8), f(4)]; };
+    const mix = (p, q, t) => p.map((v, i) => Math.round(v + (q[i] - v) * t));
+    const keep = R.keepSkin !== false;
+    for (let i = 0; i < orig.length; i += 4) {
+      if (orig[i + 3] === 0) continue;
+      const [r, g, b] = [orig[i], orig[i + 1], orig[i + 2]], [h, s, l] = hsl(r, g, b);
+      if (keep && h >= 5 && h <= 45 && s >= 0.18 && s <= 0.8 && l >= 0.3 && l <= 0.88) continue;   // skin
+      if (R.keepWhite && s < 0.2 && l > 0.62) continue;                                                // snow (Snowman's body)
+      let c;
+      if (R.op === 'hue') c = rgb((h + (R.deg || 0) + 360) % 360, Math.min(1, s * (R.sat ?? 1)), Math.max(0, Math.min(1, l + (R.light || 0))));
+      else if (R.op === 'mono') { const v = Math.max(0, Math.min(1, (l - 0.5) * (R.contrast || 1.2) + 0.5)); c = [v * 255, v * 255, v * 255].map(Math.round); }
+      else if (R.op === 'duo') c = mix(hx(R.a), hx(R.b), l);
+      else if (R.op === 'tri') c = l < 0.5 ? mix(hx(R.a), hx(R.b), l * 2) : mix(hx(R.b), hx(R.c), (l - 0.5) * 2);
+      else continue;
+      if (Math.abs(c[0] - r) + Math.abs(c[1] - g) + Math.abs(c[2] - b) < 6) continue;
+      over[i] = c[0]; over[i + 1] = c[1]; over[i + 2] = c[2]; over[i + 3] = 255;
+    }
   }
   $('#loadSkin').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; try { await applySkin(JSON.parse(await f.text())); } catch (err) { say(err.message); } };
   $('#gallery').onclick = async () => {
@@ -237,8 +263,8 @@
       const idx = await (await fetch('skins/index.json', { cache: 'no-store' })).json();
       const box = document.createElement('div'); box.className = 'gal'; let pick = null;
       idx.forEach((k) => { const r = RIDERS.find((x) => x.id === k.rider), s = r && r.slots.find((x) => x.id === k.slot);
-        const b = document.createElement('button'); b.innerHTML = '<b></b><span></span>'; b.firstChild.textContent = k.name + (k.author ? t('by', k.author) : '');
-        b.lastChild.textContent = t('replacesLbl') + ' : ' + (s ? r.name + ' — ' + slotLabel(s) : k.replaces); b.onclick = () => { pick = k; $('#dlgActs').firstChild.click(); }; box.appendChild(b); });
+        const b = document.createElement('button'); b.innerHTML = '<b></b><span></span>'; b.firstChild.textContent = ((I18N.lang === 'en' && k.name_en) || k.name) + (k.author ? t('by', k.author) : '');
+        b.lastChild.textContent = t('replacesLbl') + ' : ' + (s ? r.name + ' — ' + slotLabel(s) : (I18N.lang === 'en' && k.replaces_en) || k.replaces); b.onclick = () => { pick = k; $('#dlgActs').firstChild.click(); }; box.appendChild(b); });
       await dialog(t('galleryTitle'), box, [[t('close'), null]]);
       if (!pick) return;
       await applySkin(await (await fetch('skins/' + pick.file)).json());
@@ -541,17 +567,24 @@
     }
     const sk = $('#skinList'); sk.innerHTML = '';
     if (!S.skinIdx.length) { sk.innerHTML = '<span class="mut"></span>'; sk.firstChild.textContent = t('skinsNone'); }
-    S.skinIdx.forEach((k, i) => { const l = document.createElement('label'); l.className = S.cfg.skins.includes(i) ? 'on' : '';
-      l.innerHTML = '<input type="checkbox" class="sw"><span><b></b><br><small></small></span>'; const cb = l.firstChild; cb.checked = S.cfg.skins.includes(i);
-      cb.onchange = () => { S.cfg.skins = S.skinIdx.map((_, n) => n).filter((n) => n === i ? cb.checked : S.cfg.skins.includes(n)); cfgChanged(); };
-      l.querySelector('b').textContent = k.name + (k.author ? t('by', k.author) : ''); l.querySelector('small').textContent = t('replacesLbl') + ' : ' + k.replaces; sk.appendChild(l); });
+    const en = I18N.lang === 'en', groups = {};
+    S.skinIdx.forEach((k, i) => (groups[k.rider] = groups[k.rider] || []).push([k, i]));
+    for (const [rid, items] of Object.entries(groups)) {
+      const g = document.createElement('div'); g.className = 'skgrp'; const h = document.createElement('b'); h.textContent = (RIDERS.find((r) => r.id === rid) || { name: rid }).name; g.appendChild(h);
+      for (const [k, i] of items) { const l = document.createElement('label'); l.className = S.cfg.skins.includes(i) ? 'on' : '';
+        l.innerHTML = '<input type="checkbox" class="sw"><span><b></b><br><small></small></span>'; const cb = l.firstChild; cb.checked = S.cfg.skins.includes(i);
+        cb.onchange = () => { S.cfg.skins = S.skinIdx.map((_, n) => n).filter((n) => n === i ? cb.checked : S.cfg.skins.includes(n)); cfgChanged(); };
+        l.querySelector('b').textContent = ((en && k.name_en) || k.name) + (k.author ? t('by', k.author) : '');
+        l.querySelector('small').textContent = t('replacesLbl') + ' : ' + ((en && k.replaces_en) || k.replaces); g.appendChild(l); }
+      sk.appendChild(g);
+    }
     $('#usMus').checked = S.cfg.usMusic; $('#musEU').checked = !S.cfg.usMusic;
     $('#cfgOut').textContent = Seed.encode(S.cfg); $('#cfgSum').textContent = t('summary', S.cfg.mods.length, MODS.length);
     document.querySelectorAll('.presets button').forEach((b) => b.classList.toggle('on', PRESETS[b.dataset.preset].join() === S.cfg.mods.join()));
   }
   function cfgChanged() { renderMods(); try { history.replaceState(null, '', '#' + Seed.encode(S.cfg)); localStorage.setItem('cb2cfg', Seed.encode(S.cfg)); } catch (e) {} patchState(); }
   function loadCode(code, quiet) { const c = Seed.decode(code); if (!c) { if (!quiet) $('#cfgMsg').textContent = t('cfgBad'); return false; }
-    c.skins = c.skins.filter((i) => i < Math.max(S.skinIdx.length, 16)); S.cfg = c; cfgChanged(); if (!quiet) $('#cfgMsg').textContent = t('cfgLoaded', Seed.encode(c)); return true; }
+    c.skins = c.skins.filter((i) => i < Math.max(S.skinIdx.length, 64)); S.cfg = c; cfgChanged(); if (!quiet) $('#cfgMsg').textContent = t('cfgLoaded', Seed.encode(c)); return true; }
   document.querySelectorAll('.presets button').forEach((b) => (b.onclick = () => { S.cfg.mods = [...PRESETS[b.dataset.preset]]; cfgChanged(); }));
   $('#cfgLoad').onclick = () => loadCode($('#cfgIn').value);
   $('#cfgIn').onkeydown = (e) => { if (e.key === 'Enter') loadCode($('#cfgIn').value); };

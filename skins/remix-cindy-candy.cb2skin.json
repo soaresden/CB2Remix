@@ -1,0 +1,16 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Bonbon",
+ "name_en": "Candy",
+ "author": "CB2 Remix",
+ "rider": "cindy",
+ "slot": "FRFM1_00",
+ "replaces": "Cindy — Veste 1 · Pantalon 1",
+ "recipe": {
+  "op": "duo",
+  "a": "#3d1557",
+  "b": "#ffc2ea",
+  "keepSkin": true
+ }
+}

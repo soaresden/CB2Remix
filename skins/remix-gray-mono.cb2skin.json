@@ -1,0 +1,15 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Noir et blanc",
+ "name_en": "Black & white",
+ "author": "CB2 Remix",
+ "rider": "gray",
+ "slot": "GRAY0",
+ "replaces": "Gray — Couleur 1",
+ "recipe": {
+  "op": "mono",
+  "contrast": 1.35,
+  "keepSkin": true
+ }
+}

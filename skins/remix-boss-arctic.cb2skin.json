@@ -1,0 +1,16 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Arctique",
+ "name_en": "Arctic",
+ "author": "CB2 Remix",
+ "rider": "boss",
+ "slot": "BOSS1",
+ "replaces": "Boss — Couleur 2",
+ "recipe": {
+  "op": "duo",
+  "a": "#0d2747",
+  "b": "#eef8ff",
+  "keepSkin": true
+ }
+}

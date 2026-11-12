@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Volcan",
+ "name_en": "Volcano",
+ "author": "CB2 Remix",
+ "rider": "boss",
+ "slot": "BOSS0",
+ "replaces": "Boss — Couleur 1",
+ "recipe": {
+  "op": "tri",
+  "a": "#140404",
+  "b": "#b5230f",
+  "c": "#ffc061",
+  "keepSkin": true
+ }
+}

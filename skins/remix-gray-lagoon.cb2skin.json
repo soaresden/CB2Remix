@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Lagon",
+ "name_en": "Lagoon",
+ "author": "CB2 Remix",
+ "rider": "gray",
+ "slot": "GRAY0",
+ "replaces": "Gray — Couleur 1",
+ "recipe": {
+  "op": "tri",
+  "a": "#03262b",
+  "b": "#0f9a9a",
+  "c": "#d8fff4",
+  "keepSkin": true
+ }
+}

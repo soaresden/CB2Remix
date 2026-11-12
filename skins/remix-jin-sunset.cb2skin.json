@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Coucher de soleil",
+ "name_en": "Sunset",
+ "author": "CB2 Remix",
+ "rider": "jin",
+ "slot": "FRM2_11",
+ "replaces": "Jin — Veste 2 · Pantalon 2",
+ "recipe": {
+  "op": "tri",
+  "a": "#2a0b3d",
+  "b": "#e2456b",
+  "c": "#ffd27a",
+  "keepSkin": true
+ }
+}

@@ -89,8 +89,9 @@ h1 span{color:var(--acc)}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--snow);transition:left .15s}
 .sw:checked{background:var(--acc)} .sw:checked::after{left:21px}
 .sw:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
-.skinpick{display:flex;flex-wrap:wrap;gap:8px}
-.skinpick label{display:flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(10,22,38,.4);cursor:pointer}
+.skinpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.skgrp{display:flex;flex-direction:column;gap:6px}.skgrp>b{font-size:.85rem;color:var(--ice);letter-spacing:.06em;text-transform:uppercase}
+.skinpick label{display:flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:12px;background:rgba(10,22,38,.4);cursor:pointer}
 .skinpick label.on{border-color:var(--acc)}
 .phead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;align-items:center;margin:14px 0}
 .pbig{font:400 2.4rem var(--display);color:var(--acc);grid-row:span 2}.phead p{margin:0}

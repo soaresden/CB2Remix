@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Volcan",
+ "name_en": "Volcano",
+ "author": "CB2 Remix",
+ "rider": "jin",
+ "slot": "FRM2_02",
+ "replaces": "Jin — Veste 1 · Pantalon 3",
+ "recipe": {
+  "op": "tri",
+  "a": "#140404",
+  "b": "#b5230f",
+  "c": "#ffc061",
+  "keepSkin": true
+ }
+}

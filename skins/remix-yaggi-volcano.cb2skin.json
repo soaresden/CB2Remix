@@ -1,0 +1,17 @@
+{
+ "format": "cb2skin",
+ "version": 2,
+ "name": "Volcan",
+ "name_en": "Volcano",
+ "author": "CB2 Remix",
+ "rider": "yaggi",
+ "slot": "FRM1_10",
+ "replaces": "Yaggi — Veste 1 · Pantalon 2",
+ "recipe": {
+  "op": "tri",
+  "a": "#140404",
+  "b": "#b5230f",
+  "c": "#ffc061",
+  "keepSkin": true
+ }
+}
