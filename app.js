@@ -15,11 +15,12 @@
   drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove('hov'); if (e.dataTransfer.files[0]) openFile(e.dataTransfer.files[0]); };
   $('#file').onchange = (e) => e.target.files[0] && openFile(e.target.files[0]);
   $('#file2').onchange = (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) openFile(f); };
-  let _P = null;
-  async function remixPatch() { // CB2D delta, gzip + base64 in patches.js
-    if (!_P) { const b = Uint8Array.from(atob(window.REMIX.delta), (c) => c.charCodeAt(0));
-      _P = new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer()); }
-    return _P;
+  const _P = {};
+  async function remixPatch(us) { // CB2D delta, gzip + base64 in patches.js (us: the USA version's one)
+    const k = us ? 'REMIX_US' : 'REMIX';
+    if (!_P[k]) { const b = Uint8Array.from(atob(window[k].delta), (c) => c.charCodeAt(0));
+      _P[k] = new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer()); }
+    return _P[k];
   }
   const u32 = (P, o) => (P[o] | (P[o + 1] << 8) | (P[o + 2] << 16) | (P[o + 3] << 24)) >>> 0;
   function remixLoc(exe) { // Remix extras (competition textures of Gray / Snowman), null on a non-Remix exe
@@ -39,9 +40,13 @@
       // Remix extras (competition textures of Gray / Snowman)
       S.state = 'other';
       try {
-        const exe = await d.readFile('/SCES_009.92'); S.loc = remixLoc(exe);
-        if (S.loc) S.state = 'remix';
-        else { const P = await remixPatch(); if (exe.length === u32(P, 12) && d.crc32(exe) === u32(P, 8)) S.state = 'original'; }
+        const exeName = await d.bootExe(), exe = await d.readFile(exeName);
+        if (exeName === '/SCUS_943.58') { // USA version
+          const P = await remixPatch(true), o = 0x800 + 0x8004f538 - 0x80010000;
+          S.loc = null; S.state = (exe[o] | exe[o + 1] | exe[o + 2] | exe[o + 3]) ? 'remix-us' : exe.length === u32(P, 12) && d.crc32(exe) === u32(P, 8) ? 'original-us' : 'other';
+        } else { S.loc = remixLoc(exe);
+          if (S.loc) S.state = 'remix';
+          else { const P = await remixPatch(); if (exe.length === u32(P, 12) && d.crc32(exe) === u32(P, 8)) S.state = 'original'; } }
       } catch (e) { S.loc = null; }
       try { S.chr = await d.readFile('/TITLE/CHR.DAT'); S.menu = MenuSkin.scan(S.chr); } catch (e) { S.chr = null; }
       S.menuMaps = {};
@@ -522,13 +527,15 @@
   function discState() {
     const p = $('#discstate'); if (!S.disc) return;
     p.className = 'pill ' + (S.state === 'other' ? 'warn' : 'ok');
-    p.textContent = S.state === 'original' ? t('stOriginal') : S.state === 'remix' ? t('stRemix') : t('stOther');
+    p.textContent = { original: t('stOriginal'), remix: t('stRemix'), 'original-us': t('stOriginalUS'), 'remix-us': t('stRemixUS') }[S.state] || t('stOther');
+    $('.usmus').hidden = /us$/.test(S.state);
   }
   function patchState() {
     const usOK = $('#usMus').checked && S.us;
-    $('#patchGo').disabled = !S.disc || S.patching || !(S.state === 'original' || (S.state === 'remix' && usOK)) || ($('#usMus').checked && !S.us);
+    const isUS = S.state === 'original-us', wantUS = $('#usMus').checked && !isUS;
+    $('#patchGo').disabled = !S.disc || S.patching || !(S.state === 'original' || isUS || (S.state === 'remix' && usOK)) || (wantUS && !S.us);
     if (S.patching || S.patchedName) return;
-    $('#patchStatus').textContent = !S.disc ? '' : S.state === 'remix' ? t('patchAlready') : S.state === 'other' ? t('patchSource') : t('patchNeed');
+    $('#patchStatus').textContent = !S.disc ? '' : S.state === 'remix' || S.state === 'remix-us' ? t('patchAlready') : S.state === 'other' ? t('patchSource') : isUS ? t('patchNeedUS') : t('patchNeed');
   }
   function renderFeat() {
     const box = $('#featList'); box.innerHTML = '';
@@ -539,13 +546,13 @@
     const st = (x) => ($('#patchStatus').textContent = x); S.patching = true; S.patchedName = null; patchState();
     try {
       st(t('patchApplying')); const d = S.disc;
-      const withUS = $('#usMus').checked && S.us;
-      const mods = S.state === 'original' ? await d.applyDelta(await remixPatch(), (x) => st(t('patchApplying') + ' ' + x)) : {};
+      const isUS = S.state === 'original-us', withUS = !isUS && $('#usMus').checked && S.us;
+      const mods = S.state === 'original' || isUS ? await d.applyDelta(await remixPatch(isUS), (x) => st(t('patchApplying') + ' ' + x)) : {};
       st(t('assembling'));
       const r = withUS ? await d.composeSoundtrack(S.us, mods, US_MUSIC, (x) => st(t('assembling') + ' ' + x)) : await d.build(mods, (x) => st(t('assembling') + ' ' + x));
       const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : (p.f ? S.usFile : S.file).slice(p.a, p.b))));
       const base = S.file.name.replace(/\.chd$/i, '').replace(/ \(Remix\)$/, '');
-      const name = d.kind === 'bin' ? S.file.name : base + (withUS ? ' (Remix, musiques US).chd' : ' (Remix).chd');
+      const name = d.kind === 'bin' ? S.file.name : base + (isUS ? ' (Remix US).chd' : withUS ? ' (Remix, musiques US).chd' : ' (Remix).chd');
       dl(blob, name); S.patchedName = name; st(t('patchDone', name));
     } catch (e) { st(e.code === 'source' ? t('patchSource') : t('error', e.message)); console.error(e); }
     S.patching = false; $('#patchGo').disabled = false;

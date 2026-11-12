@@ -164,6 +164,8 @@
       return out.subarray(0, f.size);
     };
     d.name = name;
+    // executable named by SYSTEM.CNF (SCES_009.92 in Europe, SCUS_943.58 in the USA)
+    d.bootExe = async () => { try { const m = new TextDecoder().decode(await d.readFile('/SYSTEM.CNF')).match(/BOOT\s*=\s*cdrom:\\?([^;\s]+)/i); if (m) return '/' + m[1].replace(/^\\/, ''); } catch (e) {} return '/SCES_009.92'; };
     // ---- CD audio (the game's music): tracks named after the /CDDA/*.DA entries of the disc when they match
     d.audioTracks = () => {
       const named = Object.entries(d.files).filter(([p]) => /^\/CDDA\/.+\.DA$/i.test(p)).map(([p, e]) => ({ name: p.split('/').pop().replace(/\.DA$/i, ''), lba: e.lba, len: Math.round(e.size / 2048) }));
@@ -230,7 +232,7 @@
     d.applyDelta = async (P, log = () => {}) => {
       const u32 = (o) => (P[o] | (P[o + 1] << 8) | (P[o + 2] << 16) | (P[o + 3] << 24)) >>> 0, u16 = (o) => P[o] | (P[o + 1] << 8);
       if (String.fromCharCode(...P.subarray(0, 4)) !== 'CB2D') throw new Error('bad patch');
-      const exe = await d.readFile('/SCES_009.92');
+      const exe = await d.readFile(await d.bootExe());
       if (exe.length !== u32(12) || d.crc32(exe) !== u32(8)) { const e = new Error('source'); e.code = 'source'; throw e; }
       const n = u32(16); let o = 20; const mods = {};
       const src = async (addr, len) => { const out = new Uint8Array(len); let k = 0; while (k < len) { const l = Math.floor((addr + k) / 2048), off = (addr + k) % 2048, m = Math.min(len - k, 2048 - off); out.set((await d.user(l)).subarray(off, off + m), k); k += m; } return out; };
