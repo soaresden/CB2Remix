@@ -503,13 +503,30 @@
   })();
 
   // ---------- patch panel (Remix)
+  // ---------- soundtrack of the USA version (the player's own CD): European BGM n -> USA track (menus identical,
+  // the rest one track later from BGM 13: see docs/pal_vs_usa.md of cb2-decomp)
+  const US_MUSIC = {}; for (let k = 2; k <= 20; k++) US_MUSIC[k] = k <= 12 ? k : k + 1;
+  $('#usMus').onchange = () => { $('#usPick').hidden = !$('#usMus').checked; patchState(); };
+  $('#usFile').onchange = async (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    $('#usInfo').textContent = t('usReading');
+    try {
+      const read = async (a, b) => new Uint8Array(await f.slice(a, b).arrayBuffer());
+      const u = await Disc.open(read, f.size, f.name);
+      if (u.kind !== 'chd' || !u.files['/SCUS_943.58'] || !u.files['/CDDA/BGMT.DA']) throw new Error(t('usNotUS'));
+      if (S.disc && S.disc.kind !== 'chd') throw new Error(t('usNeedChd'));
+      S.us = u; S.usFile = f; $('#usInfo').textContent = t('usOK', f.name);
+    } catch (err) { S.us = null; $('#usInfo').textContent = t('error', err.message); }
+    patchState();
+  };
   function discState() {
     const p = $('#discstate'); if (!S.disc) return;
     p.className = 'pill ' + (S.state === 'other' ? 'warn' : 'ok');
     p.textContent = S.state === 'original' ? t('stOriginal') : S.state === 'remix' ? t('stRemix') : t('stOther');
   }
   function patchState() {
-    $('#patchGo').disabled = !S.disc || S.state !== 'original' || S.patching;
+    const usOK = $('#usMus').checked && S.us;
+    $('#patchGo').disabled = !S.disc || S.patching || !(S.state === 'original' || (S.state === 'remix' && usOK)) || ($('#usMus').checked && !S.us);
     if (S.patching || S.patchedName) return;
     $('#patchStatus').textContent = !S.disc ? '' : S.state === 'remix' ? t('patchAlready') : S.state === 'other' ? t('patchSource') : t('patchNeed');
   }
@@ -522,10 +539,13 @@
     const st = (x) => ($('#patchStatus').textContent = x); S.patching = true; S.patchedName = null; patchState();
     try {
       st(t('patchApplying')); const d = S.disc;
-      const mods = await d.applyDelta(await remixPatch(), (x) => st(t('patchApplying') + ' ' + x));
-      st(t('assembling')); const r = await d.build(mods, (x) => st(t('assembling') + ' ' + x));
-      const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : S.file.slice(p.a, p.b))));
-      const name = d.kind === 'bin' ? S.file.name : S.file.name.replace(/\.chd$/i, '') + ' (Remix).chd';
+      const withUS = $('#usMus').checked && S.us;
+      const mods = S.state === 'original' ? await d.applyDelta(await remixPatch(), (x) => st(t('patchApplying') + ' ' + x)) : {};
+      st(t('assembling'));
+      const r = withUS ? await d.composeSoundtrack(S.us, mods, US_MUSIC, (x) => st(t('assembling') + ' ' + x)) : await d.build(mods, (x) => st(t('assembling') + ' ' + x));
+      const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : (p.f ? S.usFile : S.file).slice(p.a, p.b))));
+      const base = S.file.name.replace(/\.chd$/i, '').replace(/ \(Remix\)$/, '');
+      const name = d.kind === 'bin' ? S.file.name : base + (withUS ? ' (Remix, musiques US).chd' : ' (Remix).chd');
       dl(blob, name); S.patchedName = name; st(t('patchDone', name));
     } catch (e) { st(e.code === 'source' ? t('patchSource') : t('error', e.message)); console.error(e); }
     S.patching = false; $('#patchGo').disabled = false;

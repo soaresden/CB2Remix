@@ -58,9 +58,10 @@
       c.M = CP.decodeMap(c.hdr, map);
       c.fph = c.hdr.hunkbytes / FRAME; c.cache = new Map();
       // track list (metadata CHT2 / CHTR): CHD frame and disc LBA of each track's index 01
-      c.tracks = []; let mo = be(h, 48, 8);
+      c.tracks = []; c.meta = []; c.head = h; let mo = be(h, 48, 8);
       while (mo) {
         const mh2 = await read(mo, mo + 16), tag = String.fromCharCode(...mh2.subarray(0, 4)), len = be(mh2, 5, 3);
+        c.meta.push({ tag: mh2.slice(0, 4), flags: mh2[4], data: (await read(mo + 16, mo + 16 + len)).slice() });
         if (tag === 'CHT2' || tag === 'CHTR') {
           const s = String.fromCharCode(...(await read(mo + 16, mo + 16 + len))).replace(/\0.*$/, ''), g = (k) => (s.match(new RegExp(k + ':(\\S+)')) || [])[1];
           c.tracks.push({ n: +g('TRACK'), type: g('TYPE'), frames: +g('FRAMES'), pregap: +(g('PREGAP') || 0), pgtype: g('PGTYPE') || '', postgap: +(g('POSTGAP') || 0) });
@@ -169,6 +170,50 @@
       const nameOf = (lba) => { const m = named.find((x) => Math.abs(x.lba - lba) <= 225); return m ? m.name : null; };
       if (d.kind === 'chd' && d.tracks.length) return d.tracks.filter((t) => t.type === 'AUDIO').map((t) => ({ n: t.n, name: nameOf(t.lba), frames: t.len, chd: t.chd, lba: t.lba }));
       return named.sort((a, b) => a.lba - b.lba).map((x, i) => ({ n: i + 2, name: x.name, frames: x.len, lba: x.lba }));
+    };
+    // ---- soundtrack of another disc (Cool Boarders 2 USA): this disc's data track (with `mods`, e.g. the Remix) +
+    // every audio track of `us`, copied as stored; /CDDA/BGMx.DA point at the tracks given by mapping (BGMA = 2).
+    // -> {parts: [Uint8Array | {a, b, f}], size}, f = 0 this file, 1 the other disc's file
+    d.composeSoundtrack = async (us, mods, mapping, log = () => {}) => {
+      if (d.kind !== 'chd' || us.kind !== 'chd') throw new Error('les deux disques doivent être des CHD');
+      if (d.hdr.hunkbytes !== us.hdr.hunkbytes || d.codecs.join() !== us.codecs.join()) throw new Error('les deux CHD ne sont pas compressés de la même façon');
+      const isT = (m) => /^CHT[2R]$/.test(String.fromCharCode(...m.tag)), txt = (m) => String.fromCharCode(...m.data).replace(/\0.*$/s, '');
+      const ta = d.meta.filter(isT), tb = us.meta.filter(isT);
+      const a1 = +txt(ta[0]).match(/FRAMES:(\d+)/)[1], b1 = +txt(tb[0]).match(/FRAMES:(\d+)/)[1], start = b1 + ((4 - (b1 % 4)) % 4), fph = d.fph;
+      if (start % fph || a1 > b1) throw new Error('disposition des pistes inattendue');
+      const H0 = start / fph, N = us.M.hunkcount;
+      mods = Object.assign({}, mods);
+      const userOf = async (l) => { const m = mods[l]; return (m ? (m instanceof Uint8Array ? m : m.data) : await d.user(l)).slice(); };
+      const C = d.files['/CDDA'];
+      for (let k = 0; k < Math.ceil(C.size / 2048); k++) {
+        const s = await userOf(C.lba + k); let i = 0;
+        while (i < 2048 && s[i]) {
+          const L = s[i], nl = s[i + 32], name = String.fromCharCode(...s.subarray(i + 33, i + 33 + nl)).split(';')[0];
+          const mm = name.match(/^BGM([A-Z])\.DA$/), n = mm ? mm[1].charCodeAt(0) - 63 : 0, t = mapping[n], src = t && us.files['/CDDA/BGM' + String.fromCharCode(t + 63) + '.DA'];
+          if (src) { const dv = new DataView(s.buffer, s.byteOffset); dv.setUint32(i + 2, src.lba, true); dv.setUint32(i + 6, src.lba, false); dv.setUint32(i + 10, src.size, true); dv.setUint32(i + 14, src.size, false);
+            log(name + ' → piste US BGM' + String.fromCharCode(t + 63)); }
+          i += L;
+        }
+        const old = mods[C.lba + k]; mods[C.lba + k] = old && !(old instanceof Uint8Array) ? { sub: old.sub, data: s } : s;
+      }
+      const bcd = (x) => ((x / 10) | 0) * 16 + (x % 10), hunks = new Map();
+      const raw = async (hi) => { if (!hunks.has(hi)) hunks.set(hi, await d.rawHunk(hi)); return hunks.get(hi); };
+      for (const l of Object.keys(mods).map(Number)) {
+        const hi = Math.floor(l / fph), f = l % fph, h = await raw(hi), sec = h.slice(f * FRAME, f * FRAME + SEC), m = mods[l];
+        if (m instanceof Uint8Array) sec.set(m, 24); else { sec.set(m.sub, 16); sec.set(m.data, 24); }
+        if (sec[0] !== 0 || sec[1] !== 255) sec.set(SYNC, 0);
+        EDCECC.fix(sec); h.set(sec, f * FRAME);
+      }
+      for (let hi = Math.floor(a1 / fph); hi < H0; hi++) {         // the data track grows to the USA length
+        const h = await raw(hi);
+        for (let f = 0; f < fph; f++) { const fr = hi * fph + f; if (fr < a1) continue; h.fill(0, f * FRAME, (f + 1) * FRAME);
+          if (fr < b1) { const s = new Uint8Array(SEC), a = fr + 150; s.set(SYNC, 0); s[12] = bcd((a / 4500) | 0); s[13] = bcd(((a / 75) | 0) % 60); s[14] = bcd(a % 75); s[15] = 2; EDCECC.fix(s); h.set(s, f * FRAME); } }
+      }
+      const entries = new Array(N);
+      for (let i = 0; i < N; i++) entries[i] = hunks.has(i) ? { data: hunks.get(i) } : i < H0 ? { src: 0, M: d.M, i } : { src: 1, M: us.M, i };
+      const enc = new TextEncoder(), meta = d.meta.filter((m) => !isT(m)).concat([{ tag: ta[0].tag, flags: ta[0].flags, data: enc.encode(txt(ta[0]).replace(/FRAMES:\d+/, 'FRAMES:' + b1) + '\0') }], tb.slice(1));
+      log(H0 + ' blocs du jeu européen, ' + (N - H0) + ' blocs de musique du disque américain');
+      return CP.composeChd(d.head, d.hdr.hunkbytes, entries, meta, d.M.parentbits);
     };
     // 16-bit stereo samples (L R L R ...) of a track; onProgress(fraction)
     d.readAudio = async (t, onProgress = () => {}) => {

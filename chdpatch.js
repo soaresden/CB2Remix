@@ -124,6 +124,40 @@
     log('Nouveau CHD : ' + (total / 1048576).toFixed(1) + ' Mo');
     return { parts, size: total };
   }
-  const api = { patchChd, patchHunks, crc16, decodeMap };
+  // new CHD made of hunks of two CHDs with the same geometry and codecs: entries[i] = {data} (uncompressed hunk),
+  // or {src: 0|1, M, i} (hunk i of source 0 / 1, copied as stored). meta = [{tag, flags, data}]. head = header of source 0.
+  // -> {parts: [Uint8Array | {a, b, f}], size}  (f = source index of a byte range)
+  function composeChd(head, hunkbytes, entries, meta, parentbits) {
+    const N = entries.length, type = new Uint8Array(N), len = new Array(N).fill(0), off = new Array(N).fill(0), crc = new Uint16Array(N), parts = [];
+    let cur = 124;
+    const root = (M, t) => { let k = 0; while (M.type[t] === 5 && k++ < 64) t = M.off[t]; return t; };
+    for (let i = 0; i < N; i++) {
+      const e = entries[i];
+      if (e.data) { type[i] = 4; len[i] = hunkbytes; off[i] = cur; crc[i] = crc16(e.data); parts.push(e.data); cur += hunkbytes; continue; }
+      const M = e.M; let t = M.type[e.i], r = e.i;
+      if (t === 5) {
+        r = root(M, M.off[e.i]); const ref = M.off[e.i];
+        if (ref < i && entries[ref] && entries[ref].src === e.src && entries[ref].i === ref && !entries[ref].data) { type[i] = 5; off[i] = ref; continue; }
+        t = M.type[r];
+      }
+      type[i] = t; len[i] = M.len[r]; crc[i] = M.crc[r]; off[i] = cur;
+      const a = M.off[r], b = a + M.len[r], last = parts[parts.length - 1];
+      if (last && !(last instanceof Uint8Array) && last.f === e.src && last.b === a) last.b = b; else parts.push({ a, b, f: e.src });
+      cur += M.len[r];
+    }
+    const metaoff = cur, mparts = [];
+    meta.forEach((m, k) => { const h = new Uint8Array(16); h.set(m.tag, 0); h[4] = m.flags; putbe(h, 5, 3, m.data.length);
+      const nxt = k === meta.length - 1 ? 0 : cur + 16 + m.data.length; putbe(h, 8, 8, nxt); mparts.push(h, m.data); cur += 16 + m.data.length; });
+    let lb = 0, sb = 0;
+    for (let i = 0; i < N; i++) { if (type[i] <= 3) while (len[i] >= 2 ** lb) lb++; if (type[i] === 5) while (off[i] >= 2 ** sb) sb++; }
+    const bw = new BW(); bw.write(1, 4); bw.write(4, 4); bw.write(13, 4);
+    for (let i = 0; i < N; i++) bw.write(type[i], 4);
+    for (let i = 0; i < N; i++) { if (type[i] <= 3) { bw.write(len[i], lb); bw.write(crc[i], 16); } else if (type[i] === 4) bw.write(crc[i], 16); else bw.write(off[i], sb); }
+    const bits = bw.bytes(), mapcrc = crc16(rawmap(type, len.map((v, i) => (type[i] === 4 ? hunkbytes : v)), off, crc));
+    const mhdr = new Uint8Array(16); putbe(mhdr, 0, 4, bits.length); putbe(mhdr, 4, 6, 124); putbe(mhdr, 10, 2, mapcrc); mhdr[12] = lb; mhdr[13] = sb; mhdr[14] = parentbits;
+    const h = head.slice(0, 124); putbe(h, 32, 8, N * hunkbytes); putbe(h, 40, 8, cur); putbe(h, 48, 8, metaoff);
+    return { parts: [h, ...parts, ...mparts, mhdr, bits], size: cur + 16 + bits.length };
+  }
+  const api = { patchChd, patchHunks, composeChd, crc16, decodeMap };
   if (typeof module !== 'undefined') module.exports = api; else root.CHDPatch = api;
 })(this);

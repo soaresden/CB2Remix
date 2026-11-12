@@ -52,6 +52,7 @@ h1 span{color:var(--acc)}
 /* tabs */
 .tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 14px}
 #music.show{display:block}
+.usmus{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 4px}
 .mhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 #mAudio{width:100%;max-width:640px;margin:0 0 10px}
 #mList{display:grid;gap:6px}
@@ -185,6 +186,7 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
     </section>
     <section id="patch" class="panel-ws">
       <div class="feat" id="featList"></div>
+      <div class="usmus"><label class="chk"><input type="checkbox" id="usMus"> <span data-i18n="usMus"></span></label><label class="btn" id="usPick" hidden><span data-i18n="usPick"></span><input type="file" id="usFile" accept=".chd" hidden></label><span id="usInfo" class="mut"></span></div>
       <button class="go" id="patchGo" disabled data-i18n="patchGo"></button>
       <div id="patchStatus"></div>
     </section>
