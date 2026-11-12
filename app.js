@@ -375,7 +375,7 @@
     // Each face has its own canvas, stretched to the board's proportions (PX = width of a texel in display units).
     const W = Board.W, H = Board.H, FH = 32, PX = (540 / 78) / (W / FH), FW = W * PX;
     const faces = [...document.querySelectorAll('#boards .face')].map((el) => { const cv = el.querySelector('canvas'); return { el, wrap: el.querySelector('.fwrap'), cv, cx: cv.getContext('2d'), k: +el.dataset.face }; });
-    let img = new Uint8ClampedArray(W * H * 4), card = null, cardName = 'carte.srm', tool = 'brush', hist = [], header = null, ready = false;
+    let region = 'eu', img = new Uint8ClampedArray(W * H * 4), card = null, cardName = 'carte.srm', tool = 'brush', hist = [], header = null, ready = false;
     let P = null; // image being placed: {face, im, ux, uy, s0, z, a, flip}  (ux, uy, scale in display units)
     const fillAll = (c) => { for (let i = 0; i < W * H; i++) img.set([...c, 255], i * 4); };
     fillAll([245, 245, 245]);
@@ -392,15 +392,16 @@
     function draw() {
       for (const f of faces) { f.cx.clearRect(0, 0, W, FH); f.cx.drawImage(composite(f), 0, 0); f.wrap.classList.toggle('placing', !!P && P.face === f.k); }
     }
-    function init() {
-      if (ready) return; ready = true;
-      S.disc.readFile('/SCES_009.92').then((exe) => { header = Board.header(exe); $('#bSave').disabled = !card; }).catch((e) => ($('#mcInfo').textContent = t('error', e.message)));
+    function init() {   // called for every opened disc: the save name and header follow its version
+      ready = true;
+      S.disc.bootExe().then((p) => { region = p === '/SCUS_943.58' ? 'us' : 'eu'; return S.disc.readFile(p); }).then((exe) => { header = Board.header(exe); $('#bSave').disabled = !card; if (card) setCard(card, cardName); }).catch((e) => ($('#mcInfo').textContent = t('error', e.message)));
       draw();
     }
     function setCard(c, name) {
       card = c; cardName = name;
-      const f = Board.readFile(c, Board.NAME);
-      if (f) { try { const d = Board.decode(f); img = d.rgba; $('#bStyle').value = d.style; $('#bType').value = d.type; $('#mcInfo').textContent = t('boardFound', name); } catch (e) { $('#mcInfo').textContent = t('boardBad', name); } }
+      const other = region === 'us' ? 'eu' : 'us'; let f = Board.readFile(c, Board.NAMES[region]), conv = false;
+      if (!f) { f = Board.readFile(c, Board.NAMES[other]); conv = !!f; }   // board of the other version: converted on save
+      if (f) { try { const d = Board.decode(f); img = d.rgba; $('#bStyle').value = d.style; $('#bType').value = d.type; $('#mcInfo').textContent = conv ? t('boardConv', name, t(other === 'us' ? 'verUS' : 'verEU'), t(region === 'us' ? 'verUS' : 'verEU')) : t('boardFound', name); } catch (e) { $('#mcInfo').textContent = t('boardBad', name); } }
       else $('#mcInfo').textContent = t('boardNone', name);
       $('#bSave').disabled = !header; draw();
     }
@@ -500,7 +501,7 @@
     $('#bExport').onclick = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').putImageData(new ImageData(img, W, H), 0, 0); c.toBlob((b) => dl(b, 'planche.png')); };
     $('#bSave').onclick = () => {
       endPlace(true);
-      try { const f = Board.encode(img, +$('#bStyle').value, +$('#bType').value, header); const c = Board.writeFile(card, Board.NAME, f); setCard(c, cardName);
+      try { const f = Board.encode(img, +$('#bStyle').value, +$('#bType').value, header); const c = Board.writeFile(card, Board.NAMES[region], f); setCard(c, cardName);
         dl(new Blob([c]), cardName); $('#mcInfo').textContent = t('boardWritten', cardName); }
       catch (e) { S.dialog('Cool Boarders 2 Remix', e.message, [[t('ok'), true, true]]); }
     };

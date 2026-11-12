@@ -1,6 +1,7 @@
 // Cool Boarders 2 custom board ("Original board", memory card file BESCES-00992BOARD1) + raw 128 KB memory cards
 (function (root) {
-  const W = 128, H = 64, NAME = 'BESCES-00992BOARD1', SIZE = 0x4000;
+  // same board format in both versions, only the save file name differs (converting = writing it under the other name)
+  const W = 128, H = 64, NAME = 'BESCES-00992BOARD1', NAMES = { eu: 'BESCES-00992BOARD1', us: 'BASCUS-94358BOARD1' }, SIZE = 0x4000;
   const STYLES = ['Free Style', 'All-Around', 'Alpine'];
   function checksum(b, a, n) { let t = 0x6b383658; for (let i = 0; i < n; i++) { const x = b[a + i]; t = (t ^ ((x << (i & 31)) | (x << ((32 - i) & 31)))) >>> 0; } return t >>> 0; }
   // ---- memory card (raw 128 KB: .srm / .mcd)
@@ -44,7 +45,10 @@
   }
   function encode(rgba, style, type, header) { // header: 0x200 bytes
     const px = []; for (let i = 0; i < W * H; i++) px.push([rgba[i * 4], rgba[i * 4 + 1], rgba[i * 4 + 2]]);
-    const cols = quant(px, 32);
+    // 32 colours max (in 15-bit colour): exact palette when the image already fits, median cut otherwise
+    const k15 = (p) => ((p[0] >> 3) << 10) | ((p[1] >> 3) << 5) | (p[2] >> 3), uniq = new Map();
+    for (const p of px) { if (!uniq.has(k15(p))) uniq.set(k15(p), p); if (uniq.size > 32) break; }
+    const cols = uniq.size <= 32 ? [...uniq.values()] : quant(px, 32);
     const f = new Uint8Array(SIZE); f.set(header, 0); const d = f.subarray(0x200);
     'ORGBOARD'.split('').forEach((ch, k) => (d[k] = ch.charCodeAt(0)));
     d[8] = style * 4 + type;
@@ -76,6 +80,6 @@
     }
     return cols;
   }
-  const api = { W, H, NAME, STYLES, newCard, cardOK, readFile, writeFile, decode, encode, header, checksum, quant };
+  const api = { W, H, NAME, NAMES, STYLES, newCard, cardOK, readFile, writeFile, decode, encode, header, checksum, quant };
   if (typeof module !== 'undefined') module.exports = api; else root.Board = api;
 })(this);

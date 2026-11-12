@@ -56,6 +56,10 @@ Merci de proposer des créations originales (pas de personnages, logos ou marque
 
 32 couleurs maximum, comme dans l'éditeur du jeu.
 
+L'Atelier écrit la planche pour la version du jeu ouvert (européenne ou américaine : le format est le même, seul le nom
+de la sauvegarde change). Pour **convertir** une planche, ouvre le jeu de l'autre version, ouvre ta carte puis
+**Écrire dans la carte** : la planche est copiée sous le nom de cette version, l'originale reste sur la carte.
+
 ## 4. Musiques
 
 Les musiques sont les pistes audio du disque (`/CDDA/BGM*.DA`). L'onglet les lit sur ton CHD, les joue dans la page et les
