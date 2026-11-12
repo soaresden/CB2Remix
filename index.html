@@ -147,6 +147,11 @@ label.chk{display:flex;gap:6px;align-items:center}
 .bpanel label{display:block;margin:6px 0}.rowb{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
 select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);border-radius:6px;padding:4px 6px;font:inherit}
 .faces{display:grid;gap:14px;padding:12px 10px}
+#bOrig h3{margin:4px 0 4px}#bOrig h4{margin:10px 0 6px;font-size:13px;color:var(--mut)}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.ogrid button{padding:4px;background:transparent;border:1px solid var(--line);border-radius:8px;cursor:pointer;display:flex;flex-direction:column;gap:3px;align-items:stretch;font-size:11px;color:var(--mut)}
+.ogrid button:hover,.ogrid button:focus-visible{border-color:var(--acc);color:var(--acc)}
+.ogrid canvas{width:100%;height:auto;image-rendering:pixelated;border-radius:4px}
 .face .fhead{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
 .face .fhead b{font-size:12px;color:var(--ice);letter-spacing:.12em}
 .face .fhead .mut{font-size:12px}
@@ -326,6 +331,11 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
             <div class="rowb"><button id="bCover" data-i18n="bCover"></button><button id="bContain" data-i18n="bContain"></button><button id="bFlip" data-i18n="bFlip"></button><button id="bPlaceCancel" data-i18n="cancel"></button><button id="bPlaceOk" class="pri" data-i18n="bOk"></button></div>
           </div>
           <p class="mut" style="font-size:12px;margin:0" data-i18n="bDrop"></p>
+          <div id="bOrig" hidden>
+            <h3 data-i18n="bOrigTitle"></h3>
+            <p class="mut" style="font-size:12px;margin:0 0 8px" data-i18n="bOrigHelp"></p>
+            <div id="bOrigList"></div>
+          </div>
         </div>
       </div>
     </div>

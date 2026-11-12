@@ -80,6 +80,27 @@
     }
     return cols;
   }
-  const api = { W, H, NAME, NAMES, STYLES, newCard, cardOK, readFile, writeFile, decode, encode, header, checksum, quant };
+  // ---- the game's own designs, read from the player's disc (/DATA/CHR/BOARD.DAT, same file in both versions):
+  // a pack of TIM images; the 21 at 8 bpp, 128x64 (top face = rows 0-31, bottom = rows 32-63, like the card's board) are
+  // the designs: 6 per style (shared by TYPE-1/2/3, in style order Free Style, All-Around, Alpine), then the 3 SPECIAL
+  // boards (one per style). Colour 0 is the transparent outside of the outline: shown in light grey.
+  function originals(dat) {
+    const dv = new DataView(dat.buffer, dat.byteOffset, dat.length), out = [];
+    for (let o = 0; o + 20 < dat.length; o += 4) {
+      if (dv.getUint32(o, true) !== 0x10 || dv.getUint32(o + 4, true) !== 9) continue;
+      const cl = dv.getUint32(o + 8, true), p = o + 8 + cl, w = dv.getUint16(p + 8, true), h = dv.getUint16(p + 10, true);
+      if (dv.getUint16(o + 16, true) !== 256 || w !== W / 2 || h !== H || p + 12 + W * H > dat.length) continue;
+      const rgba = new Uint8ClampedArray(W * H * 4);
+      for (let i = 0; i < W * H; i++) {
+        const c = dv.getUint16(o + 20 + 2 * dat[p + 12 + i], true);
+        if (!c) { rgba.set([235, 235, 235, 255], i * 4); continue; }
+        const r = c & 31, g = (c >> 5) & 31, b = (c >> 10) & 31; rgba.set([(r << 3) | (r >> 2), (g << 3) | (g >> 2), (b << 3) | (b >> 2), 255], i * 4);
+      }
+      const k = out.length; out.push({ style: k < 18 ? (k / 6) | 0 : k - 18, special: k >= 18, n: k < 18 ? k % 6 : 0, rgba });
+      o = p + 12 + W * H - 4;
+    }
+    return out.length === 21 ? out : [];
+  }
+  const api = { originals, W, H, NAME, NAMES, STYLES, newCard, cardOK, readFile, writeFile, decode, encode, header, checksum, quant };
   if (typeof module !== 'undefined') module.exports = api; else root.Board = api;
 })(this);

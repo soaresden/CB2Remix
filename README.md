@@ -10,7 +10,7 @@
 |---|---|
 | **Patchs** | Installe le hack Remix v23 sur le jeu d'origine. |
 | **Prêt-à-porter** | Repeins les tenues des 7 riders, avec aperçu 3D en course et dans le menu du jeu. |
-| **Atelier** | Dessine ou importe (JPG / PNG) ta planche et écris-la dans ta carte mémoire. |
+| **Atelier** | Dessine, importe (JPG / PNG) ou pars d'un motif d'origine du jeu, et écris ta planche dans ta carte mémoire. |
 | **Musiques** | Écoute la bande-son du jeu et télécharge-la en MP3 ou en WAV. |
 
 ## 1. Patchs (Remix v23, à la carte)
@@ -51,7 +51,8 @@ La galerie contient 5 propositions par rider (Yaggi, Jin, Cindy, Irin, Boss, Gra
 ## 3. Atelier (planches)
 
 1. Ouvre ta carte mémoire (Batocera : `/userdata/saves/psx/`, le `.srm` du jeu ou le `_1.mcd`) ou pars d'une carte vierge.
-2. Le dessus et le dessous ont chacun leur zone. Dessine, choisis un exemple (Noël, Flammes, Montagne) ou **importe une image JPG / PNG** sur la face voulue (bouton ou glisser-déposer), puis place-la : glisser pour la déplacer, molette ou deux doigts pour zoomer et tourner, et **Valider**.
+2. Le dessus et le dessous ont chacun leur zone. Dessine, pars d'un des **21 motifs d'origine** du jeu (lus sur ton disque :
+   6 par style, communs aux TYPE-1, 2 et 3, plus les 3 planches SPECIAL), choisis un exemple (Noël, Flammes, Montagne) ou **importe une image JPG / PNG** sur la face voulue (bouton ou glisser-déposer), puis place-la : glisser pour la déplacer, molette ou deux doigts pour zoomer et tourner, et **Valider**.
 3. Style (Free Style / All-Around / Alpine) et type (1 à 3), puis **Écrire dans la carte et télécharger**.
 4. Jeu fermé, remplace ta carte par le fichier téléchargé. Dans le jeu : **Board Edit** → *Load*.
 

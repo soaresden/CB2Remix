@@ -402,7 +402,28 @@
     function init() {   // called for every opened disc: the save name and header follow its version
       ready = true;
       S.disc.bootExe().then((p) => { region = p === '/SCUS_943.58' ? 'us' : 'eu'; return S.disc.readFile(p); }).then((exe) => { header = Board.header(exe); $('#bSave').disabled = !card; if (card) setCard(card, cardName); }).catch((e) => ($('#mcInfo').textContent = t('error', e.message)));
+      S.disc.readFile('/DATA/CHR/BOARD.DAT').then((dat) => { origs = Board.originals(dat); showOrig(); }).catch(() => { origs = []; showOrig(); });
       draw();
+    }
+    // the game's own designs (from the player's disc), grouped by style, SPECIAL last
+    let origs = [];
+    function showOrig() {
+      const box = $('#bOrigList'); box.innerHTML = ''; $('#bOrig').hidden = !origs.length;
+      const groups = [...Board.STYLES.map((st, k) => [st, origs.filter((o) => !o.special && o.style === k)]), [t('bOrigSp'), origs.filter((o) => o.special)]];
+      for (const [title, list] of groups) {
+        if (!list.length) continue;
+        const h = document.createElement('h4'); h.textContent = title; box.appendChild(h);
+        const g = document.createElement('div'); g.className = 'ogrid'; box.appendChild(g);
+        for (const o of list) {
+          const label = o.special ? Board.STYLES[o.style] : t('bOrigN', o.n + 1);
+          const b = document.createElement('button'); b.type = 'button'; b.title = b.ariaLabel = (o.special ? t('bOrigSp') : title) + ' – ' + label;
+          const c = document.createElement('canvas'); c.width = W; c.height = H; c.getContext('2d').putImageData(new ImageData(o.rgba.slice(), W, H), 0, 0);
+          const sp = document.createElement('span'); sp.textContent = label; b.append(c, sp); g.appendChild(b);
+          b.onclick = () => { endPlace(false); hist.push(img.slice()); if (hist.length > 40) hist.shift(); img = o.rgba.slice(); $('#bStyle').value = o.style; draw();
+            $('#mcInfo').textContent = t('bOrigLoaded', b.title);
+            faces[0].el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+        }
+      }
     }
     function setCard(c, name) {
       card = c; cardName = name;
@@ -512,7 +533,7 @@
         dl(new Blob([c]), cardName); $('#mcInfo').textContent = t('boardWritten', cardName); }
       catch (e) { S.dialog('Cool Boarders 2 Remix', e.message, [[t('ok'), true, true]]); }
     };
-    return { init, redraw: draw };
+    return { init, redraw: draw, lang: showOrig };
   })();
 
   // ---------- patch panel (Remix)
@@ -668,7 +689,7 @@
     if (!S.disc) return;
     document.querySelectorAll('.slot').forEach((d) => { const r = RIDERS.find((x) => x.slots.some((y) => y.id === d.dataset.id)); const sl = r.slots.find((y) => y.id === d.dataset.id); d.lastChild.textContent = slotLabel(sl); });
     if (S.cur) $('#title').textContent = S.cur.r.name + ' — ' + slotLabel(S.cur.s);
-    BD.redraw();
+    BD.redraw(); BD.lang();
   });
   I18N.apply();
 
