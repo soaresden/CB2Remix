@@ -36,7 +36,7 @@
       tabProg: 'Progression', tabProgSub: 'Ta checklist 100 %, lue sur ta carte mémoire',
       tabPatch: 'Patchs', tabPatchSub: 'Le hack Remix : riders cachés, tricks, MAX…',
       heroLead: 'Le hack Remix, des tenues retouchées et ta propre planche pour Cool Boarders 2. Tout se fait dans ton navigateur à partir de ton jeu : aucun fichier du jeu n’est hébergé ici.',
-      chip1: '❄ Patch Remix v20', chip2: 'Skins en 3D', chip3: 'Planches perso', dropSmall: '.chd, .bin ou .img — le fichier reste sur ton ordinateur', heroCap: 'Course de compétition, Remix v16',
+      chip1: '❄ Patch Remix v21', chip2: 'Skins en 3D', chip3: 'Planches perso', dropSmall: '.chd, .bin ou .img — le fichier reste sur ton ordinateur', heroCap: 'Course de compétition, Remix v16',
       chooseTitle: 'Choisis ton atelier', needDisc: 'Ouvre d’abord ton jeu à l’étape 1.', otherDisc: 'Changer de jeu',
       stOriginal: 'Jeu d’origine', stRemix: 'Remix déjà installé', stOther: 'Version inconnue (déjà modifiée ?)',
       patchGo: 'Installer le Remix et télécharger', patchApplying: 'Construction du patch…', patchAlready: 'Ce jeu a déjà le Remix : rien à faire. Tu peux passer directement au Prêt-à-porter ou à l’Atelier.',
@@ -72,6 +72,7 @@
         air: ['Figures en l’air', 'La croix seule fait tourner (gauche/droite = spin, haut/bas = flip), Carré = rotations ×4, enchaînements « X to Y » en gardant R1.'],
         ramming: ['Chocs en Boarder Cross', 'Fonce dans un adversaire : le plus rapide des deux reste debout.'],
         bam: ['Big Air Master', 'Touches toujours affichées et figures suivantes (NEXT) à droite.'],
+        lift: ['Remontée en Free Style', 'Juste avant l’arrivée en Free Style, retour instantané en haut de la piste pour enchaîner les descentes sans repasser par les menus (départ avec READY / GO ; le temps de la descente n’est pas enregistré).'],
         progress: ['Progression dans le jeu', 'Maintiens SELECT sur l’écran des modes : riders cachés, Mirror, Hard, Hard + Mirror, pistes, planches SPECIAL, trophées et pourcentage du 100 %, avec pour chaque ligne ce qu’il faut faire (en anglais, comme le jeu). (Le fichier du menu va à la fin du film du générique, coupé de 0,5 s.)'],
       },
       feat: [
@@ -117,7 +118,7 @@
       tabProg: 'Progress', tabProgSub: 'Your 100% checklist, read from your memory card',
       tabPatch: 'Patches', tabPatchSub: 'The Remix hack: hidden riders, tricks, MAX…',
       heroLead: 'The Remix hack, repainted outfits and your own board for Cool Boarders 2. Everything runs in your browser from your own game: no game files are hosted here.',
-      chip1: '❄ Remix patch v20', chip2: '3D skins', chip3: 'Custom boards', dropSmall: '.chd, .bin or .img — the file stays on your computer', heroCap: 'Competition race, Remix v16',
+      chip1: '❄ Remix patch v21', chip2: '3D skins', chip3: 'Custom boards', dropSmall: '.chd, .bin or .img — the file stays on your computer', heroCap: 'Competition race, Remix v16',
       chooseTitle: 'Pick your workshop', needDisc: 'Open your game in step 1 first.', otherDisc: 'Change game',
       stOriginal: 'Original game', stRemix: 'Remix already installed', stOther: 'Unknown version (already modified?)',
       patchGo: 'Install Remix and download', patchApplying: 'Building the patch…', patchAlready: 'This game already has Remix: nothing to do. Go straight to Ready-to-wear or the Workshop.',
@@ -153,6 +154,7 @@
         air: ['Air control', 'The d-pad alone rotates (left/right = spin, up/down = flip), Square = rotations x4, “X to Y” combos while holding R1.'],
         ramming: ['Boarder Cross ramming', 'Ram an opponent: the faster of the two stays up.'],
         bam: ['Big Air Master', 'Keys always shown and the next tricks (NEXT) on the right.'],
+        lift: ['Free Style lift', 'Just before the Free Style finish, instant return to the top of the course to chain runs without the menus (start with READY / GO; the run time is not recorded).'],
         progress: ['In-game progress', 'Hold SELECT on the mode select screen: hidden riders, Mirror, Hard, Hard + Mirror, courses, SPECIAL boards, trophies and 100% percentage, each with what to do. (The menu file moves to the end of the credits movie, cut by 0.5 s.)'],
       },
       feat: [
