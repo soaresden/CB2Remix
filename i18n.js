@@ -77,6 +77,7 @@
         lift: ['Arrivée express en Free Style', 'À l’arrivée, ton temps compte comme d’habitude (classement, records, trophées, donc Snowman) mais sans célébration ni replay : classement, START, résultats avec ton temps, puis X sur RETRY et tu repars aussitôt d’en haut, sans chargement.'],
         skipq: ['Qualifications au choix', 'Sur l’écran « 1st STAGE » : START = jouer les qualifications comme d’habitude, SELECT + START = les passer. Tu pars alors 4e sur 8, au milieu du départ en handicap du Boarder Cross.'],
         crew: ['Jicchi, Nick et Kelly jouables', 'Les trois riders de l’ordinateur rejoignent l’écran BOARDER, juste après Irin : leur portrait (tiré de la vidéo de la Compétition de ton propre disque), leur modèle et leur texture en course, et leurs vraies stats d’adversaires. En Free Style, Big Air, Contest Master, Halfpipe et Board Park (pas en Compétition ni en VS). Dans le menu, l’aperçu 3D reste celui de Yaggi, Jin ou Cindy. (La fin du film d’intro est raccourcie d’une demi-seconde.)'],
+        rear: ['Vue arrière (Rond)', 'En course, maintiens Rond : la caméra passe devant ton rider et regarde derrière lui, pour voir qui te suit. (Le jeu ne dessine que la piste devant toi : au loin derrière, il peut y avoir des trous blancs.)'],
         progress: ['Progression dans le jeu', 'Maintiens SELECT sur l’écran des modes : riders cachés, Mirror, Hard, Hard + Mirror, pistes, planches SPECIAL, trophées et pourcentage du 100 %, avec pour chaque ligne ce qu’il faut faire (en anglais, comme le jeu). (Le fichier du menu va à la fin du film du générique, coupé de 0,5 s.)'],
       },
       feat: [
@@ -163,6 +164,7 @@
         lift: ['Quick finish in Free Style', 'At the finish your run counts as usual (ranking, records, trophies, so Snowman) but without the celebration and the replay: ranking, START, results with your time, then X on RETRY and you start again from the top at once, no loading.'],
         skipq: ['Optional qualifying', 'On the “1st STAGE” screen: START = play the qualifying as usual, SELECT + START = skip it. You then start 4th of 8, in the middle of the Boarder Cross handicap start.'],
         crew: ['Jicchi, Nick and Kelly playable', 'The three CPU riders join the BOARDER screen, right after Irin: their portrait (taken from the Competition movie of your own disc), their model and texture in the race, and their real opponent stats. In Free Style, Big Air, Contest Master, Halfpipe and Board Park (not in Competition or VS). In the menu the 3D preview stays Yaggi’s, Jin’s or Cindy’s. (The end of the intro movie is half a second shorter.)'],
+        rear: ['Rear view (Circle)', 'In a race, hold Circle: the camera moves in front of your rider and looks back, to see who is following. (The game only draws the track ahead of you: far behind, there can be white gaps.)'],
         progress: ['In-game progress', 'Hold SELECT on the mode select screen: hidden riders, Mirror, Hard, Hard + Mirror, courses, SPECIAL boards, trophies and 100% percentage, each with what to do. (The menu file moves to the end of the credits movie, cut by 0.5 s.)'],
       },
       feat: [
