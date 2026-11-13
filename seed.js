@@ -1,6 +1,6 @@
 // CB2 Remix – configuration code ("CB2-XXXX-XXXX"): the chosen mods, music and ready-to-wear outfits in a few letters.
 // Same format as cb2-decomp remix/modular.py (encode_config / decode_config):
-// bytes [1] version, [2] mods (bit i = MOD_IDS[i]), [1] options (bit 0 = USA music), [up to 8] outfits (bit i = skins/index.json[i]),
+// bytes [1] version, [2] mods (version 2: [3]) (bit i = MOD_IDS[i]), [1] options (bit 0 = USA music), [up to 8] outfits (bit i = skins/index.json[i]),
 // trailing zero bytes dropped, then 1 check byte (crc32 & 255); Crockford base32.
 const Seed = (() => {
   const B32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -9,7 +9,7 @@ const Seed = (() => {
   function encode({ mods = [], usMusic = false, skins = [] }) {
     const m = mods.reduce((a, f) => a | (IDS.includes(f) ? 1 << IDS.indexOf(f) : 0), 0), sk = [0, 0, 0, 0, 0, 0, 0, 0];
     for (const i of skins) if (i >= 0 && i < 64) sk[i >> 3] |= 1 << (i & 7);
-    const b = [1, m & 255, m >> 8, usMusic ? 1 : 0, ...sk];
+    const b = (m < 0x10000 ? [1, m & 255, m >> 8] : [2, m & 255, (m >> 8) & 255, m >>> 16]).concat([usMusic ? 1 : 0, ...sk]);   // version 2: 3 bytes of mods
     while (b.length > 2 && b[b.length - 1] === 0) b.pop();
     b.push(crc(Uint8Array.from(b)));
     let n = 0n; for (const x of b) n = (n << 8n) | BigInt(x);
@@ -24,8 +24,9 @@ const Seed = (() => {
     let n = 0n; for (const c of s) n = n * 32n + BigInt(B32.indexOf(c));
     const nb = Math.floor(s.length * 5 / 8); n >>= BigInt(s.length * 5 - nb * 8);
     const b = []; for (let i = nb - 1; i >= 0; i--) b.push(Number((n >> BigInt(8 * i)) & 255n));
-    if (b.length < 2 || b[0] !== 1 || crc(Uint8Array.from(b.slice(0, -1))) !== b[b.length - 1]) return null;
-    const v = b.slice(0, -1).concat(Array(12).fill(0)), m = v[1] | (v[2] << 8);
+    if (b.length < 2 || (b[0] !== 1 && b[0] !== 2) || crc(Uint8Array.from(b.slice(0, -1))) !== b[b.length - 1]) return null;
+    let v = b.slice(0, -1).concat(Array(13).fill(0)), m = v[1] | (v[2] << 8);
+    if (b[0] === 2) { m |= v[3] << 16; v = v.slice(0, 3).concat(v.slice(4)); }
     return { mods: IDS.filter((f, i) => (m >> i) & 1), usMusic: !!(v[3] & 1), skins: [...Array(64).keys()].filter((i) => (v[4 + (i >> 3)] >> (i & 7)) & 1) };
   }
   return { IDS, encode, decode };
