@@ -569,7 +569,7 @@
   }
   // ---------- mods, configuration code, ready-to-wear outfits
   const MODS = Seed.IDS.filter((m) => m !== 'lift'), PRESETS = { all: MODS, earn: MODS.filter((m) => m !== 'unlock' && m !== 'special'), none: [] };
-  S.cfg = { mods: [...MODS], usMusic: false, skins: [] }; S.skinIdx = [];
+  S.cfg = { mods: MODS.filter((m) => m !== 'unlock'), usMusic: false, skins: [] }; S.skinIdx = [];   // 'Tout débloqué' off by default
   async function modsPkg() {
     if (!_P.mods) { const b = Uint8Array.from(atob(window.REMIX_MODS.pkg), (c) => c.charCodeAt(0));
       _P.mods = JSON.parse(await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text()); }
