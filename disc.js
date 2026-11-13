@@ -329,20 +329,31 @@
       const img = mdecDecode(await mdecFrame(sector, nsec, fr), 320, 240, x0, y0, x0 + w, y0 + h);
       const px = (x, y) => { const r = img[y0 + y], o = (x0 + x) * 3; return [r[o], r[o + 1], r[o + 2]]; };
       const isbg = (c) => { const lo = Math.min(...c), hi = Math.max(...c); return white ? lo >= 236 && hi - lo <= 16 : hi <= 48; };
+      const fringe = (c) => { const lo = Math.min(...c), hi = Math.max(...c); return white ? lo >= 196 && hi - lo <= 40 : hi <= 72; };
       const bg = new Uint8Array(w * h), stack = [];
       for (let x = 0; x < w; x++) stack.push([x, 0], [x, h - 1]);
       for (let y = 0; y < h; y++) stack.push([0, y], [w - 1, y]);
       while (stack.length) { const [x, y] = stack.pop(); if (bg[y * w + x] || !isbg(px(x, y))) continue; bg[y * w + x] = 1;
         if (x > 0) stack.push([x - 1, y]); if (x < w - 1) stack.push([x + 1, y]); if (y > 0) stack.push([x, y - 1]); if (y < h - 1) stack.push([x, y + 1]); }
-      const small = [];
+      for (let it = 0; it < 2; it++) { const add = [];   // the halo next to the background goes too
+        for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (!bg[y * w + x] && fringe(px(x, y)) &&
+          ((x > 0 && bg[y * w + x - 1]) || (x < w - 1 && bg[y * w + x + 1]) || (y > 0 && bg[(y - 1) * w + x]) || (y < h - 1 && bg[(y + 1) * w + x]))) add.push(y * w + x);
+        for (const i of add) bg[i] = 1; }
+      let small = [];
       for (let dy = 0; dy < 64; dy++) { const sy0 = Math.floor(dy * h / 64), sy1 = Math.floor((dy + 1) * h / 64);
         for (let dx = 0; dx < 64; dx++) { const sx0 = Math.floor(dx * w / 64), sx1 = Math.floor((dx + 1) * w / 64); let r = 0, g = 0, b = 0, c = 0, t = 0;
           for (let y = sy0; y < sy1; y++) for (let x = sx0; x < sx1; x++) { t++; if (bg[y * w + x]) continue; const q = px(x, y); r += q[0]; g += q[1]; b += q[2]; c++; }
           small.push(c === 0 || c * 2 < t ? null : [Math.floor(r / c), Math.floor(g / c), Math.floor(b / c)]); } }
-      const pal = medianCut(small.filter((q) => q), ncol - 1);
+      for (let it = 0; it < 2; it++) { const nxt = small.slice();   // specks
+        for (let i = 0; i < 4096; i++) { if (!small[i]) continue; const x = i % 64, y = i >> 6;
+          const on = (x > 0 && !!small[i - 1]) + (x < 63 && !!small[i + 1]) + (y > 0 && !!small[i - 64]) + (y < 63 && !!small[i + 64]); if (on <= 1) nxt[i] = null; }
+        small = nxt; }
+      const ink = []; for (let i = 0; i < 4096; i++) if (!small[i] && ((i % 64 > 0 && small[i - 1]) || (i % 64 < 63 && small[i + 1]) || (i >= 64 && small[i - 64]) || (i < 4032 && small[i + 64]))) ink.push(i);
+      const pal = medianCut(small.filter((q) => q), ncol - 2);
       const idx = small.map((q) => { if (!q) return 0; let best = 0, bd = 1 << 30;
         pal.forEach((c, i) => { const d2 = (q[0] - c[0]) ** 2 + (q[1] - c[1]) ** 2 + (q[2] - c[2]) ** 2; if (d2 < bd) { bd = d2; best = i; } }); return best + 1; });
-      const clut = [0, ...pal.map((c) => ((c[0] >> 3) | (c[1] >> 3) << 5 | (c[2] >> 3) << 10) || 0x8000)];
+      for (const i of ink) idx[i] = pal.length + 1;   // dark outline
+      const clut = [0, ...pal.map((c) => ((c[0] >> 3) | (c[1] >> 3) << 5 | (c[2] >> 3) << 10) || 0x8000), 0x0842];
       while (clut.length < ncol) clut.push(0);
       return [idx, clut];
     };
