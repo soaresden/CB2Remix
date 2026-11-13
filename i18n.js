@@ -36,7 +36,7 @@
       tabProg: 'Progression', tabProgSub: 'Ta checklist 100 %, lue sur ta carte mémoire',
       tabPatch: 'Patchs', tabPatchSub: 'Le hack Remix : riders cachés, tricks, MAX…',
       heroLead: 'Le hack Remix, des tenues retouchées et ta propre planche pour Cool Boarders 2. Tout se fait dans ton navigateur à partir de ton jeu : aucun fichier du jeu n’est hébergé ici.',
-      chip1: '❄ Patch Remix v25', chip2: 'Skins en 3D', chip3: 'Planches perso', dropSmall: '.chd, .bin ou .img — le fichier reste sur ton ordinateur', heroCap: 'Course de compétition, Remix v16',
+      chip1: '❄ Patch Remix v26', chip2: 'Skins en 3D', chip3: 'Planches perso', dropSmall: '.chd, .bin ou .img — le fichier reste sur ton ordinateur', heroCap: 'Course de compétition, Remix v16',
       chooseTitle: 'Choisis ton atelier', needDisc: 'Ouvre d’abord ton jeu à l’étape 1.', otherDisc: 'Changer de jeu',
       stOriginal: 'Jeu d’origine', stRemix: 'Remix déjà installé', stOther: 'Version inconnue (déjà modifiée ?)',
       patchGo: 'Installer le Remix et télécharger', patchApplying: 'Construction du patch…', patchAlready: 'Ce jeu a déjà le Remix : rien à faire. Tu peux passer directement au Prêt-à-porter ou à l’Atelier.',
@@ -76,6 +76,7 @@
         bam: ['Big Air Master', 'Touches toujours affichées, figures suivantes (NEXT) à droite, et Exit dans la pause termine la session avec ta note et le classement.'],
         lift: ['Arrivée express en Free Style', 'À l’arrivée, ton temps compte comme d’habitude (classement, records, trophées, donc Snowman) mais sans célébration ni replay : classement, START, résultats avec ton temps, puis X sur RETRY et tu repars aussitôt d’en haut, sans chargement.'],
         skipq: ['Qualifications au choix', 'Sur l’écran « 1st STAGE » : START = jouer les qualifications comme d’habitude, SELECT + START = les passer. Tu pars alors 4e sur 8, au milieu du départ en handicap du Boarder Cross.'],
+        crew: ['Jicchi, Nick et Kelly jouables', 'Les trois riders de l’ordinateur rejoignent l’écran BOARDER, juste après Irin : leur portrait (tiré de la vidéo de la Compétition de ton propre disque), leur modèle et leur texture en course, et leurs vraies stats d’adversaires. En Free Style, Big Air, Contest Master, Halfpipe et Board Park (pas en Compétition ni en VS). Dans le menu, l’aperçu 3D reste celui de Yaggi, Jin ou Cindy. (La fin du film d’intro est raccourcie d’une demi-seconde.)'],
         progress: ['Progression dans le jeu', 'Maintiens SELECT sur l’écran des modes : riders cachés, Mirror, Hard, Hard + Mirror, pistes, planches SPECIAL, trophées et pourcentage du 100 %, avec pour chaque ligne ce qu’il faut faire (en anglais, comme le jeu). (Le fichier du menu va à la fin du film du générique, coupé de 0,5 s.)'],
       },
       feat: [
@@ -121,7 +122,7 @@
       tabProg: 'Progress', tabProgSub: 'Your 100% checklist, read from your memory card',
       tabPatch: 'Patches', tabPatchSub: 'The Remix hack: hidden riders, tricks, MAX…',
       heroLead: 'The Remix hack, repainted outfits and your own board for Cool Boarders 2. Everything runs in your browser from your own game: no game files are hosted here.',
-      chip1: '❄ Remix patch v25', chip2: '3D skins', chip3: 'Custom boards', dropSmall: '.chd, .bin or .img — the file stays on your computer', heroCap: 'Competition race, Remix v16',
+      chip1: '❄ Remix patch v26', chip2: '3D skins', chip3: 'Custom boards', dropSmall: '.chd, .bin or .img — the file stays on your computer', heroCap: 'Competition race, Remix v16',
       chooseTitle: 'Pick your workshop', needDisc: 'Open your game in step 1 first.', otherDisc: 'Change game',
       stOriginal: 'Original game', stRemix: 'Remix already installed', stOther: 'Unknown version (already modified?)',
       patchGo: 'Install Remix and download', patchApplying: 'Building the patch…', patchAlready: 'This game already has Remix: nothing to do. Go straight to Ready-to-wear or the Workshop.',
@@ -161,6 +162,7 @@
         bam: ['Big Air Master', 'Keys always shown, the next tricks (NEXT) on the right, and Exit in the pause menu ends the session with your grade and the ranking.'],
         lift: ['Quick finish in Free Style', 'At the finish your run counts as usual (ranking, records, trophies, so Snowman) but without the celebration and the replay: ranking, START, results with your time, then X on RETRY and you start again from the top at once, no loading.'],
         skipq: ['Optional qualifying', 'On the “1st STAGE” screen: START = play the qualifying as usual, SELECT + START = skip it. You then start 4th of 8, in the middle of the Boarder Cross handicap start.'],
+        crew: ['Jicchi, Nick and Kelly playable', 'The three CPU riders join the BOARDER screen, right after Irin: their portrait (taken from the Competition movie of your own disc), their model and texture in the race, and their real opponent stats. In Free Style, Big Air, Contest Master, Halfpipe and Board Park (not in Competition or VS). In the menu the 3D preview stays Yaggi’s, Jin’s or Cindy’s. (The end of the intro movie is half a second shorter.)'],
         progress: ['In-game progress', 'Hold SELECT on the mode select screen: hidden riders, Mirror, Hard, Hard + Mirror, courses, SPECIAL boards, trophies and 100% percentage, each with what to do. (The menu file moves to the end of the credits movie, cut by 0.5 s.)'],
       },
       feat: [

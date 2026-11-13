@@ -246,6 +246,115 @@
       }
       return mods;
     };
+    // ---- PS1 movie frames (mod crew): STR, MDEC bitstream version 2 -> RGB, integer only (same pixels as modular.py)
+    const MZZ = [0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5, 12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13, 6, 7, 14, 21,
+      28, 35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23, 30, 37, 44, 51, 58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63];
+    const MQT = [2, 16, 19, 22, 26, 27, 29, 34, 16, 16, 22, 24, 27, 29, 34, 37, 19, 22, 26, 27, 29, 34, 34, 38, 22, 22, 26, 27,
+      29, 34, 37, 40, 22, 26, 27, 29, 32, 35, 40, 48, 26, 27, 29, 32, 35, 40, 48, 58, 26, 27, 29, 34, 38, 46, 56, 69,
+      27, 29, 35, 38, 46, 56, 69, 83];
+    const MB = [2896, 2896, 2896, 2896, 2896, 2896, 2896, 2896, 4017, 3406, 2276, 799, -799, -2276, -3406, -4017,
+      3784, 1567, -1567, -3784, -3784, -1567, 1567, 3784, 3406, -799, -4017, -2276, 2276, 4017, 799, -3406,
+      2896, -2896, -2896, 2896, 2896, -2896, -2896, 2896, 2276, -4017, 799, 3406, -3406, -799, 4017, -2276,
+      1567, -3784, 3784, -1567, -1567, 3784, -3784, 1567, 799, -2276, 3406, -4017, 4017, -3406, 2276, -799];
+    const MAC = new Map();
+    '11 0 1|011 1 1|0100 0 2|0101 2 1|00101 0 3|00111 3 1|00110 4 1|000110 1 2|000111 5 1|000101 6 1|000100 7 1|0000110 0 4|0000100 2 2|0000111 8 1|0000101 9 1|00100110 0 5|00100001 0 6|00100101 1 3|00100100 3 2|00100111 10 1|00100011 11 1|00100010 12 1|00100000 13 1|0000001010 0 7|0000001100 1 4|0000001011 2 3|0000001111 4 2|0000001001 5 2|0000001110 14 1|0000001101 15 1|0000001000 16 1|000000011101 0 8|000000011000 0 9|000000010011 0 10|000000010000 0 11|000000011011 1 5|000000010100 2 4|000000011100 3 3|000000010010 4 3|000000011110 6 2|000000010101 7 2|000000010001 8 2|000000011111 17 1|000000011010 18 1|000000011001 19 1|000000010111 20 1|000000010110 21 1|0000000011010 0 12|0000000011001 0 13|0000000011000 0 14|0000000010111 0 15|0000000010110 1 6|0000000010101 1 7|0000000010100 2 5|0000000010011 3 4|0000000010010 5 3|0000000010001 9 2|0000000010000 10 2|0000000011111 22 1|0000000011110 23 1|0000000011101 24 1|0000000011100 25 1|0000000011011 26 1|00000000011111 0 16|00000000011110 0 17|00000000011101 0 18|00000000011100 0 19|00000000011011 0 20|00000000011010 0 21|00000000011001 0 22|00000000011000 0 23|00000000010111 0 24|00000000010110 0 25|00000000010101 0 26|00000000010100 0 27|00000000010011 0 28|00000000010010 0 29|00000000010001 0 30|00000000010000 0 31|000000000011000 0 32|000000000010111 0 33|000000000010110 0 34|000000000010101 0 35|000000000010100 0 36|000000000010011 0 37|000000000010010 0 38|000000000010001 0 39|000000000010000 0 40|000000000011111 1 8|000000000011110 1 9|000000000011101 1 10|000000000011100 1 11|000000000011011 1 12|000000000011010 1 13|000000000011001 1 14|0000000000010011 1 15|0000000000010010 1 16|0000000000010001 1 17|0000000000010000 1 18|0000000000010100 6 3|0000000000011010 11 2|0000000000011001 12 2|0000000000011000 13 2|0000000000010111 14 2|0000000000010110 15 2|0000000000010101 16 2|0000000000011111 27 1|0000000000011110 28 1|0000000000011101 29 1|0000000000011100 30 1|0000000000011011 31 1'.split('|').forEach((e) => { const [c, r, l] = e.split(' '); MAC.set(c.length * 65536 + parseInt(c, 2), [+r, +l]); });
+    const mdecFrame = async (sector, nsec, n) => {
+      const parts = new Map();
+      for (let k = 0; k < nsec; k++) {
+        const s = await sector(k);
+        if (s[0] !== 0x60 || s[1] !== 1 || s[2] !== 1 || s[3] !== 0x80) continue;
+        const chunk = s[4] | s[5] << 8, fr = (s[8] | s[9] << 8 | s[10] << 16 | s[11] << 24) >>> 0;
+        if (fr === n) parts.set(chunk, s.slice(32, 2048)); else if (fr > n && parts.size) break;
+      }
+      const keys = [...parts.keys()].sort((a, b) => a - b), out = new Uint8Array(keys.length * 2016);
+      keys.forEach((k, i) => out.set(parts.get(k), i * 2016)); return out;
+    };
+    const signed = (v, n) => (v >> (n - 1) ? v - (1 << n) : v);
+    const mdecDecode = (bs, w, h, x0, y0, x1, y1) => {
+      const q = bs[4] | bs[5] << 8, ver = bs[6] | bs[7] << 8; if (ver !== 2) throw new Error('STR v' + ver);
+      let p = 8, acc = 0, nb = 0;
+      const peek = (n) => { while (nb < n) { const wd = p + 1 < bs.length ? bs[p] | bs[p + 1] << 8 : 0; p += 2; acc = ((acc << 16) | wd) >>> 0; nb += 16; } return (acc >>> (nb - n)) & ((1 << n) - 1); };
+      const get = (n) => { const v = peek(n); nb -= n; acc = nb ? acc & ((2 ** nb) - 1) : 0; return v; };
+      const block = (idct) => {
+        const c = new Array(64).fill(0);
+        c[0] = Math.max(-1024, Math.min(1023, signed(get(10), 10) * MQT[0]));
+        let k = 0;
+        for (;;) {
+          if (peek(2) === 2) { get(2); break; }
+          let run, lev;
+          if (peek(6) === 1) { get(6); run = get(6); lev = signed(get(10), 10); }
+          else {
+            let e = null, ln = 2;
+            for (; ln <= 16; ln++) { e = MAC.get(ln * 65536 + peek(ln)); if (e) break; }
+            if (!e) throw new Error('MDEC: code inconnu');
+            get(ln); [run, lev] = e; if (get(1)) lev = -lev;
+          }
+          k += run + 1; if (k > 63) throw new Error('MDEC: bloc trop long');
+          const z = MZZ[k]; c[z] = Math.max(-1024, Math.min(1023, (lev * MQT[z] * q + 4) >> 3));
+        }
+        if (!idct) return c;
+        const t = new Array(64), o = new Array(64);
+        for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) { let s = 0; for (let u = 0; u < 8; u++) { const r = c[y * 8 + u]; if (r) s += MB[u * 8 + x] * r; } t[y * 8 + x] = (s + 1024) >> 11; }
+        for (let x = 0; x < 8; x++) for (let y = 0; y < 8; y++) { let s = 0; for (let v = 0; v < 8; v++) s += MB[v * 8 + y] * t[v * 8 + x]; o[y * 8 + x] = (s + 16384) >> 15; }
+        return o;
+      };
+      const img = []; for (let y = 0; y < h; y++) img.push(new Uint8Array(w * 3));
+      const cl = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
+      for (let mx = 0; mx < w; mx += 16) for (let my = 0; my < h; my += 16) {
+        const use = !(mx + 16 <= x0 || mx >= x1 || my + 16 <= y0 || my >= y1);
+        const cr = block(use), cb = block(use), ys = [block(use), block(use), block(use), block(use)];
+        if (!use) continue;
+        for (let yy = 0; yy < 16; yy++) { const row = img[my + yy];
+          for (let xx = 0; xx < 16; xx++) {
+            const yv = ys[(yy >> 3) * 2 + (xx >> 3)][(yy & 7) * 8 + (xx & 7)] + 128, k = (yy >> 1) * 8 + (xx >> 1), r = cr[k], b = cb[k], o = (mx + xx) * 3;
+            row[o] = cl(yv + ((359 * r + 128) >> 8)); row[o + 1] = cl(yv - ((88 * b + 183 * r + 128) >> 8)); row[o + 2] = cl(yv + ((454 * b + 128) >> 8));
+          } }
+      }
+      return img;
+    };
+    const medianCut = (pixels, n) => {
+      const lex = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+      const boxes = [pixels.slice().sort(lex)];
+      while (boxes.length < n) {
+        let best = -1, br = 0, bc = 0;
+        boxes.forEach((bx, i) => { if (bx.length < 2) return;
+          for (let c = 0; c < 3; c++) { let lo = 1e9, hi = -1; for (const q of bx) { if (q[c] < lo) lo = q[c]; if (q[c] > hi) hi = q[c]; } if (hi - lo > br) { br = hi - lo; best = i; bc = c; } } });
+        if (best < 0) break;
+        const bx = boxes[best].slice().sort((a, b) => a[bc] - b[bc] || lex(a, b)), m = bx.length >> 1;
+        boxes.splice(best, 1, bx.slice(0, m), bx.slice(m));
+      }
+      return boxes.map((bx) => { const s = [0, 0, 0]; for (const q of bx) { s[0] += q[0]; s[1] += q[1]; s[2] += q[2]; } return s.map((v) => Math.floor(v / bx.length)); });
+    };
+    const face = async (sector, nsec, [fr, x0, y0, w, h, white], ncol) => {
+      const img = mdecDecode(await mdecFrame(sector, nsec, fr), 320, 240, x0, y0, x0 + w, y0 + h);
+      const px = (x, y) => { const r = img[y0 + y], o = (x0 + x) * 3; return [r[o], r[o + 1], r[o + 2]]; };
+      const isbg = (c) => { const lo = Math.min(...c), hi = Math.max(...c); return white ? lo >= 236 && hi - lo <= 16 : hi <= 48; };
+      const bg = new Uint8Array(w * h), stack = [];
+      for (let x = 0; x < w; x++) stack.push([x, 0], [x, h - 1]);
+      for (let y = 0; y < h; y++) stack.push([0, y], [w - 1, y]);
+      while (stack.length) { const [x, y] = stack.pop(); if (bg[y * w + x] || !isbg(px(x, y))) continue; bg[y * w + x] = 1;
+        if (x > 0) stack.push([x - 1, y]); if (x < w - 1) stack.push([x + 1, y]); if (y > 0) stack.push([x, y - 1]); if (y < h - 1) stack.push([x, y + 1]); }
+      const small = [];
+      for (let dy = 0; dy < 64; dy++) { const sy0 = Math.floor(dy * h / 64), sy1 = Math.floor((dy + 1) * h / 64);
+        for (let dx = 0; dx < 64; dx++) { const sx0 = Math.floor(dx * w / 64), sx1 = Math.floor((dx + 1) * w / 64); let r = 0, g = 0, b = 0, c = 0, t = 0;
+          for (let y = sy0; y < sy1; y++) for (let x = sx0; x < sx1; x++) { t++; if (bg[y * w + x]) continue; const q = px(x, y); r += q[0]; g += q[1]; b += q[2]; c++; }
+          small.push(c === 0 || c * 2 < t ? null : [Math.floor(r / c), Math.floor(g / c), Math.floor(b / c)]); } }
+      const pal = medianCut(small.filter((q) => q), ncol - 1);
+      const idx = small.map((q) => { if (!q) return 0; let best = 0, bd = 1 << 30;
+        pal.forEach((c, i) => { const d2 = (q[0] - c[0]) ** 2 + (q[1] - c[1]) ** 2 + (q[2] - c[2]) ** 2; if (d2 < bd) { bd = d2; best = i; } }); return best + 1; });
+      const clut = [0, ...pal.map((c) => ((c[0] >> 3) | (c[1] >> 3) << 5 | (c[2] >> 3) << 10) || 0x8000)];
+      while (clut.length < ncol) clut.push(0);
+      return [idx, clut];
+    };
+    // ['face', fbd, movie, {cards, face, clut, n}]: portraits from the player's own movie (see modular.face_op)
+    d.faceOp = async (fbd, sector, nsec, op) => {
+      const p = op[3], [fx, fy] = p.face, [cx, cy] = p.clut, n = p.n, vo = (x, y) => 20 + (y * 704 + x - 320) * 2;
+      for (let k = 0; k < p.cards.length; k++) {
+        const [idx, clut] = await face(sector, nsec, p.cards[k], n);
+        for (let y = 0; y < 64; y++) fbd.set(idx.slice(y * 64, (y + 1) * 64), vo(fx + 32 * k, fy + y));
+        const o = vo(cx, cy + k); clut.forEach((v, i) => { fbd[o + 2 * i] = v & 255; fbd[o + 2 * i + 1] = v >> 8; });
+      }
+    };
     // modular Remix (cb2-decomp remix/modular.py): pkg = {exe_crc, exe_size, ops: {feature: [op]}}, feats = ids
     // -> {lba: {sub, data}}. Ops: ['w', file, off, old, new] word, ['b', file, off, hex], ['append', file, hex],
     // ['bs', file, off, [[0, len, src] | [1, hex]]] bytes copied from the original file or new, ['rec', path, lba, size] directory record, ['sec', lba, subhex, [[0, len, addr] | [1, hex]]] whole sector
@@ -257,7 +366,7 @@
       if (on.has('max') || on.has('air')) on.add('input');
       if (on.has('input') && !on.has('air')) on.add('input_noair');
       if (on.size && !on.has('riders') && (pkg.ops.brand || []).length) on.add('brand');   // REMIX on the title screen (moved with 'riders')
-      const order = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'input', 'input_noair', 'brand'].filter((f) => on.has(f));
+      const order = ['unlock', 'special', 'hardmirror', 'riders', 'crew', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'input', 'input_noair', 'brand'].filter((f) => on.has(f));
       const files = {}, recs = {}, secs = {};
       const origs = {}, orig = async (p) => origs[p] || (origs[p] = await d.readFile(p));
       const buf = async (p) => { if (!files[p]) files[p] = (await orig(p)).slice(); return files[p]; };
@@ -279,6 +388,7 @@
         }
         else if (op[0] === 'rec') recs[op[1]] = [op[2], op[3]];
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
+        else if (op[0] === 'face') { const m = d.files[op[2]]; log('portraits…'); await d.faceOp(await buf(op[1]), (k) => d.user(m.lba + k), Math.floor(m.size / 2048), op); }
       }
       log('…');
       const mods = {}, blank = (n) => new Uint8Array(n);

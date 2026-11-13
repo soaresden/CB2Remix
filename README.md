@@ -8,21 +8,21 @@
 
 | | |
 |---|---|
-| **Patchs** | Installe le hack Remix v25 sur le jeu d'origine. |
+| **Patchs** | Installe le hack Remix v26 sur le jeu d'origine. |
 | **Prêt-à-porter** | Repeins les tenues des 7 riders, avec aperçu 3D en course et dans le menu du jeu. |
 | **Atelier** | Dessine, importe (JPG / PNG) ou pars d'un motif d'origine du jeu, et écris ta planche dans ta carte mémoire. |
 | **Musiques** | Écoute la bande-son du jeu et télécharge-la en MP3 ou en WAV. |
 
-## 1. Patchs (Remix v25, à la carte)
+## 1. Patchs (Remix v26, à la carte)
 
 Ouvre le jeu **d'origine** (PAL SCES-00992, `.chd` ou `.bin`), coche les mods que tu veux, puis **Construire et télécharger**.
 
-- **Interrupteurs** : 11 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master, progression dans le jeu, qualifications au choix), avec un aperçu.
+- **Interrupteurs** : 12 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master, progression dans le jeu, qualifications au choix, Jicchi/Nick/Kelly jouables), avec un aperçu.
 - **Préréglages** : *Remix complet*, *100 % à gagner* (toutes les améliorations, mais riders cachés, pistes, planches, Mirror et Hard se gagnent comme dans le jeu d'origine), *Aucun mod*.
 - **Musiques** (européennes ou américaines, avec ton CD US en .chd) et **tenues du Prêt-à-porter** à inclure.
 - **Code de configuration** `CB2-XXXX-XXXX` : il résume tous ces choix. Copie-le ou partage le lien (le code est dans l'adresse), recolle-le plus tard : le même code redonne exactement le même jeu. Il est aussi écrit dans le jeu construit, que le site reconnaît ensuite.
 
-Le patch ne contient que les octets écrits par le Remix et des références vers ton propre disque, jamais de données du jeu. Le même code marche avec le patcheur Batocera et `make_remix.py --config` du dépôt de décompilation.
+Le patch ne contient que les octets écrits par le Remix et des références vers ton propre disque, jamais de données du jeu (les portraits de Jicchi, Nick et Kelly sont décodés de la vidéo de ton disque au moment du patch). Le même code marche avec le patcheur Batocera et `make_remix.py --config` du dépôt de décompilation.
 
 ## 2. Prêt-à-porter (skins)
 
