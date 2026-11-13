@@ -75,7 +75,7 @@
         ramming: ['Chocs en Boarder Cross', 'Fonce dans un adversaire : le plus rapide des deux reste debout.'],
         bam: ['Big Air Master', 'Touches toujours affichées et figures suivantes (NEXT) à droite.'],
         lift: ['Arrivée express en Free Style', 'À l’arrivée, ton temps compte comme d’habitude (classement, records, trophées, donc Snowman) mais sans célébration ni replay : classement, START, résultats avec ton temps, puis X sur RETRY et tu repars aussitôt d’en haut, sans chargement.'],
-        skipq: ['Compétition sans qualifications', 'Chaque manche passe directement au Boarder Cross : pas d’épreuve de figures avant (appuie juste sur START à son écran). Tu pars 4e sur 8, au milieu du départ en handicap.'],
+        skipq: ['Qualifications au choix', 'Sur l’écran « 1st STAGE » : START = jouer les qualifications comme d’habitude, SELECT + START = les passer. Tu pars alors 4e sur 8, au milieu du départ en handicap du Boarder Cross.'],
         progress: ['Progression dans le jeu', 'Maintiens SELECT sur l’écran des modes : riders cachés, Mirror, Hard, Hard + Mirror, pistes, planches SPECIAL, trophées et pourcentage du 100 %, avec pour chaque ligne ce qu’il faut faire (en anglais, comme le jeu). (Le fichier du menu va à la fin du film du générique, coupé de 0,5 s.)'],
       },
       feat: [
@@ -160,7 +160,7 @@
         ramming: ['Boarder Cross ramming', 'Ram an opponent: the faster of the two stays up.'],
         bam: ['Big Air Master', 'Keys always shown and the next tricks (NEXT) on the right.'],
         lift: ['Quick finish in Free Style', 'At the finish your run counts as usual (ranking, records, trophies, so Snowman) but without the celebration and the replay: ranking, START, results with your time, then X on RETRY and you start again from the top at once, no loading.'],
-        skipq: ['Competition without qualifying', 'Each round goes straight to the Boarder Cross: no trick event first (just press START on its screen). You start 4th of 8, in the middle of the handicap start.'],
+        skipq: ['Optional qualifying', 'On the “1st STAGE” screen: START = play the qualifying as usual, SELECT + START = skip it. You then start 4th of 8, in the middle of the Boarder Cross handicap start.'],
         progress: ['In-game progress', 'Hold SELECT on the mode select screen: hidden riders, Mirror, Hard, Hard + Mirror, courses, SPECIAL boards, trophies and 100% percentage, each with what to do. (The menu file moves to the end of the credits movie, cut by 0.5 s.)'],
       },
       feat: [
