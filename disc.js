@@ -366,6 +366,55 @@
         const o = vo(cx, cy + k); clut.forEach((v, i) => { fbd[o + 2 * i] = v & 255; fbd[o + 2 * i + 1] = v >> 8; });
       }
     };
+    // ['crewmenu', lba, archive, fbd, p] (mod crew): menu model of a CPU rider from its ending model (see modular.crew_menu_chunk)
+    d.crewMenuChunk = (archive, fbd, p) => {
+      const dv = new DataView(archive.buffer, archive.byteOffset, archive.length);
+      const n0 = dv.getUint32(4, true), t = archive.subarray(n0 * 4, 4 * dv.getUint32(8, true)), tv = new DataView(t.buffer, t.byteOffset, t.length);
+      const u32 = (o) => tv.getUint32(o, true), n = u32(8), parts = [];
+      for (let i = 0; i < n; i++) {
+        const b = 12 + 28 * i, vt = u32(b), nv = u32(b + 4), nt = u32(b + 8), nn = u32(b + 12), pt = u32(b + 16), np = u32(b + 20);
+        const verts = []; for (let j = 0; j < nv; j++) { const o = 12 + vt + 8 * j; verts.push([tv.getInt16(o, true), tv.getInt16(o + 2, true), tv.getInt16(o + 4, true), tv.getInt16(o + 6, true)]); }
+        const norms = t.slice(12 + nt, 12 + nt + 8 * nn), prims = []; let o = 12 + pt;
+        for (let j = 0; j < np; j++) { const ilen = t[o + 1], w = []; for (let q = 0; q <= ilen; q++) w.push(u32(o + 4 * q)); prims.push(w); o += 4 + 4 * ilen; }
+        if (!prims.some((w) => (w[0] >>> 24) & 4 && ((w[2] >>> 16) & 0x1f) === 5)) parts.push([verts, norms, prims]);
+      }
+      const col = p.col, ncba = (768 >> 4) | (p.cly << 6), out = [];
+      for (const group of p.parts) {
+        const V = [], N = [], P = [];
+        for (const gi of group) {
+          const [verts, norms, prims] = parts[gi], vo = V.length, no = N.reduce((a, x) => a + x.length, 0) / 8;
+          for (const [x, y, z, q] of verts) V.push([x, y + p.yshift, z, q]); N.push(norms);
+          for (const w0 of prims) {
+            const w = w0.slice(), mode = (w[0] >>> 24) & 0xff;
+            for (const [wi, half, kind] of p.idx[mode]) {
+              const sh = 16 * half, val = ((w[wi] >>> sh) & 0xffff) + (kind === 'v' ? vo : no);
+              w[wi] = half ? ((w[wi] & 0xffff) | (val << 16)) >>> 0 : ((w[wi] & 0xffff0000) | val) >>> 0;
+            }
+            if (mode & 4) { w[1] = ((w[1] & 0xffff) | (ncba << 16)) >>> 0; w[2] = ((w[2] & 0xffff) | (((((w[2] >>> 16) & 0xffff) & ~0x1f) | (col >> 6)) << 16)) >>> 0; }
+            P.push(w);
+          }
+        }
+        out.push([V, N, P]);
+      }
+      const hdr = 12 + 28 * out.length, chunks = [], table = []; let len = 0;
+      const push = (u) => { chunks.push(u); len += u.length; };
+      for (const [V, N, P] of out) {
+        const vt = hdr + len, vb = new DataView(new ArrayBuffer(8 * V.length)); V.forEach((v, j) => v.forEach((c, q) => vb.setInt16(8 * j + 2 * q, c, true))); push(new Uint8Array(vb.buffer));
+        const nt = hdr + len; let nn = 0; for (const x of N) { push(x); nn += x.length / 8; }
+        const pt = hdr + len, words = P.flat(), pb = new DataView(new ArrayBuffer(4 * words.length)); words.forEach((w, j) => pb.setUint32(4 * j, w, true)); push(new Uint8Array(pb.buffer));
+        table.push([p.dest + vt, V.length, p.dest + nt, nn, p.dest + pt, P.length, 0]);
+      }
+      const chunk = new Uint8Array(p.size), cv = new DataView(chunk.buffer);
+      cv.setUint32(0, 0x41, true); cv.setUint32(4, 1, true); cv.setUint32(8, out.length, true);
+      table.forEach((e, i) => e.forEach((x, q) => cv.setUint32(12 + 28 * i + 4 * q, x >>> 0, true)));
+      let o = hdr; for (const c of chunks) { chunk.set(c, o); o += c.length; }
+      if (o > p.clut_off) throw new Error('menu model too big');
+      const [px, py, cx, cy] = p.src, vo = (x, y) => 20 + (y * 704 + x - 320) * 2;
+      chunk.set(fbd.subarray(vo(cx, cy), vo(cx, cy) + 512), p.clut_off);
+      for (let y = 0; y < 256; y++) chunk.set(fbd.subarray(vo(px, py + y), vo(px, py + y) + 128), p.img_off + 128 * y);
+      cv.setUint32(p.magic_off, p.magic >>> 0, true);
+      return chunk;
+    };
     // modular Remix (cb2-decomp remix/modular.py): pkg = {exe_crc, exe_size, ops: {feature: [op]}}, feats = ids
     // -> {lba: {sub, data}}. Ops: ['w', file, off, old, new] word, ['b', file, off, hex], ['append', file, hex],
     // ['bs', file, off, [[0, len, src] | [1, hex]]] bytes copied from the original file or new, ['rec', path, lba, size] directory record, ['sec', lba, subhex, [[0, len, addr] | [1, hex]]] whole sector
@@ -399,6 +448,10 @@
         }
         else if (op[0] === 'rec') recs[op[1]] = [op[2], op[3]];
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
+        else if (op[0] === 'crewmenu') { const ch = d.crewMenuChunk(await orig(op[2]), await orig(op[3]), op[4]), nch = Math.ceil(ch.length / 2048);
+          const hx = (u) => Array.from(u, (b) => b.toString(16).padStart(2, '0')).join('');
+          for (let k = 0; k < nch; k++) { const sec = new Uint8Array(2048); sec.set(ch.subarray(k * 2048, Math.min(ch.length, (k + 1) * 2048)));
+            const f = k === nch - 1 ? 0x89 : 0x08; secs[op[1] + k] = [Uint8Array.from([0, 0, f, 0, 0, 0, f, 0]), [[1, hx(sec)]]]; } }
         else if (op[0] === 'face') { const m = d.files[op[2]]; log('portraits…'); await d.faceOp(await buf(op[1]), (k) => d.user(m.lba + k), Math.floor(m.size / 2048), op); }
       }
       log('…');
