@@ -476,6 +476,7 @@
         else if (op[0] === 'rec') recs[op[1]] = [op[2], op[3]];
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
         else if (op[0] === 'icons') d.iconsOp(await buf(op[1]), op);
+        else if (op[0] === 'fcopy') { const sb = await buf(op[1]), db = await buf(op[2]); for (const [so, dO, n] of op[3]) db.set(sb.subarray(so, so + n), dO); }
         else if (op[0] === 'crewmenu') { const ch = d.crewMenuChunk(await orig(op[2]), await orig(op[3]), op[4]), nch = Math.ceil(ch.length / 2048);
           const hx = (u) => Array.from(u, (b) => b.toString(16).padStart(2, '0')).join('');
           for (let k = 0; k < nch; k++) { const sec = new Uint8Array(2048); sec.set(ch.subarray(k * 2048, Math.min(ch.length, (k + 1) * 2048)));
