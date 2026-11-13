@@ -415,6 +415,33 @@
       cv.setUint32(p.magic_off, p.magic >>> 0, true);
       return chunk;
     };
+    // ['icons', fbd, p] (mod crew): 16x16 4-bit heads of the riders from the menu portraits (see modular.icons_op)
+    d.iconsOp = (fbd, op) => {
+      const p = op[2], vo = (x, y) => 20 + (y * 704 + x - 320) * 2, rd = (o) => fbd[o] | (fbd[o + 1] << 8);
+      const [dx, dy] = p.dest, [cx0, cy0] = p.clut;
+      p.src.forEach(([sx, sy, w, h, cx, cy, nc], i) => {
+        const clut = []; for (let j = 0; j < nc; j++) clut.push(rd(vo(cx, cy) + 2 * j));
+        const small = [];
+        for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+          let r = 0, g = 0, b = 0, c = 0, t = 0;
+          for (let yy = Math.floor(y * h / 16); yy < Math.floor((y + 1) * h / 16); yy++) {
+            const row = vo(sx, sy + yy);
+            for (let xx = Math.floor(x * w / 16); xx < Math.floor((x + 1) * w / 16); xx++) {
+              t++; const ci = fbd[row + xx], v = ci < nc ? clut[ci] : 0; if (v === 0) continue;
+              r += (v & 31) << 3; g += ((v >> 5) & 31) << 3; b += ((v >> 10) & 31) << 3; c++; } }
+          small.push(c === 0 || c * 2 < t ? null : [Math.floor(r / c), Math.floor(g / c), Math.floor(b / c)]);
+        }
+        const pal = medianCut(small.filter((q) => q), 15);
+        const idx = small.map((q) => { if (!q) return 0; let best = 0, bd = 1 << 30;
+          pal.forEach((c, j) => { const e = (q[0] - c[0]) ** 2 + (q[1] - c[1]) ** 2 + (q[2] - c[2]) ** 2; if (e < bd) { bd = e; best = j; } }); return best + 1; });
+        for (let y = 0; y < 16; y++) { const o = vo(dx + 4 * i, dy + y); for (let x = 0; x < 16; x += 2) fbd[o + x / 2] = idx[y * 16 + x] | (idx[y * 16 + x + 1] << 4); }
+        const cols = [0, ...pal.map((c) => ((c[0] >> 3) | (c[1] >> 3) << 5 | (c[2] >> 3) << 10) || 0x8000)];
+        const greys = [0, ...pal.map((c) => ((Math.floor(Math.floor((c[0] * 77 + c[1] * 150 + c[2] * 29) / 256) * 5 / 8) >> 3) * 0x421) || 0x8000)];
+        while (cols.length < 16) cols.push(0); while (greys.length < 16) greys.push(0);
+        for (const [row, cl] of [[cy0 + Math.floor(i / 6), cols], [cy0 + 2 + Math.floor(i / 6), greys]]) {
+          const o = vo(cx0 + 16 * (i % 6), row); cl.forEach((v, j) => { fbd[o + 2 * j] = v & 255; fbd[o + 2 * j + 1] = v >> 8; }); }
+      });
+    };
     // modular Remix (cb2-decomp remix/modular.py): pkg = {exe_crc, exe_size, ops: {feature: [op]}}, feats = ids
     // -> {lba: {sub, data}}. Ops: ['w', file, off, old, new] word, ['b', file, off, hex], ['append', file, hex],
     // ['bs', file, off, [[0, len, src] | [1, hex]]] bytes copied from the original file or new, ['rec', path, lba, size] directory record, ['sec', lba, subhex, [[0, len, addr] | [1, hex]]] whole sector
@@ -448,6 +475,7 @@
         }
         else if (op[0] === 'rec') recs[op[1]] = [op[2], op[3]];
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
+        else if (op[0] === 'icons') d.iconsOp(await buf(op[1]), op);
         else if (op[0] === 'crewmenu') { const ch = d.crewMenuChunk(await orig(op[2]), await orig(op[3]), op[4]), nch = Math.ceil(ch.length / 2048);
           const hx = (u) => Array.from(u, (b) => b.toString(16).padStart(2, '0')).join('');
           for (let k = 0; k < nch; k++) { const sec = new Uint8Array(2048); sec.set(ch.subarray(k * 2048, Math.min(ch.length, (k + 1) * 2048)));
