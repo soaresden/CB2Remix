@@ -17,7 +17,7 @@
 
 Ouvre le jeu **d'origine** (PAL SCES-00992, `.chd` ou `.bin`), coche les mods que tu veux, puis **Construire et télécharger**.
 
-- **Interrupteurs** : 12 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master, progression dans le jeu, arrivée express en Free Style, compétition sans qualifications), avec un aperçu.
+- **Interrupteurs** : 11 mods indépendants (tout débloqué, planches SPECIAL partout, Hard + Mirror, Boss/Gray/Snowman en championnat, tenues cachées de Cindy et Irin, stats MAX, figures en l'air, chocs en Boarder Cross, Big Air Master, progression dans le jeu, qualifications au choix), avec un aperçu.
 - **Préréglages** : *Remix complet*, *100 % à gagner* (toutes les améliorations, mais riders cachés, pistes, planches, Mirror et Hard se gagnent comme dans le jeu d'origine), *Aucun mod*.
 - **Musiques** (européennes ou américaines, avec ton CD US en .chd) et **tenues du Prêt-à-porter** à inclure.
 - **Code de configuration** `CB2-XXXX-XXXX` : il résume tous ces choix. Copie-le ou partage le lien (le code est dans l'adresse), recolle-le plus tard : le même code redonne exactement le même jeu. Il est aussi écrit dans le jeu construit, que le site reconnaît ensuite.
