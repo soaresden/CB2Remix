@@ -256,7 +256,8 @@
       const on = new Set(feats.filter((f) => pkg.ops[f]));
       if (on.has('max') || on.has('air')) on.add('input');
       if (on.has('input') && !on.has('air')) on.add('input_noair');
-      const order = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'input', 'input_noair'].filter((f) => on.has(f));
+      if (on.size && !on.has('riders') && (pkg.ops.brand || []).length) on.add('brand');   // REMIX on the title screen (moved with 'riders')
+      const order = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'input', 'input_noair', 'brand'].filter((f) => on.has(f));
       const files = {}, recs = {}, secs = {};
       const origs = {}, orig = async (p) => origs[p] || (origs[p] = await d.readFile(p));
       const buf = async (p) => { if (!files[p]) files[p] = (await orig(p)).slice(); return files[p]; };
