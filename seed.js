@@ -4,7 +4,7 @@
 // trailing zero bytes dropped, then 1 check byte (crc32 & 255); Crockford base32.
 const Seed = (() => {
   const B32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-  const IDS = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'crew', 'rear', 'news', 'hplive'];
+  const IDS = ['unlock', 'special', 'hardmirror', 'riders', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'crew', 'rear', 'news', 'hplive', 'options'];
   const crc = (u8) => { let c = ~0; for (const x of u8) { c ^= x; for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1)); } return (~c >>> 0) & 255; };
   function encode({ mods = [], usMusic = false, skins = [] }) {
     const m = mods.reduce((a, f) => a | (IDS.includes(f) ? 1 << IDS.indexOf(f) : 0), 0), sk = [0, 0, 0, 0, 0, 0, 0, 0];

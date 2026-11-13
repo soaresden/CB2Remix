@@ -80,6 +80,7 @@
         rear: ['Vue arrière (Rond)', 'En course, maintiens Rond : la caméra passe devant ton rider et regarde derrière lui, pour voir qui te suit. (Le jeu ne dessine que la piste devant toi : au loin derrière, il peut y avoir des trous blancs.)'],
         news: ['Annonces de déblocage', 'De retour au menu après une course, un bandeau qui brille annonce ce que tu viens de gagner : Boss, Gray, Snowman, planche SPECIAL, Mirror, Hard, nouvelles pistes, trophée du Free Style, et les 100 % (CONGRATULATIONS, avec Jicchi, Nick et Kelly si leur mod est coché). Une seule fois, au moment où ça se débloque ; charger une sauvegarde ne déclenche rien.'],
         hplive: ['Notes du half-pipe en direct', 'En half-pipe, les cinq notes des juges (figures, amplitude, réception, rotation, mérite technique) et le total s’affichent en haut à droite pendant le run, sur fond sombre, et montent à chaque figure : les mêmes que sur l’écran de fin.'],
+        options: ['Options dans le jeu', 'Sur l’écran de choix du mode, maintiens R1 : le panneau REMIX OPTIONS s’affiche, et L1 / L2 / R2 activent ou coupent la vue arrière, les notes du half-pipe en direct et les annonces de déblocage. Le réglage est gardé dans ta sauvegarde.'],
         progress: ['Progression dans le jeu', 'Maintiens SELECT sur l’écran des modes : riders cachés, Mirror, Hard, Hard + Mirror, pistes, planches SPECIAL, trophées et pourcentage du 100 %, avec pour chaque ligne ce qu’il faut faire (en anglais, comme le jeu). (Le fichier du menu va à la fin du film du générique, coupé de 0,5 s.)'],
       },
       feat: [
@@ -169,6 +170,7 @@
         rear: ['Rear view (Circle)', 'In a race, hold Circle: the camera moves in front of your rider and looks back, to see who is following. (The game only draws the track ahead of you: far behind, there can be white gaps.)'],
         news: ['Unlock announcements', 'Back in the menu after a race, a shining banner tells what you just won: Boss, Gray, Snowman, SPECIAL board, Mirror, Hard, new courses, Free Style trophy, and the 100 % (CONGRATULATIONS, with Jicchi, Nick and Kelly if their mod is on). Only once, when it unlocks; loading a save does not trigger it.'],
         hplive: ['Live half-pipe marks', 'In the half-pipe, the five judges’ marks (manoeuvres, amplitude, landing, rotation, technical merit) and the total are shown at the top right during the run, on a dark box, and go up with each trick: the same as on the end screen.'],
+        options: ['In-game options', 'On the mode select screen, hold R1: the REMIX OPTIONS panel shows, and L1 / L2 / R2 switch the rear view, the live half-pipe marks and the unlock announcements on or off. The setting is kept in your save.'],
         progress: ['In-game progress', 'Hold SELECT on the mode select screen: hidden riders, Mirror, Hard, Hard + Mirror, courses, SPECIAL boards, trophies and 100% percentage, each with what to do. (The menu file moves to the end of the credits movie, cut by 0.5 s.)'],
       },
       feat: [
