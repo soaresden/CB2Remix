@@ -465,6 +465,7 @@
         else if (op[0] === 'bs') { const b = await buf(op[1]), src = await orig(op[1]); let o = op[2];
           for (const x of op[3]) { const u = x[0] === 0 ? src.subarray(x[2], x[2] + x[1]) : hex(x[1]); b.set(u, o); o += u.length; } }
         else if (op[0] === 'append') { const a = await buf(op[1]), x = hex(op[2]), n = new Uint8Array(a.length + x.length); n.set(a); n.set(x, a.length); files[op[1]] = n; }
+        else if (op[0] === 'padto') { const a = await buf(op[1]); if (a.length < op[2]) { const n = new Uint8Array(op[2]); n.set(a); files[op[1]] = n; } }
         else if (op[0] === 'px4') { // 4-bit image: rectangles of the original copied (transparent index skipped)
           const b = await buf(op[1]), [, , hdr, W, [cx, cy, cw, ch, fill], tr, blits] = op;
           const get = (x, y) => { const v = b[hdr + y * W * 2 + (x >> 1)]; return x & 1 ? v >> 4 : v & 15; };
