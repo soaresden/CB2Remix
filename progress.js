@@ -46,7 +46,7 @@
   // INV: set = on); REAR VIEW and AIR CONTROL have one bit per game mode (v64)
   const INV = (1 << 5) | (1 << 18);
   const TABS = [['COMP', [[22, 'REAR VIEW'], [19, 'SSX STYLE BOOST'], [3, 'AIR CONTROL'], [7, 'RACE RANKING'], [6, 'RACE RADAR LINE'], [17, 'FALLS AS A NUMBER'], [4, 'KNOCK RIDERS DOWN'], [20, 'RETRY ROUND (3 PER CUP)'], [15, 'SKIP QUALIFYING (SELECT)'], [9, 'NEW HARD+MIRROR CUP'], [10, 'BOSS GRAY SNOWMAN IN COMP']]],
-    ['FREE', [[23, 'REAR VIEW'], [21, 'SSX STYLE BOOST'], [17, 'FALLS AS A NUMBER'], [27, 'AIR CONTROL']]], ['AIR', [[13, 'BIG AIR MASTER KEYS SHOWN'], [24, 'REAR VIEW'], [28, 'AIR CONTROL']]],
+    ['FREE', [[23, 'REAR VIEW'], [21, 'SSX STYLE BOOST'], [17, 'FALLS AS A NUMBER'], [27, 'AIR CONTROL']]], ['AIR', [[13, 'BIG AIR MASTER KEYS SHOWN'], [0, 'BIG AIR MASTER JUMP AT MAX'], [24, 'REAR VIEW'], [28, 'AIR CONTROL']]],
     ['PIPE', [[1, 'LIVE HALF-PIPE MARKS'], [25, 'REAR VIEW'], [29, 'AIR CONTROL']]], ['PARK', [[16, 'JICCHI NICK KELLY PARK ICONS'], [26, 'REAR VIEW'], [30, 'AIR CONTROL']]],
     ['GAME', [[11, 'HIDDEN OUTFITS FOR GIRLS'], [12, 'CAN MAX RIDERS AND BOARD'], [8, 'SPECIAL BOARDS ALWAYS'], [14, 'PROGRESS PAGE (MENU)'], [2, 'NOTICE WITH UNLOCK SCREEN'], [5, 'WIDESCREEN 16:9'], [18, 'UNLOCK EVERYTHING']]]];
   const tr = (k, ...a) => { const v = (L[I18N.lang] || L.fr)[k]; return typeof v === 'function' ? v(...a) : v; };
