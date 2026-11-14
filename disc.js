@@ -497,7 +497,7 @@
       const md = files['/MODE_SEL.BIN'];
       if (md && Math.ceil(md.length / 2048) > Math.ceil(d.files['/MODE_SEL.BIN'].size / 2048)) { // in-game progress page: moves to the end of the credits movie (cut)
         const n2 = Math.ceil(md.length / 2048), sm = d.files['/MOVIE/STAFFE.STR'], sn = Math.floor(sm.size / 2048), ml = sm.lba + sn - n2;
-        recs['/MOVIE/STAFFE.STR'] = [sm.lba, (sn - n2) * 2048]; recs['/MODE_SEL.BIN'] = [ml, md.length];
+        recs['/MOVIE/STAFFE.STR'] = [sm.lba, Math.min(recs['/MOVIE/STAFFE.STR'] ? recs['/MOVIE/STAFFE.STR'][1] : sm.size, (sn - n2) * 2048)]; recs['/MODE_SEL.BIN'] = [ml, md.length];
         for (let k = 0; k < n2; k++) { const data = blank(2048); data.set(md.subarray(k * 2048, Math.min(md.length, (k + 1) * 2048)));
           mods[ml + k] = { sub: Uint8Array.from([0, 0, k === n2 - 1 ? 0x89 : 0x08, 0, 0, 0, k === n2 - 1 ? 0x89 : 0x08, 0]), data }; }
         delete files['/MODE_SEL.BIN'];
