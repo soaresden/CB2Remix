@@ -371,7 +371,7 @@
       const r = await d.build(sec, L);
       const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : S.file.slice(p.a, p.b))));
       const base = S.file.name.replace(/\.(chd|bin|img|iso)$/i, '');
-      const name = d.kind === 'bin' ? S.file.name : base + (withRemix ? ' (Remix ' + code.slice(4) + ')' : '') + t('skinsSuffix') + '.chd';
+      const name = d.kind === 'bin' ? S.file.name : base + (withRemix ? ' (Remix v' + window.REMIX_MODS.version + ')' : '') + t('skinsSuffix') + '.chd';
       dl(blob, name); L(t('downloading', name, (blob.size / 1048576).toFixed(0)));
     } catch (e) { L(t('error', e.message)); console.error(e); }
   };
@@ -659,7 +659,7 @@
       const r = withUS ? await d.composeSoundtrack(S.us, mods, US_MUSIC, (x) => st(t('assembling') + ' ' + x)) : await d.build(mods, (x) => st(t('assembling') + ' ' + x));
       const blob = new Blob(r.parts.map((p) => (p instanceof Uint8Array ? p : (p.f ? S.usFile : S.file).slice(p.a, p.b))));
       const base = S.file.name.replace(/\.chd$/i, '').replace(/ \(Remix[^)]*\)$/, '');
-      const name = d.kind === 'bin' ? S.file.name : base + (isUS ? ' (Remix US).chd' : ' (Remix ' + code.slice(4) + ').chd');
+      const name = d.kind === 'bin' ? S.file.name : base + (isUS ? ' (Remix US v' + window.REMIX_MODS.version + ').chd' : ' (Remix v' + window.REMIX_MODS.version + ').chd');
       dl(blob, name); S.patchedName = name; st(t('patchDone', name) + (isUS ? '' : '\n' + t('cfgCode') + ' : ' + code));
     } catch (e) { st(e.code === 'source' ? t('patchSource') : t('error', e.message)); console.error(e); }
     S.patching = false; $('#patchGo').disabled = false;
