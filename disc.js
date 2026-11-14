@@ -383,8 +383,15 @@
         const V = [], N = [], P = [];
         for (const gi of group) {
           const [verts, norms, prims] = parts[gi], vo = V.length, no = N.reduce((a, x) => a + x.length, 0) / 8;
-          for (const [x, y, z, q] of verts) V.push([x, y + p.yshift, z, q]); N.push(norms);
-          for (const w0 of prims) {
+          let vs = verts, ns = norms;
+          if (p.flip && p.flip.includes(gi)) {   // part turned half a turn around y (Boss's ending head, v57)
+            vs = verts.map(([x, y, z, q]) => [-x, y, -z, q]); ns = norms.slice(); const nv = new DataView(ns.buffer, ns.byteOffset, ns.length);
+            for (let j = 0; j < ns.length; j += 8) for (const q of [0, 4]) nv.setInt16(j + q, -nv.getInt16(j + q, true), true);
+          }
+          for (const [x, y, z, q] of vs) V.push([x, y + p.yshift, z, q]); N.push(ns);
+          const dropE = (p.drop || []).find((e) => e[0] === gi), drop = new Set(dropE ? dropE[1] : []);   // left out (Boss's ending hair, v57)
+          for (const [k, w0] of prims.entries()) {
+            if (drop.has(k)) continue;
             const w = w0.slice(), mode = (w[0] >>> 24) & 0xff;
             for (const [wi, half, kind] of p.idx[mode]) {
               const sh = 16 * half, val = ((w[wi] >>> sh) & 0xffff) + (kind === 'v' ? vo : no);
