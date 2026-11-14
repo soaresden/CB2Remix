@@ -6,7 +6,7 @@
   const COURSES = ['White Resort', 'Sunset Downhill', 'Bear in the Forest', 'Railroad Trip', 'Take It Easy', 'Pipeline Canyon', 'Freezing Point', 'Winding River', 'Snow Ruins', 'Dive into the Cave'];
   const L = {
     fr: {
-      title: 'Ta progression', lead: 'Ouvre ta carte mémoire : la page lit la sauvegarde de Cool Boarders 2 et coche ce que tu as déjà gagné. Rien n’est envoyé. Dans le jeu, avec le mod « Progression dans le jeu » : maintiens SELECT sur l’écran des modes.',
+      title: 'Ta progression', lead: 'Ouvre ta carte mémoire : la page lit la sauvegarde de Cool Boarders 2 et coche ce que tu as déjà gagné. Rien n’est envoyé. Dans le jeu, avec le mod « Progression dans le jeu » : entrée PROGRESS en vert sous REMIX sur l’écran des modes.',
       pick: 'Ouvrir une carte mémoire', where: 'Batocera : /userdata/saves/psx/<nom du jeu>.srm (pcsx_rearmed) ou .mcd (DuckStation). Formats lus : .srm, .mcr, .mcd, .mc, .gme, .vmp, .mcs, .psv.',
       none: 'Pas de sauvegarde Cool Boarders 2 sur cette carte.', bad: 'Sauvegarde trouvée mais illisible.', found: (n, r) => 'Sauvegarde ' + n + ' (' + r + ')',
       riders: 'Riders cachés', modes: 'Modes', boards: 'Planches SPECIAL', trophies: 'Trophées du Free Style', time: 'Temps', trick: 'Figures', total: 'Total',
@@ -24,7 +24,7 @@
       settings: 'Réglages de l’écran REMIX (dans la sauvegarde)', on: 'ON', off: 'OFF',
     },
     en: {
-      title: 'Your progress', lead: 'Open your memory card: the page reads the Cool Boarders 2 save and ticks what you have already earned. Nothing is uploaded. In the game, with the “In-game progress” mod: hold SELECT on the mode select screen.',
+      title: 'Your progress', lead: 'Open your memory card: the page reads the Cool Boarders 2 save and ticks what you have already earned. Nothing is uploaded. In the game, with the “In-game progress” mod: the green PROGRESS entry under REMIX on the mode select screen.',
       pick: 'Open a memory card', where: 'Batocera: /userdata/saves/psx/<game name>.srm (pcsx_rearmed) or .mcd (DuckStation). Formats: .srm, .mcr, .mcd, .mc, .gme, .vmp, .mcs, .psv.',
       none: 'No Cool Boarders 2 save on this card.', bad: 'Save found but unreadable.', found: (n, r) => 'Save ' + n + ' (' + r + ')',
       riders: 'Hidden riders', modes: 'Modes', boards: 'SPECIAL boards', trophies: 'Free Style trophies', time: 'Time', trick: 'Tricks', total: 'Total',
@@ -45,10 +45,10 @@
   // the REMIX screen (cb2-decomp remix/options.py): tabs and their lines, bit of the word 0x80057438 (set = off, except
   // INV: set = on); REAR VIEW and AIR CONTROL have one bit per game mode (v64)
   const INV = (1 << 5) | (1 << 18);
-  const TABS = [['COMP', [[22, 'REAR VIEW'], [19, 'SSX STYLE BOOST'], [20, 'RETRY ROUND (3 PER CUP)'], [15, 'SKIP QUALIFYING (SELECT)'], [6, 'RACE RADAR LINE'], [7, 'RACE RANKING'], [17, 'FALLS AS A NUMBER'], [3, 'AIR CONTROL'], [4, 'MAKE RIDERS FALL AGAINST THEM'], [9, 'NEW HARD+MIRROR CUP'], [10, 'BOSS GRAY SNOWMAN IN COMP']]],
+  const TABS = [['COMP', [[22, 'REAR VIEW'], [19, 'SSX STYLE BOOST'], [3, 'AIR CONTROL'], [7, 'RACE RANKING'], [6, 'RACE RADAR LINE'], [17, 'FALLS AS A NUMBER'], [4, 'KNOCK RIDERS DOWN'], [20, 'RETRY ROUND (3 PER CUP)'], [15, 'SKIP QUALIFYING (SELECT)'], [9, 'NEW HARD+MIRROR CUP'], [10, 'BOSS GRAY SNOWMAN IN COMP']]],
     ['FREE', [[23, 'REAR VIEW'], [21, 'SSX STYLE BOOST'], [27, 'AIR CONTROL']]], ['AIR', [[13, 'BIG AIR MASTER KEYS SHOWN'], [24, 'REAR VIEW'], [28, 'AIR CONTROL']]],
     ['PIPE', [[1, 'LIVE HALF-PIPE MARKS'], [25, 'REAR VIEW'], [29, 'AIR CONTROL']]], ['PARK', [[16, 'JICCHI NICK KELLY PARK ICONS'], [26, 'REAR VIEW'], [30, 'AIR CONTROL']]],
-    ['GAME', [[11, 'HIDDEN OUTFITS FOR GIRLS'], [12, 'CAN MAX RIDERS AND BOARD'], [8, 'SPECIAL BOARDS ALWAYS'], [14, 'PROGRESS PAGE (SELECT)'], [2, 'NOTICE WITH UNLOCK SCREEN'], [5, 'WIDESCREEN 16:9'], [18, 'UNLOCK EVERYTHING']]]];
+    ['GAME', [[11, 'HIDDEN OUTFITS FOR GIRLS'], [12, 'CAN MAX RIDERS AND BOARD'], [8, 'SPECIAL BOARDS ALWAYS'], [14, 'PROGRESS PAGE (MENU)'], [2, 'NOTICE WITH UNLOCK SCREEN'], [5, 'WIDESCREEN 16:9'], [18, 'UNLOCK EVERYTHING']]]];
   const tr = (k, ...a) => { const v = (L[I18N.lang] || L.fr)[k]; return typeof v === 'function' ? v(...a) : v; };
   // ---- memory card formats -> {name, block (8 KB)}
   function findSave(u8) {
