@@ -176,6 +176,37 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
 @media (max-width:960px){#work{grid-template-columns:1fr;height:auto}#view canvas{height:380px}#bwork{grid-template-columns:1fr}}
 @media (max-width:760px){.hero-in{grid-template-columns:1fr;padding-bottom:130px}.tabs{grid-template-columns:1fr}#patch .feat{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#snow{display:none}}
+/* showcase: what the Remix adds */
+.show{margin:-96px 0 10px;position:relative;z-index:3}
+.show-h{margin:0 0 4px;font:400 clamp(1.5rem,3.4vw,2.2rem)/1.1 var(--display);letter-spacing:.02em}
+.show-h span{color:var(--acc)}
+.show-lead{margin:0 0 16px;color:#c9daec;max-width:70ch}
+.show-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.sc{position:relative;display:flex;flex-direction:column;margin:0;border-radius:16px;overflow:hidden;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.35);transition:transform .25s ease,box-shadow .25s ease,border-color .25s}
+.sc:hover{transform:translateY(-4px) rotate(-.4deg);border-color:var(--acc);box-shadow:0 22px 44px rgba(0,0,0,.45),0 0 0 1px var(--acc)}
+.sc .shot{position:relative;margin:0;aspect-ratio:4/3;background:#000;overflow:hidden}
+.sc .shot img{display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;transition:transform .6s ease}
+.sc:hover .shot img{transform:scale(1.04)}
+.sc .shot::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px),linear-gradient(180deg,transparent 55%,rgba(11,23,40,.85))}
+.sc .badge{position:absolute;top:10px;left:10px;z-index:2;padding:3px 10px;border-radius:999px;background:var(--acc);color:#140a02;font:400 .78rem var(--display);letter-spacing:.06em;box-shadow:0 4px 14px rgba(255,122,26,.45)}
+.sc .badge.ice{background:var(--ice);box-shadow:0 4px 14px rgba(143,211,255,.4)}
+.sc .txt{padding:12px 14px 14px}
+.sc h3{margin:0 0 4px;font:400 1.02rem/1.15 var(--display);letter-spacing:.02em;color:var(--snow)}
+.sc p{margin:0;color:var(--mut);font-size:.9rem}
+.sc.big{grid-column:span 2;grid-row:span 2}
+.sc.big .shot{flex:1;aspect-ratio:auto;min-height:240px}
+.sc.big h3{font-size:1.5rem} .sc.big p{font-size:1rem;color:#c9daec}
+.sc .keys{display:inline-flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.sc .keys kbd{font:800 .8rem var(--body);padding:2px 8px;border-radius:6px;background:rgba(244,251,255,.1);border:1px solid var(--line2);color:var(--snow)}
+@media (max-width:960px){.show-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.show-grid{grid-template-columns:minmax(0,1fr)}.sc.big{grid-column:auto;grid-row:auto}.sc.big .shot{flex:none;aspect-ratio:4/3;min-height:0}.show{margin-top:-80px}}
+/* hero screen: a slideshow of the Remix */
+.tv .slides{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#000}
+.tv .slides img{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;opacity:0;animation:slide 24s infinite}
+.tv .slides img:nth-child(1){animation-delay:0s}.tv .slides img:nth-child(2){animation-delay:4s}.tv .slides img:nth-child(3){animation-delay:8s}
+.tv .slides img:nth-child(4){animation-delay:12s}.tv .slides img:nth-child(5){animation-delay:16s}.tv .slides img:nth-child(6){animation-delay:20s}
+@keyframes slide{0%{opacity:0}3%{opacity:1}16.6%{opacity:1}20%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.tv .slides img{animation:none}.tv .slides img:first-child{opacity:1}}
 </style>
 </head>
 <body>
@@ -190,7 +221,7 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
         <p class="lead" data-i18n="heroLead"></p>
         <ul class="chips"><li data-i18n="chip1"></li><li data-i18n="chip2"></li><li data-i18n="chip3"></li></ul>
       </div>
-      <figure class="tv" style="margin:0"><img src="screens/race.png" alt="" width="320" height="240"><figcaption data-i18n="heroCap"></figcaption></figure>
+      <figure class="tv" style="margin:0"><div class="slides"><img src="screens/feat_title.png" alt="" width="320" height="240"><img src="screens/feat_boost.png" alt="" width="320" height="240"><img src="screens/mod_crew.png" alt="" width="320" height="240"><img src="screens/mod_radar.png" alt="" width="320" height="240"><img src="screens/feat_menu.png" alt="" width="320" height="240"><img src="screens/mod_riders.png" alt="" width="320" height="240"></div><figcaption data-i18n="heroCap"></figcaption></figure>
     </div>
   </div>
   <svg class="mountains" viewBox="0 0 1440 170" preserveAspectRatio="none" aria-hidden="true">
@@ -201,6 +232,21 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
   </svg>
 </div>
 <main class="wrap">
+  <section class="show" id="news">
+    <h2 class="show-h" data-i18n-html="showTitle"></h2>
+    <p class="show-lead" data-i18n="showLead"></p>
+    <div class="show-grid">
+      <article class="sc big"><figure class="shot"><span class="badge" data-i18n="badgeNew"></span><img src="screens/feat_boost.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f1t"></h3><p data-i18n-html="f1d"></p></div></article>
+      <article class="sc"><figure class="shot"><span class="badge" data-i18n="badgeNew"></span><img src="screens/mod_crew.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f2t"></h3><p data-i18n-html="f2d"></p></div></article>
+      <article class="sc"><figure class="shot"><img src="screens/feat_snowman.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f3t"></h3><p data-i18n-html="f3d"></p></div></article>
+      <article class="sc"><figure class="shot"><img src="screens/mod_radar.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f4t"></h3><p data-i18n-html="f4d"></p></div></article>
+      <article class="sc"><figure class="shot"><span class="badge" data-i18n="badgeNew"></span><img src="screens/mod_options.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f5t"></h3><p data-i18n-html="f5d"></p></div></article>
+      <article class="sc"><figure class="shot"><img src="screens/feat_rear.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f6t"></h3><p data-i18n-html="f6d"></p></div></article>
+      <article class="sc"><figure class="shot"><img src="screens/mod_hplive.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f7t"></h3><p data-i18n-html="f7d"></p></div></article>
+      <article class="sc"><figure class="shot"><img src="screens/mod_outfits.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f8t"></h3><p data-i18n-html="f8d"></p></div></article>
+      <article class="sc"><figure class="shot"><img src="screens/mod_hardmirror.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f9t"></h3><p data-i18n-html="f9d"></p></div></article>
+    </div>
+  </section>
   <section class="step" id="open">
     <h2><span class="num">1</span><span data-i18n="openTitle"></span></h2>
     <p class="mut" data-i18n-html="openText"></p>
