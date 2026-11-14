@@ -20,6 +20,8 @@
       trophyHelp: 'Un trophée = battre le record officiel de la piste (affiché en bas à gauche) en Free Style.',
       outfits: 'Les tenues cachées de Cindy et Irin ne se gagnent pas : dans le jeu d’origine c’est un code (avec le mod « Tenues cachées », elles sont toujours là).',
       remixNote: 'Avec le mod « Tout débloqué », une nouvelle sauvegarde a déjà riders, modes et planches : seuls les trophées restent à gagner.',
+      remix: 'Remix', crew: ['Jicchi, Nick et Kelly', 'Les 5 lettres R-E-M-I-X ramassées en une descente du Board Park (ou UNLOCK EVERYTHING).'],
+      settings: 'Réglages de l’écran REMIX (dans la sauvegarde)', on: 'ON', off: 'OFF',
     },
     en: {
       title: 'Your progress', lead: 'Open your memory card: the page reads the Cool Boarders 2 save and ticks what you have already earned. Nothing is uploaded. In the game, with the “In-game progress” mod: hold SELECT on the mode select screen.',
@@ -36,8 +38,17 @@
       trophyHelp: 'A trophy = beat the course’s official record (shown bottom left) in Free Style.',
       outfits: 'Cindy and Irin’s hidden outfits are not earned: in the original game they come from a code (with the “hidden outfits” mod they are always there).',
       remixNote: 'With the “Everything unlocked” mod, a new save already has riders, modes and boards: only the trophies are left to earn.',
+      remix: 'Remix', crew: ['Jicchi, Nick and Kelly', 'The 5 letters R-E-M-I-X grabbed in one Board Park run (or UNLOCK EVERYTHING).'],
+      settings: 'REMIX screen settings (in the save)', on: 'ON', off: 'OFF',
     },
   };
+  // the REMIX screen (cb2-decomp remix/options.py): tabs and their lines, bit of the word 0x80057438 (set = off, except
+  // INV: set = on); REAR VIEW and AIR CONTROL have one bit per game mode (v64)
+  const INV = (1 << 5) | (1 << 18);
+  const TABS = [['COMP', [[22, 'REAR VIEW'], [19, 'SSX STYLE BOOST'], [20, 'RETRY ROUND (3 PER CUP)'], [15, 'SKIP QUALIFYING (SELECT)'], [6, 'RACE RADAR LINE'], [7, 'RACE RANKING'], [17, 'FALLS AS A NUMBER'], [3, 'AIR CONTROL'], [4, 'MAKE RIDERS FALL AGAINST THEM'], [9, 'NEW HARD+MIRROR CUP'], [10, 'BOSS GRAY SNOWMAN IN COMP']]],
+    ['FREE', [[23, 'REAR VIEW'], [27, 'AIR CONTROL']]], ['AIR', [[13, 'BIG AIR MASTER KEYS SHOWN'], [24, 'REAR VIEW'], [28, 'AIR CONTROL']]],
+    ['PIPE', [[1, 'LIVE HALF-PIPE MARKS'], [25, 'REAR VIEW'], [29, 'AIR CONTROL']]], ['PARK', [[21, 'PARK ICONS JICCHI NICK KELLY'], [26, 'REAR VIEW'], [30, 'AIR CONTROL']]],
+    ['GAME', [[16, 'JICCHI NICK KELLY PLAYABLE'], [11, 'HIDDEN OUTFITS FOR GIRLS'], [12, 'CAN MAX RIDERS AND BOARD'], [8, 'SPECIAL BOARDS ALWAYS'], [14, 'PROGRESS PAGE (SELECT)'], [2, 'NOTICE WITH UNLOCK SCREEN'], [5, 'WIDESCREEN 16:9'], [18, 'UNLOCK EVERYTHING']]]];
   const tr = (k, ...a) => { const v = (L[I18N.lang] || L.fr)[k]; return typeof v === 'function' ? v(...a) : v; };
   // ---- memory card formats -> {name, block (8 KB)}
   function findSave(u8) {
@@ -57,7 +68,7 @@
     const dv = new DataView(block.buffer, block.byteOffset, block.length);
     if (block[0] !== 0x53 || block[1] !== 0x43 || dv.getUint32(0x21c, true) !== 0x998) return null;
     const v = (a) => dv.getUint16(0x21c + 4 + a - 0x80057434, true);
-    return { riders: v(0x80057440), fcourses: v(0x8005743c), courses: v(0x8005743e), special: v(0x80057442), mirror: v(0x80057444), hard: v(0x80057446), time: v(0x80057448), trick: v(0x8005744a), total: v(0x8005744c) };
+    return { riders: v(0x80057440), fcourses: v(0x8005743c), courses: v(0x8005743e), special: v(0x80057442), mirror: v(0x80057444), hard: v(0x80057446), time: v(0x80057448), trick: v(0x8005744a), total: v(0x8005744c), flags: dv.getUint32(0x21c + 4 + 4, true) };
   }
   function render(st, label) {
     const box = $('#progOut'); box.innerHTML = '';
@@ -83,6 +94,12 @@
     head.innerHTML = '<div class="pbig"></div><div class="pbar"><i></i></div><p class="mut"></p>';
     head.firstChild.textContent = pct + ' %'; head.querySelector('i').style.width = pct + '%'; head.lastChild.textContent = label + ' — ' + n + ' / ' + items.length;
     const o = document.createElement('p'); o.className = 'mut'; o.textContent = tr('outfits') + ' ' + tr('remixNote'); box.appendChild(o);
+    s = sec(tr('remix')); row(s, tr('crew'), st.flags >>> 31, true);
+    const h = document.createElement('h4'); h.textContent = tr('settings'); s.appendChild(h);
+    const t2 = document.createElement('table'); t2.className = 'ptab'; const tb2 = t2.createTBody();
+    TABS.forEach(([tab, lines]) => lines.forEach(([bit, name], i) => { const r = tb2.insertRow(); r.insertCell().textContent = i ? '' : tab; r.insertCell().textContent = name;
+      const on = ((st.flags >>> bit) & 1) ^ (((INV >>> bit) & 1) ? 1 : 0) ? false : true; const c = r.insertCell(); c.textContent = on ? tr('on') : tr('off'); c.className = on ? 'ok' : ''; }));
+    s.appendChild(t2);
   }
   let last = null;
   const show = () => { $('#progTitle').textContent = tr('title'); $('#progLead').textContent = tr('lead'); $('#progPickTxt').textContent = tr('pick'); $('#progWhere').textContent = tr('where');
