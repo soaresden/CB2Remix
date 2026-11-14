@@ -421,8 +421,27 @@
       if (p.pal2) chunk.set(fbd.subarray(vo(cx, cy + 1), vo(cx, cy + 1) + 512), p.clut_off + 512);   // second palette row (v58)
       for (let y = 0; y < 256; y++) chunk.set(fbd.subarray(vo(px, py + y), vo(px, py + y) + 128), p.img_off + 128 * y);
       if (p.copy) { const [su, sv, du, dv, cw, ch] = p.copy, io = p.img_off; for (let y = 0; y < ch; y++) chunk.copyWithin(io + 128 * (dv + y) + du, io + 128 * (sv + y) + su, io + 128 * (sv + y) + su + cw); }
+      if (p.recolor) for (let i = 0; i < 256; i++) cv.setUint16(p.clut2_off + 2 * i, d.recolor(cv.getUint16(p.clut_off + 2 * i, true), p.recolor), true);   // 2nd outfit (v78)
       cv.setUint32(p.magic_off, p.magic >>> 0, true);
       return chunk;
+    };
+    // 2nd outfits of Jicchi / Nick / Kelly (mod crew, v78): see modular.recolor / modular.crew_tex
+    d.recolor = (c, rule) => {
+      if ((c & 0x7fff) === 0) return c;
+      const v = [c & 31, (c >> 5) & 31, (c >> 10) & 31];
+      for (const [a, b, cc, t] of rule.test) if (a * v[0] + b * v[1] + cc * v[2] + t <= 0) return c;
+      const n = rule.mat.map((m) => Math.max(0, Math.min(31, (m[0] * v[0] + m[1] * v[1] + m[2] * v[2]) >> 4)));
+      const x = n[0] | (n[1] << 5) | (n[2] << 10);
+      return (c & 0x8000) | (x || 0x421);
+    };
+    d.crewTex = (enemy1, enemy2, header, p) => {
+      const out = new Uint8Array(20 + 1024 + 256 * 64), c0 = 20 + (p.row - 493) * 512;
+      out.set(header.subarray(0, 20)); out.set(enemy1.subarray(c0, c0 + 1024), 20);
+      const [src, base, w] = p.page === 6 ? [enemy2, 0, 64] : [enemy1, 16 * 512, 192];
+      for (let y = 0; y < 256; y++) { const o = base + 20 + (y * w + (p.du >> 2)) * 2; out.set(src.subarray(o, o + 64), 1044 + 64 * y); }
+      const ov = new DataView(out.buffer);
+      for (let k = 0; k < 32; k++) if (!p.skip.includes(k)) for (let i = 0; i < 16; i++) { const o = 20 + 32 * k + 2 * i; ov.setUint16(o, d.recolor(ov.getUint16(o, true), p.recolor), true); }
+      return out;
     };
     // Cindy's unused ending outfit (mod crew, v58): race model and texture from ENDING/S_CHR/ED_CHRCG.DAT (see modular.cg_*)
     d.cgParts = (archive, dec) => {
@@ -620,8 +639,9 @@
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
         else if (op[0] === 'icons') d.iconsOp(await buf(op[1]), op);
         else if (op[0] === 'fcopy') { const sb = await buf(op[1]), db = await buf(op[2]); for (const [so, dO, n] of op[3]) db.set(sb.subarray(so, so + n), dO); }
-        else if (op[0] === 'crewmenu' || op[0] === 'cgpmd' || op[0] === 'cgfbd') {
+        else if (op[0] === 'crewmenu' || op[0] === 'cgpmd' || op[0] === 'cgfbd' || op[0] === 'crewtex') {
           const ch = op[0] === 'crewmenu' ? d.crewMenuChunk(await orig(op[2]), await orig(op[3]), op[4]) : op[0] === 'cgpmd' ? d.cgPmd(await orig(op[2]), await orig(op[3]), op[4])
+            : op[0] === 'crewtex' ? d.crewTex(await orig(op[2]), await orig(op[3]), await orig(op[4]), op[5])
             : d.cgFbd(await orig(op[2]), await orig(op[3]), await orig(op[4]), op[5]), nch = Math.ceil(ch.length / 2048);
           const hx = (u) => Array.from(u, (b) => b.toString(16).padStart(2, '0')).join('');
           for (let k = 0; k < nch; k++) { const sec = new Uint8Array(2048); sec.set(ch.subarray(k * 2048, Math.min(ch.length, (k + 1) * 2048)));
