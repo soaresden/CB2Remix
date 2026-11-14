@@ -397,7 +397,7 @@
               const sh = 16 * half, val = ((w[wi] >>> sh) & 0xffff) + (kind === 'v' ? vo : no);
               w[wi] = half ? ((w[wi] & 0xffff) | (val << 16)) >>> 0 : ((w[wi] & 0xffff0000) | val) >>> 0;
             }
-            if (mode & 4) { w[1] = ((w[1] & 0xffff) | (ncba << 16)) >>> 0; w[2] = ((w[2] & 0xffff) | (((((w[2] >>> 16) & 0xffff) & ~0x1f) | (col >> 6)) << 16)) >>> 0; }
+            if (mode & 4) { w[1] = ((w[1] & 0xffff) | ((ncba + (p.pal2 && p.pal2.includes(gi) ? 64 : 0)) << 16)) >>> 0; w[2] = ((w[2] & 0xffff) | (((((w[2] >>> 16) & 0xffff) & ~0x1f) | (col >> 6)) << 16)) >>> 0; }
             P.push(w);
           }
         }
@@ -418,9 +418,144 @@
       if (o > p.clut_off) throw new Error('menu model too big');
       const [px, py, cx, cy] = p.src, vo = (x, y) => 20 + (y * 704 + x - 320) * 2;
       chunk.set(fbd.subarray(vo(cx, cy), vo(cx, cy) + 512), p.clut_off);
+      if (p.pal2) chunk.set(fbd.subarray(vo(cx, cy + 1), vo(cx, cy + 1) + 512), p.clut_off + 512);   // second palette row (v58)
       for (let y = 0; y < 256; y++) chunk.set(fbd.subarray(vo(px, py + y), vo(px, py + y) + 128), p.img_off + 128 * y);
+      if (p.copy) { const [su, sv, du, dv, cw, ch] = p.copy, io = p.img_off; for (let y = 0; y < ch; y++) chunk.copyWithin(io + 128 * (dv + y) + du, io + 128 * (sv + y) + su, io + 128 * (sv + y) + su + cw); }
       cv.setUint32(p.magic_off, p.magic >>> 0, true);
       return chunk;
+    };
+    // Cindy's unused ending outfit (mod crew, v58): race model and texture from ENDING/S_CHR/ED_CHRCG.DAT (see modular.cg_*)
+    d.cgParts = (archive, dec) => {
+      const dv = new DataView(archive.buffer, archive.byteOffset, archive.length);
+      const n0 = dv.getUint32(4, true), t = archive.subarray(n0 * 4, 4 * dv.getUint32(8, true)), tv = new DataView(t.buffer, t.byteOffset, t.length);
+      const u32 = (o) => tv.getUint32(o, true), n = u32(8), out = [];
+      for (let i = 0; i < n; i++) {
+        const b = 12 + 28 * i, vt = u32(b), nv = u32(b + 4), pt = u32(b + 16), np = u32(b + 20);
+        const V = []; for (let j = 0; j < nv; j++) { const o = 12 + vt + 8 * j; V.push([tv.getInt16(o, true), tv.getInt16(o + 2, true), tv.getInt16(o + 4, true)]); }
+        let T = []; let o = 12 + pt;
+        for (let j = 0; j < np; j++) {
+          const ilen = t[o + 1], w = []; for (let q = 0; q <= ilen; q++) w.push(u32(o + 4 * q));
+          if ((w[0] >>> 24) === 0x34) T.push([w[4] >>> 16, w[5] >>> 16, w[6] >>> 16, w[1] & 0xffff, w[2] & 0xffff, w[3] & 0xffff]);
+          o += 4 + 4 * ilen;
+        }
+        if (dec) {
+          const rp = V.map((_, k) => k); for (const [u, v] of dec[i]) rp[u] = v;
+          const f = (x) => { while (rp[x] !== x) x = rp[x]; return x; };
+          T = T.map(([a, b2, c, u0, u1, u2]) => [f(a), f(b2), f(c), u0, u1, u2]).filter((x) => x[0] !== x[1] && x[1] !== x[2] && x[0] !== x[2]);
+        }
+        out.push([V, T]);
+      }
+      return out;
+    };
+    d.cgTexels = (uv0, uv1, uv2) => {
+      const P = [uv0, uv1, uv2].map((u) => [(u & 0xff) * 2, (u >>> 8) * 2]), out = [];
+      const [[ax, ay], [bx, by], [cx, cy]] = P, xs = P.map((q) => q[0]), ys = P.map((q) => q[1]);
+      if ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax) === 0) return out;
+      const fl = (a) => Math.floor(a / 2);
+      for (let y = fl(Math.min(...ys)); y <= fl(Math.max(...ys) + 1); y++) for (let x = fl(Math.min(...xs)); x <= fl(Math.max(...xs) + 1); x++) {
+        const px = 2 * x + 1, py = 2 * y + 1;
+        const e0 = (bx - ax) * (py - ay) - (by - ay) * (px - ax), e1 = (cx - bx) * (py - by) - (cy - by) * (px - bx), e2 = (ax - cx) * (py - cy) - (ay - cy) * (px - cx);
+        if ((e0 >= 0 && e1 >= 0 && e2 >= 0) || (e0 <= 0 && e1 <= 0 && e2 <= 0)) if (x >= 0 && x < 128 && y >= 0 && y < 256) out.push([x, y]);
+      }
+      return out;
+    };
+    d.cgLayout = (parts) => {
+      const owner = Array.from({ length: 256 }, () => new Array(128).fill(-1)), up = parts.map((_, k) => k);
+      const find = (a) => { while (up[a] !== a) a = up[a]; return a; };
+      parts.forEach(([V, T], i) => { for (const tr of T) for (const [x, y] of d.cgTexels(tr[3], tr[4], tr[5])) {
+        const o = owner[y][x]; if (o < 0) owner[y][x] = i; else { const a = find(o), b = find(i); if (a !== b) up[Math.max(a, b)] = Math.min(a, b); } } });
+      const roots = [], group = [];
+      parts.forEach((_, i) => { const r = find(i); if (!roots.includes(r)) roots.push(r); group.push(roots.indexOf(r)); });
+      return [owner, group];
+    };
+    const tcmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+    d.cgMedianCut = (hist, n) => {
+      const boxes = [[...hist.entries()].map(([k, v]) => [k.split(',').map(Number), v]).sort((a, b) => tcmp(a[0], b[0]))];
+      while (boxes.length < n) {
+        let best = -1, bi = -1, bc = 0;
+        boxes.forEach((b, k) => { if (b.length < 2) return; for (let c = 0; c < 3; c++) { let mx = -1, mn = 99; for (const e of b) { mx = Math.max(mx, e[0][c]); mn = Math.min(mn, e[0][c]); } if (mx - mn > best) { best = mx - mn; bi = k; bc = c; } } });
+        if (bi < 0) break;
+        const b = boxes[bi].slice().sort((x, y) => x[0][bc] - y[0][bc] || tcmp(x[0], y[0]));
+        const tot = b.reduce((a, e) => a + e[1], 0); let acc = 0, cut = 1;
+        for (let k = 0; k < b.length; k++) { acc += b[k][1]; if (2 * acc >= tot) { cut = Math.min(Math.max(k + 1, 1), b.length - 1); break; } }
+        boxes.splice(bi, 1, b.slice(0, cut), b.slice(cut));
+      }
+      const pal = boxes.map((b) => { const tot = b.reduce((a, e) => a + e[1], 0); return [0, 1, 2].map((c) => Math.floor(b.reduce((a, e) => a + e[0][c] * e[1], 0) / tot)); });
+      while (pal.length < n) pal.push([0, 0, 0]);
+      return pal;
+    };
+    d.cgFbd = (archive, fbd, header, p) => {
+      const parts = d.cgParts(archive, p.dec), [owner, group] = d.cgLayout(parts);
+      const vo = (x, y) => 20 + (y * 704 + x - 320) * 2, [sx, sy, cx, cy] = p.src, pal2 = p.pal2, cp = p.copy;
+      const col = (x, y) => {
+        const i = owner[y][x];
+        if (cp && cp[2] <= x && x < cp[2] + cp[4] && cp[3] <= y && y < cp[3] + cp[5]) { x = x - cp[2] + cp[0]; y = y - cp[3] + cp[1]; }
+        const k = fbd[vo(sx, sy + y) + x], o = vo(cx + k, cy + (pal2.includes(i) ? 1 : 0)), c = fbd[o] | (fbd[o + 1] << 8);
+        return [c & 31, (c >> 5) & 31, (c >> 10) & 31];
+      };
+      const ng = Math.max(...group) + 1, hists = Array.from({ length: ng }, () => new Map());
+      for (let y = 0; y < 256; y++) for (let x = 0; x < 128; x++) { const i = owner[y][x]; if (i >= 0) { const h = hists[group[i]], k = col(x, y).join(','); h.set(k, (h.get(k) || 0) + 1); } }
+      const pals = hists.map((h) => h.size ? d.cgMedianCut(h, 16) : new Array(16).fill([0, 0, 0]));
+      const out = new Uint8Array(20 + 1024 + 128 * 256 / 2); out.set(header.subarray(0, 20)); const ov = new DataView(out.buffer);
+      pals.forEach((pl, g) => pl.forEach(([r, gg, b], k) => { const v = r | (gg << 5) | (b << 10); ov.setUint16(20 + 512 * Math.floor(g / 16) + 2 * (16 * (g % 16) + k), v || 0x8000, true); }));
+      for (let y = 0; y < 256; y++) for (let x = 0; x < 128; x++) {
+        const i = owner[y][x]; if (i < 0) continue;
+        const c = col(x, y), pl = pals[group[i]]; let best = 0, bd = 1 << 30;
+        pl.forEach((q, k) => { const dd = (c[0] - q[0]) ** 2 + (c[1] - q[1]) ** 2 + (c[2] - q[2]) ** 2; if (dd < bd) { bd = dd; best = k; } });
+        out[20 + 1024 + y * 64 + (x >> 1)] |= best << (4 * (x & 1));
+      }
+      return out;
+    };
+    const vcmp = (a, b) => a[0] - b[0] || a[1] - b[1];
+    d.cgQuads = (T) => {
+      const key = (x, y) => { const [a, b] = vcmp(x, y) <= 0 ? [x, y] : [y, x]; return a.join(',') + '|' + b.join(','); };
+      const edge = new Map();
+      T.forEach((t, k) => { const vs = [[t[0], t[3]], [t[1], t[4]], [t[2], t[5]]]; for (let e = 0; e < 3; e++) { const kk = key(vs[e], vs[(e + 1) % 3]); if (!edge.has(kk)) edge.set(kk, []); edge.get(kk).push(k); } });
+      const used = new Array(T.length).fill(false), out = [], same = (a, b) => a[0] === b[0] && a[1] === b[1];
+      T.forEach((t, k) => {
+        if (used[k]) return; used[k] = true; const vs = [[t[0], t[3]], [t[1], t[4]], [t[2], t[5]]]; let done = false;
+        for (let e = 0; e < 3 && !done; e++) {
+          const x = vs[e], y = vs[(e + 1) % 3];
+          for (const j of edge.get(key(x, y))) {
+            if (used[j]) continue; const u = T[j], ws = [[u[0], u[3]], [u[1], u[4]], [u[2], u[5]]];
+            const dd = ws.filter((w) => !same(w, x) && !same(w, y)); if (dd.length !== 1) continue;
+            used[j] = true; done = true; out.push([vs[(e + 2) % 3], x, y, dd[0]]); break;
+          }
+        }
+        if (!done) out.push(vs);
+      });
+      return out;
+    };
+    d.cgPmd = (archive, race, p) => {
+      const parts = d.cgParts(archive, p.dec), [, group] = d.cgLayout(parts), rv = new DataView(race.buffer, race.byteOffset, race.length);
+      const nobj = rv.getUint32(12, true), objs = []; let o = 16;
+      for (let i = 0; i < nobj; i++) { const n = rv.getUint32(o, true), ptr = []; for (let k = 0; k < n; k++) ptr.push(rv.getUint32(o + 4 + 4 * k, true)); objs.push(ptr); o += 4 + 4 * n; }
+      const raw = (q) => { const n = rv.getUint16(q, true), t = rv.getUint16(q + 2, true), [pk, nv] = { 0x12: [0x50, 3], 0x13: [0x68, 4], 0x11: [0x50, 3] }[t]; return race.subarray(q, q + 4 + n * (pk + 8 * nv)); };
+      const words = (ws) => { const b = new Uint8Array(4 * ws.length), v = new DataView(b.buffer); ws.forEach((w, k) => v.setUint32(4 * k, w >>> 0, true)); return b; };
+      const cat = (arr) => { const b = new Uint8Array(arr.reduce((a, x) => a + x.length, 0)); let k = 0; for (const x of arr) { b.set(x, k); k += x.length; } return b; };
+      const blocks = [];
+      for (let ob = 0; ob < nobj; ob++) {
+        const bl = ob === p.board ? objs[ob].filter((q) => rv.getUint16(q + 2, true) !== 0x12).map(raw) : [];
+        const tris = [], quads = []; let nt = 0, nq = 0;
+        parts.forEach(([V, T], i) => {
+          if (p.obj[i] !== ob) return;
+          const m = p.xf[i], W = V.map((v) => [0, 1, 2].map((r) => ((m[3 * r] * v[0] + m[3 * r + 1] * v[1] + m[3 * r + 2] * v[2]) >> 12) + m[9 + r]));
+          const g = group[i], cba = ((493 + Math.floor(g / 16)) << 6) | ((768 + 16 * (g % 16)) >> 4);
+          const vx = (k) => { const b = new Uint8Array(8), v = new DataView(b.buffer); W[k].forEach((c, q) => v.setInt16(2 * q, c, true)); return b; };
+          for (const q of d.cgQuads(T)) {
+            if (q.length === 3) { const [[a, u0], [b2, u1], [c, u2]] = q, pk = words([0x09000000, 0x35808080, 0, (cba << 16) | u0, 0x808080, 0, (9 << 16) | u1, 0x808080, 0, u2]);
+              tris.push(pk, pk, vx(a), vx(b2), vx(c)); nt++; }
+            else { const [[a, u0], [b2, u1], [c, u2], [e, u3]] = q, pk = words([0x0C000000, 0x3D808080, 0, (cba << 16) | u0, 0x808080, 0, (9 << 16) | u1, 0x808080, 0, u2, 0x808080, 0, u3]);
+              quads.push(pk, pk, vx(a), vx(b2), vx(c), vx(e)); nq++; }
+          }
+        });
+        if (nt) bl.push(cat([words([nt | (0x12 << 16)]), ...tris]));
+        if (nq) bl.push(cat([words([nq | (0x13 << 16)]), ...quads]));
+        blocks.push(bl);
+      }
+      const head = 16 + blocks.reduce((a, b) => a + 4 + 4 * b.length, 0), tab = [], body = []; let blen = 0;
+      for (const bl of blocks) { tab.push(bl.length); for (const b of bl) { tab.push(head + blen); body.push(b); blen += b.length; } }
+      return cat([words([0x42, head, 0, nobj]), words(tab), ...body]);
     };
     // ['icons', fbd, p] (mod crew): 16x16 4-bit heads of the riders from the menu portraits (see modular.icons_op)
     d.iconsOp = (fbd, op) => {
@@ -485,7 +620,9 @@
         else if (op[0] === 'sec') secs[op[1]] = [hex(op[2]), op[3]];
         else if (op[0] === 'icons') d.iconsOp(await buf(op[1]), op);
         else if (op[0] === 'fcopy') { const sb = await buf(op[1]), db = await buf(op[2]); for (const [so, dO, n] of op[3]) db.set(sb.subarray(so, so + n), dO); }
-        else if (op[0] === 'crewmenu') { const ch = d.crewMenuChunk(await orig(op[2]), await orig(op[3]), op[4]), nch = Math.ceil(ch.length / 2048);
+        else if (op[0] === 'crewmenu' || op[0] === 'cgpmd' || op[0] === 'cgfbd') {
+          const ch = op[0] === 'crewmenu' ? d.crewMenuChunk(await orig(op[2]), await orig(op[3]), op[4]) : op[0] === 'cgpmd' ? d.cgPmd(await orig(op[2]), await orig(op[3]), op[4])
+            : d.cgFbd(await orig(op[2]), await orig(op[3]), await orig(op[4]), op[5]), nch = Math.ceil(ch.length / 2048);
           const hx = (u) => Array.from(u, (b) => b.toString(16).padStart(2, '0')).join('');
           for (let k = 0; k < nch; k++) { const sec = new Uint8Array(2048); sec.set(ch.subarray(k * 2048, Math.min(ch.length, (k + 1) * 2048)));
             const f = k === nch - 1 ? 0x89 : 0x08; secs[op[1] + k] = [Uint8Array.from([0, 0, f, 0, 0, 0, f, 0]), [[1, hx(sec)]]]; } }
