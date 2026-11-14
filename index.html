@@ -176,30 +176,33 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
 @media (max-width:960px){#work{grid-template-columns:1fr;height:auto}#view canvas{height:380px}#bwork{grid-template-columns:1fr}}
 @media (max-width:760px){.hero-in{grid-template-columns:1fr;padding-bottom:130px}.tabs{grid-template-columns:1fr}#patch .feat{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){#snow{display:none}}
-/* showcase: what the Remix adds */
+/* showcase: one row per feature, a screen and its pitch */
 .show{margin:-96px 0 10px;position:relative;z-index:3}
-.show-h{margin:0 0 4px;font:400 clamp(1.5rem,3.4vw,2.2rem)/1.1 var(--display);letter-spacing:.02em}
+.show-h{margin:0 0 4px;font:400 clamp(1.6rem,3.6vw,2.4rem)/1.1 var(--display);letter-spacing:.02em}
 .show-h span{color:var(--acc)}
-.show-lead{margin:0 0 16px;color:#c9daec;max-width:70ch}
-.show-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.sc{position:relative;display:flex;flex-direction:column;margin:0;border-radius:16px;overflow:hidden;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.35);transition:transform .25s ease,box-shadow .25s ease,border-color .25s}
-.sc:hover{transform:translateY(-4px) rotate(-.4deg);border-color:var(--acc);box-shadow:0 22px 44px rgba(0,0,0,.45),0 0 0 1px var(--acc)}
-.sc .shot{position:relative;margin:0;aspect-ratio:4/3;background:#000;overflow:hidden}
-.sc .shot img{display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;transition:transform .6s ease}
-.sc:hover .shot img{transform:scale(1.04)}
-.sc .shot::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px),linear-gradient(180deg,transparent 55%,rgba(11,23,40,.85))}
-.sc .badge{position:absolute;top:10px;left:10px;z-index:2;padding:3px 10px;border-radius:999px;background:var(--acc);color:#140a02;font:400 .78rem var(--display);letter-spacing:.06em;box-shadow:0 4px 14px rgba(255,122,26,.45)}
-.sc .badge.ice{background:var(--ice);box-shadow:0 4px 14px rgba(143,211,255,.4)}
-.sc .txt{padding:12px 14px 14px}
-.sc h3{margin:0 0 4px;font:400 1.02rem/1.15 var(--display);letter-spacing:.02em;color:var(--snow)}
-.sc p{margin:0;color:var(--mut);font-size:.9rem}
-.sc.big{grid-column:span 2;grid-row:span 2}
-.sc.big .shot{flex:1;aspect-ratio:auto;min-height:240px}
-.sc.big h3{font-size:1.5rem} .sc.big p{font-size:1rem;color:#c9daec}
-.sc .keys{display:inline-flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.sc .keys kbd{font:800 .8rem var(--body);padding:2px 8px;border-radius:6px;background:rgba(244,251,255,.1);border:1px solid var(--line2);color:var(--snow)}
-@media (max-width:960px){.show-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:560px){.show-grid{grid-template-columns:minmax(0,1fr)}.sc.big{grid-column:auto;grid-row:auto}.sc.big .shot{flex:none;aspect-ratio:4/3;min-height:0}.show{margin-top:-80px}}
+.show-lead{margin:0 0 26px;color:#c9daec;max-width:70ch;font-size:1.05rem}
+.fr{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);gap:44px;align-items:center;padding:30px 0;border-top:1px solid var(--line)}
+.fr.rev .scr{order:2}
+.scr{position:relative;margin:0;border-radius:16px;padding:10px;background:linear-gradient(160deg,#27466e,#152a46);box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18);transform:rotate(-1.2deg);transition:transform .35s ease,box-shadow .35s ease}
+.fr.rev .scr{transform:rotate(1.2deg)}
+.fr:hover .scr{transform:rotate(0) scale(1.015);box-shadow:0 28px 70px rgba(0,0,0,.55),0 0 0 2px var(--acc),0 0 40px rgba(255,122,26,.25)}
+.scr img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:9px;image-rendering:pixelated;background:#000}
+.scr::after{content:"";position:absolute;inset:10px;border-radius:9px;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px)}
+.scr .badge{position:absolute;top:-10px;left:18px;z-index:2;padding:4px 12px;border-radius:999px;background:var(--acc);color:#140a02;font:400 .8rem var(--display);letter-spacing:.06em;box-shadow:0 4px 14px rgba(255,122,26,.45)}
+.fk{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-size:.78rem;color:var(--ice)}
+.fk span{font:400 1.05rem var(--display);letter-spacing:0;color:var(--acc)}
+.cp h3{margin:0 0 8px;font:400 clamp(1.35rem,2.6vw,2rem)/1.08 var(--display);letter-spacing:.01em;color:var(--snow);text-wrap:balance}
+.fp{margin:0 0 10px;font-size:1.12rem;font-weight:800;color:var(--acc)}
+.fd{margin:0;color:#c9daec;max-width:60ch}
+.keys{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}
+.keys kbd{font:800 .85rem var(--body);padding:4px 10px;border-radius:8px;background:rgba(244,251,255,.08);border:1px solid var(--line2);border-bottom-width:3px;color:var(--snow)}
+.show-cta{text-align:center;margin:24px 0 6px}
+.cta{display:inline-block;padding:12px 26px;border-radius:999px;background:var(--acc);color:#140a02;font:400 1.05rem var(--display);letter-spacing:.04em;text-decoration:none;box-shadow:0 10px 30px rgba(255,122,26,.35)}
+.cta:hover{filter:brightness(1.08)}
+.cta.ghost{background:rgba(244,251,255,.08);color:var(--snow);border:1px solid var(--line2);box-shadow:none}
+.hero-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+@media (max-width:760px){.fr{grid-template-columns:minmax(0,1fr);gap:18px;padding:24px 0}.fr.rev .scr{order:0}.scr,.fr.rev .scr{transform:none}.show{margin-top:-80px}}
+@media (prefers-reduced-motion:reduce){.scr,.fr.rev .scr,.fr:hover .scr{transform:none;transition:none}}
 /* hero screen: a slideshow of the Remix */
 .tv .slides{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#000}
 .tv .slides img{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:auto;border-radius:0;opacity:0;animation:slide 24s infinite}
@@ -220,6 +223,7 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
         <h1>Cool Boarders 2 <span>Remix</span></h1>
         <p class="lead" data-i18n="heroLead"></p>
         <ul class="chips"><li data-i18n="chip1"></li><li data-i18n="chip2"></li><li data-i18n="chip3"></li></ul>
+        <p class="hero-cta"><a class="cta" href="#open" data-i18n="ctaPatch"></a><a class="cta ghost" href="#news" data-i18n="ctaNews"></a></p>
       </div>
       <figure class="tv" style="margin:0"><div class="slides"><img src="screens/feat_title.png" alt="" width="320" height="240"><img src="screens/feat_boost.png" alt="" width="320" height="240"><img src="screens/mod_crew.png" alt="" width="320" height="240"><img src="screens/mod_radar.png" alt="" width="320" height="240"><img src="screens/feat_menu.png" alt="" width="320" height="240"><img src="screens/mod_riders.png" alt="" width="320" height="240"></div><figcaption data-i18n="heroCap"></figcaption></figure>
     </div>
@@ -235,17 +239,22 @@ select{background:var(--panel2);color:var(--txt);border:1px solid var(--line2);b
   <section class="show" id="news">
     <h2 class="show-h" data-i18n-html="showTitle"></h2>
     <p class="show-lead" data-i18n="showLead"></p>
-    <div class="show-grid">
-      <article class="sc big"><figure class="shot"><span class="badge" data-i18n="badgeNew"></span><img src="screens/feat_boost.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f1t"></h3><p data-i18n-html="f1d"></p></div></article>
-      <article class="sc"><figure class="shot"><span class="badge" data-i18n="badgeNew"></span><img src="screens/mod_crew.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f2t"></h3><p data-i18n-html="f2d"></p></div></article>
-      <article class="sc"><figure class="shot"><img src="screens/feat_snowman.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f3t"></h3><p data-i18n-html="f3d"></p></div></article>
-      <article class="sc"><figure class="shot"><img src="screens/mod_radar.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f4t"></h3><p data-i18n-html="f4d"></p></div></article>
-      <article class="sc"><figure class="shot"><span class="badge" data-i18n="badgeNew"></span><img src="screens/mod_options.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f5t"></h3><p data-i18n-html="f5d"></p></div></article>
-      <article class="sc"><figure class="shot"><img src="screens/feat_rear.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f6t"></h3><p data-i18n-html="f6d"></p></div></article>
-      <article class="sc"><figure class="shot"><img src="screens/mod_hplive.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f7t"></h3><p data-i18n-html="f7d"></p></div></article>
-      <article class="sc"><figure class="shot"><img src="screens/mod_outfits.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f8t"></h3><p data-i18n-html="f8d"></p></div></article>
-      <article class="sc"><figure class="shot"><img src="screens/mod_hardmirror.png" alt="" width="320" height="240" loading="lazy"></figure><div class="txt"><h3 data-i18n="f9t"></h3><p data-i18n-html="f9d"></p></div></article>
-    </div>
+    <article class="fr" id="f-boost"><figure class="scr"><span class="badge" data-i18n="badgeNew"></span><img src="screens/feat_boost.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>01</span><b data-i18n="fk_boost"></b></p><h3 data-i18n="ft_boost"></h3><p class="fp" data-i18n="fp_boost"></p><p class="fd" data-i18n="fd_boost"></p><p class="keys"><kbd>R2</kbd><kbd>L1 / R1 / ▢ / ○ / △</kbd></p></div></article>
+    <article class="fr rev" id="f-crew"><figure class="scr"><span class="badge" data-i18n="badgeNew"></span><img src="screens/mod_crew.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>02</span><b data-i18n="fk_crew"></b></p><h3 data-i18n="ft_crew"></h3><p class="fp" data-i18n="fp_crew"></p><p class="fd" data-i18n="fd_crew"></p></div></article>
+    <article class="fr" id="f-riders"><figure class="scr"><img src="screens/feat_snowman.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>03</span><b data-i18n="fk_riders"></b></p><h3 data-i18n="ft_riders"></h3><p class="fp" data-i18n="fp_riders"></p><p class="fd" data-i18n="fd_riders"></p></div></article>
+    <article class="fr rev" id="f-radar"><figure class="scr"><img src="screens/mod_radar.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>04</span><b data-i18n="fk_radar"></b></p><h3 data-i18n="ft_radar"></h3><p class="fp" data-i18n="fp_radar"></p><p class="fd" data-i18n="fd_radar"></p></div></article>
+    <article class="fr" id="f-falls"><figure class="scr"><img src="screens/feat_falls.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>05</span><b data-i18n="fk_falls"></b></p><h3 data-i18n="ft_falls"></h3><p class="fp" data-i18n="fp_falls"></p><p class="fd" data-i18n="fd_falls"></p></div></article>
+    <article class="fr rev" id="f-remix"><figure class="scr"><span class="badge" data-i18n="badgeNew"></span><img src="screens/mod_options.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>06</span><b data-i18n="fk_remix"></b></p><h3 data-i18n="ft_remix"></h3><p class="fp" data-i18n="fp_remix"></p><p class="fd" data-i18n="fd_remix"></p><p class="keys"><kbd>X</kbd><kbd>← →</kbd><kbd>△</kbd></p></div></article>
+    <article class="fr" id="f-rear"><figure class="scr"><img src="screens/feat_rear.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>07</span><b data-i18n="fk_rear"></b></p><h3 data-i18n="ft_rear"></h3><p class="fp" data-i18n="fp_rear"></p><p class="fd" data-i18n="fd_rear"></p><p class="keys"><kbd>O</kbd></p></div></article>
+    <article class="fr rev" id="f-hplive"><figure class="scr"><img src="screens/mod_hplive.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>08</span><b data-i18n="fk_hplive"></b></p><h3 data-i18n="ft_hplive"></h3><p class="fp" data-i18n="fp_hplive"></p><p class="fd" data-i18n="fd_hplive"></p></div></article>
+    <article class="fr" id="f-outfits"><figure class="scr"><img src="screens/mod_outfits.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>09</span><b data-i18n="fk_outfits"></b></p><h3 data-i18n="ft_outfits"></h3><p class="fp" data-i18n="fp_outfits"></p><p class="fd" data-i18n="fd_outfits"></p></div></article>
+    <article class="fr rev" id="f-max"><figure class="scr"><img src="screens/mod_max.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>10</span><b data-i18n="fk_max"></b></p><h3 data-i18n="ft_max"></h3><p class="fp" data-i18n="fp_max"></p><p class="fd" data-i18n="fd_max"></p></div></article>
+    <article class="fr" id="f-hardmirror"><figure class="scr"><img src="screens/mod_hardmirror.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>11</span><b data-i18n="fk_hardmirror"></b></p><h3 data-i18n="ft_hardmirror"></h3><p class="fp" data-i18n="fp_hardmirror"></p><p class="fd" data-i18n="fd_hardmirror"></p><p class="keys"><kbd>L1 + R1 + X</kbd></p></div></article>
+    <article class="fr rev" id="f-news"><figure class="scr"><img src="screens/mod_news.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>12</span><b data-i18n="fk_news"></b></p><h3 data-i18n="ft_news"></h3><p class="fp" data-i18n="fp_news"></p><p class="fd" data-i18n="fd_news"></p></div></article>
+    <article class="fr" id="f-progress"><figure class="scr"><img src="screens/mod_progress.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>13</span><b data-i18n="fk_progress"></b></p><h3 data-i18n="ft_progress"></h3><p class="fp" data-i18n="fp_progress"></p><p class="fd" data-i18n="fd_progress"></p><p class="keys"><kbd>SELECT</kbd></p></div></article>
+    <article class="fr rev" id="f-skipq"><figure class="scr"><img src="screens/mod_skipq.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>14</span><b data-i18n="fk_skipq"></b></p><h3 data-i18n="ft_skipq"></h3><p class="fp" data-i18n="fp_skipq"></p><p class="fd" data-i18n="fd_skipq"></p><p class="keys"><kbd>SELECT</kbd></p></div></article>
+    <article class="fr" id="f-unlock"><figure class="scr"><img src="screens/mod_unlock.png" alt="" width="320" height="240" loading="lazy"></figure><div class="cp"><p class="fk"><span>15</span><b data-i18n="fk_unlock"></b></p><h3 data-i18n="ft_unlock"></h3><p class="fp" data-i18n="fp_unlock"></p><p class="fd" data-i18n="fd_unlock"></p></div></article>
+    <p class="show-cta"><a class="cta" href="#open" data-i18n="showCta"></a></p>
   </section>
   <section class="step" id="open">
     <h2><span class="num">1</span><span data-i18n="openTitle"></span></h2>
