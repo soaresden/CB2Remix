@@ -614,7 +614,7 @@
       if (on.has('max') || on.has('air')) on.add('input');
       if (on.has('input') && !on.has('air')) on.add('input_noair');
       if (on.size && !on.has('riders') && (pkg.ops.brand || []).length) on.add('brand');   // REMIX on the title screen (moved with 'riders')
-      if (on.has('sign') && on.has('riders') && pkg.ops.sign_r) { on.delete('sign'); on.add('sign_r'); }   // v83: signature, on the moved title files
+      on.delete('sign'); on.delete('sign_r'); if (on.size && pkg.ops.sign) on.add(on.has('riders') ? 'sign_r' : 'sign');   // v84: the title's signature, with any mod (switched in the game)
       const order = ['unlock', 'special', 'hardmirror', 'riders', 'crew', 'outfits', 'max', 'air', 'ramming', 'bam', 'progress', 'lift', 'skipq', 'rear', 'news', 'hplive', 'radar', 'options', 'input', 'input_noair', 'brand', 'sign', 'sign_r'].filter((f) => on.has(f));
       const files = {}, recs = {}, secs = {};
       const origs = {}, orig = async (p) => origs[p] || (origs[p] = await d.readFile(p));
